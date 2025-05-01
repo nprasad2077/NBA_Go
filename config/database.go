@@ -8,7 +8,7 @@ import (
 )
 
 func InitDB() *gorm.DB {
-    db, err := gorm.Open(sqlite.Open("/Users/ravi/code/projects/NBA_Go/data/nba.db"), &gorm.Config{})
+    db, err := gorm.Open(sqlite.Open("/app/data/nba.db"), &gorm.Config{})
     if err != nil {
         log.Fatal("Failed to connect database")
     }

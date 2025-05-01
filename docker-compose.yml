@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  db-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    command: "/nba_go import-data"
+  
+  api1:
+    volumes:
+      - ./data:/app/data
+    build: .
+    ports:
+      - "5001:5000"
+    restart: always
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - api.network
+
+  # Add the same depends_on configuration for api2 and api3
+  api2:
+    volumes:
+      - ./data:/app/data
+    build: .
+    ports:
+      - "5002:5000"
+    restart: always
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - api.network
+
+  api3:
+    volumes:
+      - ./data:/app/data
+    build: .
+    ports:
+      - "5003:5000"
+    restart: always
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - api.network
+
+  # Nginx load balancer
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+      - api3
+    ports:
+      - "8080:8080"
+    networks:
+      - api.network
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - api.network
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - api.network
+
+networks:
+  api.network:
