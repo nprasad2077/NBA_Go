@@ -10,15 +10,15 @@ import (
     "gorm.io/gorm/clause"
 )
 
-func FetchAndStorePlayerStats(db *gorm.DB, season int) error {
-    url := fmt.Sprintf("http://rest.nbaapi.com/api/PlayerDataAdvanced/query?season=%d&sortBy=Points&ascending=false&pageNumber=1&pageSize=20", season)
+func FetchAndStorePlayerAdvancedStats(db *gorm.DB, season int) error {
+    url := fmt.Sprintf("http://rest.nbaapi.com/api/PlayerDataAdvanced/query?season=%d&sortBy=Points&ascending=false&pageNumber=1&pageSize=1000", season)
     
     body, err := utils.GetJSON(url)
     if err != nil {
         return err
     }
 
-    var stats []models.PlayerStat
+    var stats []models.PlayerAdvancedStat
     if err := json.Unmarshal(body, &stats); err != nil {
         return err
     }

@@ -7,12 +7,12 @@ import (
     "github.com/nprasad2077/NBA_Go/models"
 )
 
-func FetchPlayerStats(db *gorm.DB) fiber.Handler {
+func FetchPlayerAdvancedStats(db *gorm.DB) fiber.Handler {
     return func(c *fiber.Ctx) error {
         season := c.QueryInt("season", 2025)
 
         // Call service and assign err here
-        err := services.FetchAndStorePlayerStats(db, season)
+        err := services.FetchAndStorePlayerAdvancedStats(db, season)
         if err != nil {
             return c.Status(500).JSON(fiber.Map{"error": err.Error()})
         }
@@ -37,10 +37,10 @@ func FetchPlayerStats(db *gorm.DB) fiber.Handler {
 // @Param sortBy query string false "Field to sort by (e.g., per, games, winShares)"
 // @Param ascending query bool false "Sort ascending (default false)"
 // @Success 200 {object} map[string]interface{}
-// @Router /api/playerstats [get]
-func GetAllPlayerStats(db *gorm.DB) fiber.Handler {
+// @Router /api/playeradvancedstats [get]
+func GetAllAdvancedPlayerStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var stats []models.PlayerStat
+		var stats []models.PlayerAdvancedStat
 
 		// Filters
 		season := c.QueryInt("season", 0)
@@ -61,7 +61,7 @@ func GetAllPlayerStats(db *gorm.DB) fiber.Handler {
 		}
 
 		// Build query
-		query := db.Model(&models.PlayerStat{})
+		query := db.Model(&models.PlayerAdvancedStat{})
 
 		if season != 0 {
 			query = query.Where("season = ?", season)

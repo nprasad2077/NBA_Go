@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/playerstats": {
+        "/api/playeradvancedstats": {
             "get": {
                 "description": "Returns filtered and paginated player stats",
                 "consumes": [
@@ -80,6 +80,85 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/playertotals": {
+            "get": {
+                "description": "Filter and paginate player totals",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PlayerTotals"
+                ],
+                "summary": "Get player total stats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Season (e.g. 2000)",
+                        "name": "season",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Team abbreviation (e.g. LAL)",
+                        "name": "team",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Player ID (e.g. greenac01)",
+                        "name": "playerId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Field to sort by (e.g. points, assists)",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Sort ascending (default false)",
+                        "name": "ascending",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }

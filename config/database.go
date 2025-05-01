@@ -13,7 +13,8 @@ func InitDB() *gorm.DB {
         log.Fatal("Failed to connect database")
     }
 
-    db.AutoMigrate(&models.PlayerStat{})
+    db.AutoMigrate(&models.PlayerAdvancedStat{})
+    db.AutoMigrate(&models.PlayerTotalStat{})
 
     return db
 }
