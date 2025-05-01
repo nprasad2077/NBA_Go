@@ -5,7 +5,9 @@ import (
     "github.com/gofiber/fiber/v2"
 	"github.com/nprasad2077/NBA_Go/config"
 	"github.com/nprasad2077/NBA_Go/routes" 
-    "github.com/nprasad2077/NBA_Go/services" 
+    "github.com/nprasad2077/NBA_Go/services"
+    _"github.com/nprasad2077/NBA_Go/docs" // swag docs
+	fiberswagger "github.com/swaggo/fiber-swagger"
 )
 
 func main() {
@@ -21,6 +23,11 @@ func main() {
         }
     }()
 
+
+
     routes.RegisterPlayerRoutes(app, db)
+
+    app.Get("/swagger/*", fiberswagger.WrapHandler)
+
     app.Listen(":3001")
 }
