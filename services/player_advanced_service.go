@@ -6,11 +6,13 @@ import (
     "log"
 	"github.com/nprasad2077/NBA_Go/models"
 	"github.com/nprasad2077/NBA_Go/utils"
+    "github.com/nprasad2077/NBA_Go/utils/metrics"
     "gorm.io/gorm"
     "gorm.io/gorm/clause"
 )
 
 func FetchAndStorePlayerAdvancedStats(db *gorm.DB, season int) error {
+    metrics.DBOperationsTotal.WithLabelValues("fetch", "player_advanced").Inc()
     url := fmt.Sprintf("http://rest.nbaapi.com/api/PlayerDataAdvanced/query?season=%d&sortBy=Points&ascending=false&pageNumber=1&pageSize=1000", season)
     
     body, err := utils.GetJSON(url)
@@ -38,6 +40,8 @@ func FetchAndStorePlayerAdvancedStats(db *gorm.DB, season int) error {
                 "win_shares_per", "offensive_box", "defensive_box", "box", "vorp",
             }),
         }).Create(&stat).Error
+        
+        metrics.DBOperationsTotal.WithLabelValues("store", "player_advanced").Inc()
 
         if err != nil {
             log.Printf("Failed to upsert stat for playerId %s (%s): %v", stat.PlayerID, stat.Team, err)
