@@ -1,0 +1,104 @@
+info:
+  contact: {}
+paths:
+  /api/playeradvancedstats:
+    get:
+      consumes:
+      - application/json
+      description: Returns filtered and paginated player stats
+      parameters:
+      - description: Season (e.g., 2025)
+        in: query
+        name: season
+        type: integer
+      - description: Team abbreviation (e.g., MIL)
+        in: query
+        name: team
+        type: string
+      - description: Player ID (e.g., greenaj01)
+        in: query
+        name: playerId
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Field to sort by (e.g., per, games, winShares)
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort ascending (default false)
+        in: query
+        name: ascending
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get player stats
+      tags:
+      - PlayerStats
+  /api/playertotals:
+    get:
+      consumes:
+      - application/json
+      description: Filter and paginate player totals
+      parameters:
+      - description: Season (e.g. 2000)
+        in: query
+        name: season
+        type: integer
+      - description: Team abbreviation (e.g. LAL)
+        in: query
+        name: team
+        type: string
+      - description: Player ID (e.g. greenac01)
+        in: query
+        name: playerId
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Field to sort by (e.g. points, assists)
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort ascending (default false)
+        in: query
+        name: ascending
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get player total stats
+      tags:
+      - PlayerTotals
+swagger: "2.0"
