@@ -91,6 +91,18 @@ func main() {
         log.Printf("player totals Import Success")
     }()
 
+	go func() {
+        for season := 2023; season <= 2024; season++ {
+            if err := services.FetchAndStorePlayerTotalPlayoffsStats(db, season, true); err != nil {
+                log.Printf("Fetch failed for player totals Playoffs season %d: %v\n", season, err)
+            } else {
+                log.Printf("Fetch successful for player totals Playoffs season %d\n", season)
+            }
+            time.Sleep(1500 * time.Millisecond) // optional delay
+        }
+        log.Printf("player totals Playoffs Import Success")
+    }()
+
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
 		if err := app.Listen(":5000"); err != nil && !errors.Is(err, http.ErrServerClosed) {
