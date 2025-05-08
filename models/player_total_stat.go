@@ -36,4 +36,5 @@ type PlayerTotalStat struct {
 	Points          int     `json:"points"`
 	Team            string  `gorm:"not null;uniqueIndex:idx_total_player_season_team" json:"team"`
 	Season          int     `gorm:"not null;uniqueIndex:idx_total_player_season_team" json:"season"`
+	IsPlayoff		bool	`gorm:"not null;default:false;uniqueIndex:idx_total_player_season_team" json:"isPlayoff"`
 }

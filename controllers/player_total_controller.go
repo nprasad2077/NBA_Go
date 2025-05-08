@@ -5,6 +5,7 @@
 // @Accept  json
 // @Produce  json
 // @Param season query int false "Season (e.g. 2000)"
+// @Param isPlayoff query bool false "Whether the stats are for playoffs"
 // @Success 200 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /api/playertotals/fetch [get]
@@ -21,8 +22,9 @@ import (
 func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		season := c.QueryInt("season", 2025)
+		isPlayoff := c.QueryBool("isPlayoff", false)
 
-		err := services.FetchAndStorePlayerTotalStats(db, season)
+		err := services.FetchAndStorePlayerTotalStats(db, season, isPlayoff)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 		}
@@ -46,6 +48,7 @@ func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
 // @Param pageSize query int false "Page size" default(20)
 // @Param sortBy query string false "Field to sort by (e.g. points, assists)"
 // @Param ascending query bool false "Sort ascending (default false)"
+// @Param isPlayoff query bool false "Whether the stats are for playoffs"
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]string
 // @Router /api/playertotals [get]
@@ -76,6 +79,12 @@ func GetPlayerTotalStats(db *gorm.DB) fiber.Handler {
 		}
 		if playerId != "" {
 			query = query.Where("player_id = ?", playerId)
+		}
+
+		isPlayoffStr := c.Query("isPlayoff")
+		if isPlayoffStr != "" {
+			isPlayoff := c.QueryBool("isPlayoff", false)
+			query = query.Where("is_playoff = ?", isPlayoff)
 		}
 
 		var total int64

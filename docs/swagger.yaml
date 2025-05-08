@@ -90,6 +90,10 @@ paths:
         in: query
         name: ascending
         type: boolean
+      - description: Whether the stats are for playoffs
+        in: query
+        name: isPlayoff
+        type: boolean
       produces:
       - application/json
       responses:

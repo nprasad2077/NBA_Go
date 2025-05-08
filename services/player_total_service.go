@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func FetchAndStorePlayerTotalStats(db *gorm.DB, season int) error {
+func FetchAndStorePlayerTotalStats(db *gorm.DB, season int, isPlayoff bool) error {
 	url := fmt.Sprintf(
 		"http://rest.nbaapi.com/api/PlayerDataTotals/query?season=%d&sortBy=PlayerName&ascending=true&pageNumber=1&pageSize=1000",
 		season,
@@ -29,9 +29,10 @@ func FetchAndStorePlayerTotalStats(db *gorm.DB, season int) error {
 
 	for _, stat := range stats {
 		stat.Season = season
+		stat.IsPlayoff = isPlayoff
 
 		err := db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "player_id"}, {Name: "season"}, {Name: "team"}},
+			Columns:   []clause.Column{{Name: "player_id"}, {Name: "season"}, {Name: "team"}, {Name: "is_playoff"}},
 			DoUpdates: clause.AssignmentColumns([]string{
 				"player_name", "position", "age", "games", "games_started",
 				"minutes_pg", "field_goals", "field_attempts", "field_percent",

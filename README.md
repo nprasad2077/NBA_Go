@@ -15,3 +15,11 @@ curl -XPOST http://localhost:8080/admin/keys \
 # 3. call a protected endpoint
 curl http://localhost:8080/api/playeradvancedstats \
      -H "X-API-Key: ab12cd…"
+
+```
+
+### Swagger Initiate Docs
+
+```bash
+swag init -g main.go -o docs
+```

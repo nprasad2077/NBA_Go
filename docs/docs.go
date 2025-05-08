@@ -152,6 +152,12 @@ const docTemplate = `{
                         "description": "Sort ascending (default false)",
                         "name": "ascending",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether the stats are for playoffs",
+                        "name": "isPlayoff",
+                        "in": "query"
                     }
                 ],
                 "responses": {
