@@ -1,3 +1,12 @@
+// @title       NBA_Go API
+// @version     1.0
+// @description Stats service with API-key auth
+// @schemes     http https
+// @BasePath    /
+//
+// @securityDefinitions.apikey ApiKeyAuth
+// @in   header
+// @name X-API-Key
 package main
 
 import (
@@ -13,7 +22,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/nprasad2077/NBA_Go/config"
-    "github.com/nprasad2077/NBA_Go/services"
+    // "github.com/nprasad2077/NBA_Go/services"
 	"github.com/nprasad2077/NBA_Go/controllers"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/middleware"
@@ -58,29 +67,29 @@ func main() {
 	routes.RegisterPlayerTotalRoutes(app, db)
 
 	/* ---------- Optional import job ---------- */
-	go func() {
-        for season := 2023; season <= 2025; season++ {
-            if err := services.FetchAndStorePlayerAdvancedStats(db, season); err != nil {
-                log.Printf("Fetch failed for player advanced season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player advanced season %d\n", season)
-            }
-            time.Sleep(1100 * time.Millisecond) // optional delay
-        }
-        log.Printf("player advanced Import Success")
-    }()
+	// go func() {
+    //     for season := 2023; season <= 2025; season++ {
+    //         if err := services.FetchAndStorePlayerAdvancedStats(db, season); err != nil {
+    //             log.Printf("Fetch failed for player advanced season %d: %v\n", season, err)
+    //         } else {
+    //             log.Printf("Fetch successful for player advanced season %d\n", season)
+    //         }
+    //         time.Sleep(1100 * time.Millisecond) // optional delay
+    //     }
+    //     log.Printf("player advanced Import Success")
+    // }()
 
-    go func() {
-        for season := 2023; season <= 2025; season++ {
-            if err := services.FetchAndStorePlayerTotalStats(db, season); err != nil {
-                log.Printf("Fetch failed for player totals season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player totals season %d\n", season)
-            }
-            time.Sleep(1000 * time.Millisecond) // optional delay
-        }
-        log.Printf("player totals Import Success")
-    }()
+    // go func() {
+    //     for season := 2023; season <= 2025; season++ {
+    //         if err := services.FetchAndStorePlayerTotalStats(db, season); err != nil {
+    //             log.Printf("Fetch failed for player totals season %d: %v\n", season, err)
+    //         } else {
+    //             log.Printf("Fetch successful for player totals season %d\n", season)
+    //         }
+    //         time.Sleep(1000 * time.Millisecond) // optional delay
+    //     }
+    //     log.Printf("player totals Import Success")
+    // }()
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {

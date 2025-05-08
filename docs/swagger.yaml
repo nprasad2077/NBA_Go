@@ -1,5 +1,9 @@
+basePath: /
 info:
   contact: {}
+  description: Stats service with API-key auth
+  title: NBA_Go API
+  version: "1.0"
 paths:
   /api/playeradvancedstats:
     get:
@@ -105,4 +109,12 @@ paths:
       summary: Get player total stats
       tags:
       - PlayerTotals
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-Key
+    type: apiKey
 swagger: "2.0"
