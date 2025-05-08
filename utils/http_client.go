@@ -1,16 +1,21 @@
 package utils
 
 import (
+	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 )
 
 func GetJSON(url string) ([]byte, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	resp, err := client.Get(url)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +25,7 @@ func GetJSON(url string) ([]byte, error) {
 		return nil, errors.New("received non-200 response: " + resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

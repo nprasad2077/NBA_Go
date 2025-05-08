@@ -1,52 +1,79 @@
+// main_test.go
 package main
 
 import (
 	"io"
 	"net/http"
 	"testing"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+
+	"github.com/nprasad2077/NBA_Go/models"
 	"github.com/nprasad2077/NBA_Go/routes"
-	"github.com/nprasad2077/NBA_Go/config"
+	"github.com/nprasad2077/NBA_Go/utils/security"
 )
 
-func setupTestApp() *fiber.App {
+// -----------------------------------------------------------------------------
+// test bootstrap
+// -----------------------------------------------------------------------------
+func setupTestApp() (*fiber.App, string) {
 	app := fiber.New()
-	db := config.InitDB() // uses SQLite file; can be mocked or in-memory for advanced testing
+
+	// in‑memory SQLite so tests don’t touch real file
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	_ = db.AutoMigrate(&models.PlayerAdvancedStat{}, &models.APIKey{})
+
+	// seed one API key we can use in the requests
+	rawKey := "testkey123"
+	db.Create(&models.APIKey{Hash: security.HashKey(rawKey)})
+
+	// register only the routes we need
 	routes.RegisterPlayerAdvancedRoutes(app, db)
-	return app
+
+	return app, rawKey
 }
 
+// -----------------------------------------------------------------------------
+// actual test
+// -----------------------------------------------------------------------------
 func TestGetPlayerAdvancedStats(t *testing.T) {
-	app := setupTestApp()
+	app, key := setupTestApp()
 
 	tests := []struct {
-		description   string
+		name          string
 		route         string
-		expectedCode  int
-		expectInBody  string
+		wantCode      int
+		wantSubstring string
 	}{
 		{
-			description:  "valid route",
-			route:        "/api/playeradvancedstats",
-			expectedCode: 200,
-			expectInBody: `"data"`, // assuming a JSON object with "data"
+			name:          "valid route",
+			route:         "/api/playeradvancedstats/",
+			wantCode:      200,
+			wantSubstring: `"data"`, // expect JSON payload has "data"
 		},
 		{
-			description:  "invalid route",
-			route:        "/api/invalid",
-			expectedCode: 404,
-			expectInBody: "Cannot GET /api/invalid",
+			name:          "invalid route",
+			route:         "/api/invalid",
+			wantCode:      404,
+			wantSubstring: "Cannot GET /api/invalid",
 		},
 	}
 
 	for _, tc := range tests {
-		req, _ := http.NewRequest("GET", tc.route, nil)
+		req, _ := http.NewRequest(http.MethodGet, tc.route, nil)
+		req.Header.Set("X-API-Key", key)
+
 		resp, err := app.Test(req, -1)
-		assert.Nil(t, err, tc.description)
-		assert.Equal(t, tc.expectedCode, resp.StatusCode, tc.description)
+		assert.NoError(t, err, tc.name)
+		assert.Equal(t, tc.wantCode, resp.StatusCode, tc.name)
 
 		body, _ := io.ReadAll(resp.Body)
-		assert.Contains(t, string(body), tc.expectInBody, tc.description)
+		assert.Contains(t, string(body), tc.wantSubstring, tc.name)
 	}
 }

@@ -45,6 +45,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get player stats
       tags:
       - PlayerStats
@@ -98,6 +100,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get player total stats
       tags:
       - PlayerTotals

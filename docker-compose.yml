@@ -10,6 +10,7 @@ services:
     networks:
       - api.network
   api1:
+    env_file: .env
     volumes:
       - './data:/app/data'
     build: .
@@ -22,6 +23,7 @@ services:
     networks:
       - api.network
   api2:
+    env_file: .env
     volumes:
       - './data:/app/data'
     build: .
@@ -34,6 +36,7 @@ services:
     networks:
       - api.network
   api3:
+    env_file: .env
     volumes:
       - './data:/app/data'
     build: .

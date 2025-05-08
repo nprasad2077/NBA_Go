@@ -33,6 +33,7 @@ func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
 
 
 // GetPlayerTotalStats godoc
+// @Security ApiKeyAuth 
 // @Summary Get player total stats
 // @Description Filter and paginate player totals
 // @Tags PlayerTotals

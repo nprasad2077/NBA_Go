@@ -24,6 +24,7 @@ func FetchPlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 
 
 // GetAllPlayerStats godoc
+// @Security ApiKeyAuth 
 // @Summary Get player stats
 // @Description Returns filtered and paginated player stats
 // @Tags PlayerStats

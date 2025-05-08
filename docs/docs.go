@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/api/playeradvancedstats": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Returns filtered and paginated player stats",
                 "consumes": [
                     "application/json"
@@ -87,6 +92,11 @@ const docTemplate = `{
         },
         "/api/playertotals": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Filter and paginate player totals",
                 "consumes": [
                     "application/json"
