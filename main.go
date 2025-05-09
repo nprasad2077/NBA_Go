@@ -13,6 +13,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,19 +22,31 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	fiberswagger "github.com/swaggo/fiber-swagger"
+
 	"github.com/nprasad2077/NBA_Go/config"
-    "github.com/nprasad2077/NBA_Go/services"
 	"github.com/nprasad2077/NBA_Go/controllers"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/middleware"
 	_ "github.com/nprasad2077/NBA_Go/docs"
-	fiberswagger "github.com/swaggo/fiber-swagger"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-    "net/http" 
 )
 
 func main() {
-	// graceful shutdown context
+	// ——— One-off import-data mode ———
+	if len(os.Args) > 1 && os.Args[1] == "import-data" {
+		db := config.InitDB()
+		importPlayerAdvanced(db)
+		log.Println("🎉 Player Advanced Import completed successfully")
+		importPlayerTotals(db)
+		log.Println("🎉 Player Totals Import completed successfully")
+		importPlayerPlayoffs(db)
+		log.Println("🎉 Player Totals Playoffs Import completed successfully")
+		log.Println("🎉 Import completed successfully")
+		return
+	}
+
+	// gracefull shutdown context
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -53,55 +66,18 @@ func main() {
 	app.Use(logger.New())
 	app.Use(middleware.MetricsMiddleware())
 
-	// DB
+	// DB connection
 	db := config.InitDB()
 
 	/* ---------- PUBLIC ROUTES (no API key) ---------- */
 	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	app.Get("/swagger/*", fiberswagger.WrapHandler)
-	controllers.RegisterKeyAdminRoutes(app, db) // guarded only by X‑Admin‑Secret
+	controllers.RegisterKeyAdminRoutes(app, db)
 
 	/* ---------- PROTECTED ROUTES ---------- */
 	app.Use(middleware.APIKeyAuth(db))
 	routes.RegisterPlayerAdvancedRoutes(app, db)
 	routes.RegisterPlayerTotalRoutes(app, db)
-
-	/* ---------- Optional import job ---------- */
-	go func() {
-        for season := 2023; season <= 2025; season++ {
-            if err := services.FetchAndStorePlayerAdvancedStats(db, season); err != nil {
-                log.Printf("Fetch failed for player advanced season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player advanced season %d\n", season)
-            }
-            time.Sleep(1100 * time.Millisecond) // optional delay
-        }
-        log.Printf("player advanced Import Success")
-    }()
-
-    go func() {
-        for season := 2023; season <= 2025; season++ {
-            if err := services.FetchAndStorePlayerTotalStats(db, season, false); err != nil {
-                log.Printf("Fetch failed for player totals season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player totals season %d\n", season)
-            }
-            time.Sleep(1000 * time.Millisecond) // optional delay
-        }
-        log.Printf("player totals Import Success")
-    }()
-
-	go func() {
-        for season := 2023; season <= 2024; season++ {
-            if err := services.FetchAndStorePlayerTotalPlayoffsStats(db, season, true); err != nil {
-                log.Printf("Fetch failed for player totals Playoffs season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player totals Playoffs season %d\n", season)
-            }
-            time.Sleep(1500 * time.Millisecond) // optional delay
-        }
-        log.Printf("player totals Playoffs Import Success")
-    }()
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
@@ -110,9 +86,9 @@ func main() {
 		}
 	}()
 
-	<-ctx.Done()           // wait for SIGTERM/CTRL‑C
-	stop()                 // stop receiving more signals
+	<-ctx.Done()
+	stop()
 	log.Println("shutting down…")
-	_ = app.Shutdown()     // stop accepting new conns
+	_ = app.Shutdown()
 	log.Println("bye")
 }

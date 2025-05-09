@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   db-init:
     build:
@@ -6,9 +7,17 @@ services:
       dockerfile: Dockerfile
     volumes:
       - './data:/app/data'
-    command: /nba_go import-data
+    # now invoke your new subcommand
+    command: ["/nba_go", "import-data"]
+    restart: "no"           # so it doesn’t keep trying forever
+    healthcheck:           # optional: mark healthy when the DB file exists
+      test: ["CMD", "test", "-f", "/app/data/nba.db"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - api.network
+
   api1:
     env_file: .env
     volumes:
@@ -19,9 +28,10 @@ services:
     restart: always
     depends_on:
       db-init:
-        condition: service_completed_successfully
+        condition: service_healthy
     networks:
       - api.network
+
   api2:
     env_file: .env
     volumes:
@@ -29,12 +39,9 @@ services:
     build: .
     ports:
       - '5002:5000'
-    restart: always
-    depends_on:
-      db-init:
-        condition: service_completed_successfully
     networks:
       - api.network
+
   api3:
     env_file: .env
     volumes:
@@ -42,12 +49,9 @@ services:
     build: .
     ports:
       - '5003:5000'
-    restart: always
-    depends_on:
-      db-init:
-        condition: service_completed_successfully
     networks:
       - api.network
+
   nginx:
     image: 'nginx:stable'
     volumes:
@@ -60,6 +64,7 @@ services:
       - '8080:8080'
     networks:
       - api.network
+
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
