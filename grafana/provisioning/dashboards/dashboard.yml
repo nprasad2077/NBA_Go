@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'NBA Go Dashboards'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    options:
+      # mount point inside the container
+      path: /var/lib/grafana/dashboards
