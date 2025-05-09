@@ -80,7 +80,24 @@ services:
     networks:
       - api.network
     restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3001:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=testing
+    volumes:
+      - './grafana/provisioning/datasources:/etc/grafana/provisioning/datasources'
+      - './grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards'
+      - './grafana/dashboards:/var/lib/grafana/dashboards'
+      - 'grafana_data:/var/lib/grafana'
+    networks:
+      - api.network
+    restart: unless-stopped
+
 volumes:
   prometheus_data: null
+  grafana_data: null
 networks:
   api.network: null

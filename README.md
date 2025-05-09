@@ -23,3 +23,9 @@ curl http://localhost:8080/api/playeradvancedstats \
 ```bash
 swag init -g main.go -o docs
 ```
+
+### Test
+
+```bash
+go run loadtest.go -n 100 -c 10 -url "http://127.0.0.1:8080/api/playeradvancedstats?page=1&pageSize=20" -log results.log -key "xxx"
+```
