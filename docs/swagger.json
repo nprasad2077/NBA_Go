@@ -1,11 +1,24 @@
 {
+    "schemes": [
+        "http",
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "Stats service with API-key auth",
+        "title": "NBA_Go API",
+        "contact": {},
+        "version": "1.0"
     },
+    "basePath": "/",
     "paths": {
         "/api/playeradvancedstats": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Returns filtered and paginated player stats",
                 "consumes": [
                     "application/json"
@@ -76,6 +89,11 @@
         },
         "/api/playertotals": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Filter and paginate player totals",
                 "consumes": [
                     "application/json"
@@ -131,6 +149,12 @@
                         "description": "Sort ascending (default false)",
                         "name": "ascending",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether the stats are for playoffs",
+                        "name": "isPlayoff",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -152,6 +176,13 @@
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "X-API-Key",
+            "in": "header"
         }
     }
 }

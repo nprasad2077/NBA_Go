@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/api/playeradvancedstats": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Returns filtered and paginated player stats",
                 "consumes": [
                     "application/json"
@@ -87,6 +92,11 @@ const docTemplate = `{
         },
         "/api/playertotals": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Filter and paginate player totals",
                 "consumes": [
                     "application/json"
@@ -142,6 +152,12 @@ const docTemplate = `{
                         "description": "Sort ascending (default false)",
                         "name": "ascending",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether the stats are for playoffs",
+                        "name": "isPlayoff",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -164,17 +180,24 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "X-API-Key",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	BasePath:         "/",
+	Schemes:          []string{"http", "https"},
+	Title:            "NBA_Go API",
+	Description:      "Stats service with API-key auth",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

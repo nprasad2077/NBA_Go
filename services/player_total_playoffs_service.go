@@ -11,9 +11,9 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func FetchAndStorePlayerTotalStats(db *gorm.DB, season int, isPlayoff bool) error {
+func FetchAndStorePlayerTotalPlayoffsStats(db *gorm.DB, season int, isPlayoff bool) error {
 	url := fmt.Sprintf(
-		"http://rest.nbaapi.com/api/PlayerDataTotals/query?season=%d&sortBy=PlayerName&ascending=true&pageNumber=1&pageSize=1000",
+		"http://rest.nbaapi.com/api/PlayerDataTotalsPlayoffs/query?season=%d&sortBy=PlayerName&ascending=true&pageNumber=1&pageSize=1000",
 		season,
 	)
 

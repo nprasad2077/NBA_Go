@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /nba_go main.go
+RUN go build -o /nba_go .
 
 # STEP 2 - final image
 FROM debian:bullseye-slim

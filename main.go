@@ -1,67 +1,94 @@
+// @title       NBA_Go API
+// @version     1.0
+// @description Stats service with API-key auth
+// @schemes     http https
+// @BasePath    /
+//
+// @securityDefinitions.apikey ApiKeyAuth
+// @in   header
+// @name X-API-Key
 package main
 
 import (
-    "log"
-    "time"
-    
-    "github.com/gofiber/fiber/v2"
-    "github.com/gofiber/fiber/v2/middleware/logger"
-    "github.com/gofiber/fiber/v2/middleware/adaptor"
-    "github.com/nprasad2077/NBA_Go/config"
-    "github.com/nprasad2077/NBA_Go/routes"
-    "github.com/nprasad2077/NBA_Go/services"
-    "github.com/nprasad2077/NBA_Go/utils/middleware"
-    _ "github.com/nprasad2077/NBA_Go/docs"
-    fiberswagger "github.com/swaggo/fiber-swagger"
-    "github.com/prometheus/client_golang/prometheus/promhttp"
+	"context"
+	"errors"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	fiberswagger "github.com/swaggo/fiber-swagger"
+
+	"github.com/nprasad2077/NBA_Go/config"
+	"github.com/nprasad2077/NBA_Go/controllers"
+	"github.com/nprasad2077/NBA_Go/routes"
+	"github.com/nprasad2077/NBA_Go/utils/middleware"
+	_ "github.com/nprasad2077/NBA_Go/docs"
 )
 
 func main() {
-    app := fiber.New()
+	// ——— One-off import-data mode ———
+	if len(os.Args) > 1 && os.Args[1] == "import-data" {
+		db := config.InitDB()
+		importPlayerAdvanced(db)
+		log.Println("🎉 Player Advanced Import completed successfully")
+		importPlayerTotals(db)
+		log.Println("🎉 Player Totals Import completed successfully")
+		importPlayerPlayoffs(db)
+		log.Println("🎉 Player Totals Playoffs Import completed successfully")
+		log.Println("🎉 Import completed successfully")
+		return
+	}
 
-    // Add standard logger middleware
-    app.Use(logger.New())
-    
-    // Add metrics middleware
-    app.Use(middleware.MetricsMiddleware())
+	// gracefull shutdown context
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-    // Initialize database
-    db := config.InitDB()
+	app := fiber.New(fiber.Config{
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+			return c.Status(code).JSON(fiber.Map{"error": err.Error()})
+		},
+	})
 
-    // Original data fetching code, no environment variable check
-    go func() {
-        for season := 1993; season <= 2025; season++ {
-            if err := services.FetchAndStorePlayerAdvancedStats(db, season); err != nil {
-                log.Printf("Fetch failed for player advanced season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player advanced season %d\n", season)
-            }
-            time.Sleep(1100 * time.Millisecond) // optional delay
-        }
-        log.Printf("player advanced Import Success")
-    }()
+	// middlewares
+	app.Use(logger.New())
+	app.Use(middleware.MetricsMiddleware())
 
-    go func() {
-        for season := 1993; season <= 2025; season++ {
-            if err := services.FetchAndStorePlayerTotalStats(db, season); err != nil {
-                log.Printf("Fetch failed for player totals season %d: %v\n", season, err)
-            } else {
-                log.Printf("Fetch successful for player totals season %d\n", season)
-            }
-            time.Sleep(1000 * time.Millisecond) // optional delay
-        }
-        log.Printf("player totals Import Success")
-    }()
+	// DB connection
+	db := config.InitDB()
 
-    // Add Prometheus metrics endpoint
-    app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
+	/* ---------- PUBLIC ROUTES (no API key) ---------- */
+	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
+	app.Get("/swagger/*", fiberswagger.WrapHandler)
+	controllers.RegisterKeyAdminRoutes(app, db)
 
-    // Register routes
-    routes.RegisterPlayerAdvancedRoutes(app, db)
-    routes.RegisterPlayerTotalRoutes(app, db)
+	/* ---------- PROTECTED ROUTES ---------- */
+	app.Use(middleware.APIKeyAuth(db))
+	routes.RegisterPlayerAdvancedRoutes(app, db)
+	routes.RegisterPlayerTotalRoutes(app, db)
 
-    // Swagger endpoint
-    app.Get("/swagger/*", fiberswagger.WrapHandler)
+	/* ---------- START & SHUTDOWN ---------- */
+	go func() {
+		if err := app.Listen(":5000"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("listen: %v", err)
+		}
+	}()
 
-    app.Listen(":5000")
+	<-ctx.Done()
+	stop()
+	log.Println("shutting down…")
+	_ = app.Shutdown()
+	log.Println("bye")
 }

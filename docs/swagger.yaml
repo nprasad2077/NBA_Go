@@ -1,5 +1,9 @@
+basePath: /
 info:
   contact: {}
+  description: Stats service with API-key auth
+  title: NBA_Go API
+  version: "1.0"
 paths:
   /api/playeradvancedstats:
     get:
@@ -45,6 +49,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get player stats
       tags:
       - PlayerStats
@@ -84,6 +90,10 @@ paths:
         in: query
         name: ascending
         type: boolean
+      - description: Whether the stats are for playoffs
+        in: query
+        name: isPlayoff
+        type: boolean
       produces:
       - application/json
       responses:
@@ -98,7 +108,17 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get player total stats
       tags:
       - PlayerTotals
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-Key
+    type: apiKey
 swagger: "2.0"
