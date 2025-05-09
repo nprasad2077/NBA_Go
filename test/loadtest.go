@@ -1,14 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
-	"log"
-	"flag"
-	"os"
 )
 
 // Response struct to track which server handled the request
@@ -25,6 +25,7 @@ func main() {
 	concurrency := flag.Int("c", 10, "Number of concurrent requests")
 	endpoint := flag.String("url", "http://localhost:8080/api/player/advanced", "API endpoint to test")
 	logFile := flag.String("log", "loadtest.log", "Log file path")
+	apiKey := flag.String("key", "", "API key for x-api-key header")
 	flag.Parse()
 
 	// Setup logging
@@ -34,48 +35,64 @@ func main() {
 	}
 	defer f.Close()
 	log.SetOutput(f)
-	
+
 	fmt.Printf("Starting load test with %d requests, %d concurrent\n", *numRequests, *concurrency)
 	fmt.Printf("Testing endpoint: %s\n", *endpoint)
-	
+
 	// Channel to collect results
 	results := make(chan Response, *numRequests)
-	
+
 	// Use a WaitGroup to manage concurrency
 	var wg sync.WaitGroup
-	
+
 	// Semaphore to limit concurrency
 	sem := make(chan bool, *concurrency)
-	
+
 	// Start the timer
 	startTime := time.Now()
-	
+
 	// Launch goroutines for requests
 	for i := 0; i < *numRequests; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			
+
 			// Acquire semaphore
 			sem <- true
 			defer func() { <-sem }()
-			
-			// Make the request
+
 			start := time.Now()
-			resp, err := http.Get(*endpoint)
-			duration := time.Since(start)
-			
 			result := Response{
-				Duration: duration,
-				Error:    err,
+				Duration: 0,
+				Error:    nil,
 			}
-			
+
+			req, err := http.NewRequest("GET", *endpoint, nil)
+			if err != nil {
+				result.Duration = time.Since(start)
+				result.Error = err
+				log.Printf("Request %d failed to create request: %v", id, err)
+				results <- result
+				return
+			}
+
+			if *apiKey != "" {
+				req.Header.Add("x-api-key", *apiKey)
+			}
+
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			duration := time.Since(start)
+
+			result.Duration = duration
+			result.Error = err
+
 			if err != nil {
 				log.Printf("Request %d failed: %v", id, err)
 				results <- result
 				return
 			}
-			
+
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
@@ -84,27 +101,26 @@ func main() {
 				results <- result
 				return
 			}
-			
+
 			result.StatusCode = resp.StatusCode
 			result.Body = string(body)
 			results <- result
-			
+
 			// Log request details
-			log.Printf("Request %d: Status=%d, Time=%v", 
-				id, resp.StatusCode, duration)
+			log.Printf("Request %d: Status=%d, Time=%v", id, resp.StatusCode, duration)
 		}(i)
 	}
-	
+
 	// Close the results channel when all requests are done
 	go func() {
 		wg.Wait()
 		close(results)
 	}()
-	
+
 	// Process results
 	var successCount, errorCount int
 	var totalDuration time.Duration
-	
+
 	for result := range results {
 		if result.Error != nil {
 			errorCount++
@@ -115,12 +131,15 @@ func main() {
 			errorCount++
 		}
 	}
-	
+
 	// Calculate statistics
 	totalTime := time.Since(startTime)
-	avgDuration := totalDuration / time.Duration(successCount)
+	var avgDuration time.Duration
+	if successCount > 0 {
+		avgDuration = totalDuration / time.Duration(successCount)
+	}
 	requestsPerSecond := float64(*numRequests) / totalTime.Seconds()
-	
+
 	// Print summary
 	fmt.Printf("\nLoad Test Summary:\n")
 	fmt.Printf("Total Requests: %d\n", *numRequests)
