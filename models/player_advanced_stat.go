@@ -33,4 +33,5 @@ type PlayerAdvancedStat struct {
 	VORP                float64 `json:"vorp"`
 	Team                string  `gorm:"not null;uniqueIndex:idx_player_season_team" json:"team"`
 	Season              int     `gorm:"not null;uniqueIndex:idx_player_season_team" json:"season"`
+	isPlayoff			bool	`gorm:"not null;default:false;uniqueIndex:idx_player_season_team" json:"isPlayoff"`
 }
