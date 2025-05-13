@@ -226,18 +226,6 @@ const docTemplate = `{
                 }
             }
         },
-        "gorm.DeletedAt": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
-                }
-            }
-        },
         "models.PlayerAdvancedStat": {
             "type": "object",
             "properties": {
@@ -253,9 +241,6 @@ const docTemplate = `{
                 "box": {
                     "type": "number"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "defensiveBox": {
                     "type": "number"
                 },
@@ -264,9 +249,6 @@ const docTemplate = `{
                 },
                 "defensiveWS": {
                     "type": "number"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "ftr": {
                     "type": "number"
@@ -324,9 +306,6 @@ const docTemplate = `{
                 },
                 "turnoverPercent": {
                     "type": "number"
-                },
-                "updatedAt": {
-                    "type": "string"
                 },
                 "usagePercent": {
                     "type": "number"
