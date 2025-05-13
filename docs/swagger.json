@@ -19,7 +19,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Returns filtered and paginated player stats",
+                "description": "Returns filtered and paginated player advanced stats",
                 "consumes": [
                     "application/json"
                 ],
@@ -29,7 +29,7 @@
                 "tags": [
                     "PlayerStats"
                 ],
-                "summary": "Get player stats",
+                "summary": "Get player advanced stats",
                 "parameters": [
                     {
                         "type": "integer",
@@ -65,14 +65,22 @@
                     },
                     {
                         "type": "string",
-                        "description": "Field to sort by (e.g., per, games, winShares)",
+                        "default": "winShares",
+                        "description": "Field to sort by",
                         "name": "sortBy",
                         "in": "query"
                     },
                     {
                         "type": "boolean",
-                        "description": "Sort ascending (default false)",
+                        "default": false,
+                        "description": "Sort ascending",
                         "name": "ascending",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether playoffs?",
+                        "name": "isPlayoff",
                         "in": "query"
                     }
                 ],
@@ -80,8 +88,16 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "$ref": "#/definitions/controllers.AdvancedStatsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -174,6 +190,152 @@
                             }
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.AdvancedStatsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PlayerAdvancedStat"
+                    }
+                },
+                "pagination": {
+                    "type": "object",
+                    "properties": {
+                        "page": {
+                            "type": "integer"
+                        },
+                        "pageSize": {
+                            "type": "integer"
+                        },
+                        "pages": {
+                            "type": "integer"
+                        },
+                        "total": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.PlayerAdvancedStat": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "assistPercent": {
+                    "type": "number"
+                },
+                "blockPercent": {
+                    "type": "number"
+                },
+                "box": {
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "defensiveBox": {
+                    "type": "number"
+                },
+                "defensiveRBPercent": {
+                    "type": "number"
+                },
+                "defensiveWS": {
+                    "type": "number"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "ftr": {
+                    "type": "number"
+                },
+                "games": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isPlayoff": {
+                    "type": "boolean"
+                },
+                "minutesPlayed": {
+                    "type": "integer"
+                },
+                "offensiveBox": {
+                    "type": "number"
+                },
+                "offensiveRBPercent": {
+                    "type": "number"
+                },
+                "offensiveWS": {
+                    "type": "number"
+                },
+                "per": {
+                    "type": "number"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "playerName": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "season": {
+                    "type": "integer"
+                },
+                "stealPercent": {
+                    "type": "number"
+                },
+                "team": {
+                    "type": "string"
+                },
+                "threePAR": {
+                    "type": "number"
+                },
+                "totalRBPercent": {
+                    "type": "number"
+                },
+                "tsPercent": {
+                    "type": "number"
+                },
+                "turnoverPercent": {
+                    "type": "number"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "usagePercent": {
+                    "type": "number"
+                },
+                "vorp": {
+                    "type": "number"
+                },
+                "winShares": {
+                    "type": "number"
+                },
+                "winSharesPer": {
+                    "type": "number"
                 }
             }
         }

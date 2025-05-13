@@ -11,9 +11,9 @@ import (
     "gorm.io/gorm/clause"
 )
 
-func FetchAndStorePlayerAdvancedStats(db *gorm.DB, season int, isPlayoff bool)  error {
+func FetchAndStorePlayerAdvancedPlayoffsStats(db *gorm.DB, season int, isPlayoff bool) error {
     metrics.DBOperationsTotal.WithLabelValues("fetch", "player_advanced").Inc()
-    url := fmt.Sprintf("http://rest.nbaapi.com/api/PlayerDataAdvanced/query?season=%d&sortBy=Points&ascending=false&pageNumber=1&pageSize=1000", season)
+    url := fmt.Sprintf("http://rest.nbaapi.com/api/PlayerDataAdvancedPlayoffs/query?season=%d&sortBy=PlayerName&ascending=true&pageNumber=1&pageSize=1000", season)
     
     body, err := utils.GetJSON(url)
     if err != nil {
@@ -28,7 +28,7 @@ func FetchAndStorePlayerAdvancedStats(db *gorm.DB, season int, isPlayoff bool)  
     for _, stat := range stats {
         // Ensure the season is included from the query param
         stat.Season = season
-        stat.IsPlayoff = isPlayoff
+		stat.IsPlayoff = isPlayoff
 
         err := db.Clauses(clause.OnConflict{
             Columns:   []clause.Column{{Name: "player_id"}, {Name: "season"}, {Name: "team"}, {Name: "is_playoff"}},
