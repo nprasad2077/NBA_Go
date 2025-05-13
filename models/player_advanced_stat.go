@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type PlayerAdvancedStat struct {
 	gorm.Model
 	ExternalID          int     `json:"id"`
-	PlayerID            string  `gorm:"not null;uniqueIndex:idx_player_season_team" json:"playerId"`
+	PlayerID            string  `gorm:"not null;index:idx_player_season_team,unique" json:"playerId"`
 	PlayerName          string  `json:"playerName"`
 	Position            string  `json:"position"`
 	Age                 int     `json:"age"`
@@ -31,6 +31,7 @@ type PlayerAdvancedStat struct {
 	DefensiveBox        float64 `json:"defensiveBox"`
 	Box                 float64 `json:"box"`
 	VORP                float64 `json:"vorp"`
-	Team                string  `gorm:"not null;uniqueIndex:idx_player_season_team" json:"team"`
-	Season              int     `gorm:"not null;uniqueIndex:idx_player_season_team" json:"season"`
+	Team                string  `gorm:"not null;index:idx_player_season_team,unique" json:"team"`
+	Season              int     `gorm:"not null;index:idx_player_season_team,unique" json:"season"`
+	IsPlayoff			bool	`gorm:"not null;default:false;index:idx_player_season_team,unique" json:"isPlayoff"`
 }

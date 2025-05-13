@@ -38,6 +38,8 @@ func main() {
 		db := config.InitDB()
 		importPlayerAdvanced(db)
 		log.Println("🎉 Player Advanced Import completed successfully")
+		importPlayerAdvancedPlayoffs(db)
+		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
 		importPlayerTotals(db)
 		log.Println("🎉 Player Totals Import completed successfully")
 		importPlayerPlayoffs(db)

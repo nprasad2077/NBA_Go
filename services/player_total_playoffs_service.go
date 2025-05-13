@@ -44,7 +44,7 @@ func FetchAndStorePlayerTotalPlayoffsStats(db *gorm.DB, season int, isPlayoff bo
 		}).Create(&stat).Error
 
 		if err != nil {
-			log.Printf("Failed to upsert PlayerTotalStat for playerId %s: %v", stat.PlayerID, err)
+			log.Printf("Failed to upsert PlayerTotalPlayoffStat for playerId %s: %v", stat.PlayerID, err)
 		}
 	}
 

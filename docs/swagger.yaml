@@ -1,4 +1,100 @@
 basePath: /
+definitions:
+  controllers.AdvancedStatsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.PlayerAdvancedStat'
+        type: array
+      pagination:
+        properties:
+          page:
+            type: integer
+          pageSize:
+            type: integer
+          pages:
+            type: integer
+          total:
+            type: integer
+        type: object
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.PlayerAdvancedStat:
+    properties:
+      age:
+        type: integer
+      assistPercent:
+        type: number
+      blockPercent:
+        type: number
+      box:
+        type: number
+      createdAt:
+        type: string
+      defensiveBox:
+        type: number
+      defensiveRBPercent:
+        type: number
+      defensiveWS:
+        type: number
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      ftr:
+        type: number
+      games:
+        type: integer
+      id:
+        type: integer
+      isPlayoff:
+        type: boolean
+      minutesPlayed:
+        type: integer
+      offensiveBox:
+        type: number
+      offensiveRBPercent:
+        type: number
+      offensiveWS:
+        type: number
+      per:
+        type: number
+      playerId:
+        type: string
+      playerName:
+        type: string
+      position:
+        type: string
+      season:
+        type: integer
+      stealPercent:
+        type: number
+      team:
+        type: string
+      threePAR:
+        type: number
+      totalRBPercent:
+        type: number
+      tsPercent:
+        type: number
+      turnoverPercent:
+        type: number
+      updatedAt:
+        type: string
+      usagePercent:
+        type: number
+      vorp:
+        type: number
+      winShares:
+        type: number
+      winSharesPer:
+        type: number
+    type: object
 info:
   contact: {}
   description: Stats service with API-key auth
@@ -9,7 +105,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns filtered and paginated player stats
+      description: Returns filtered and paginated player advanced stats
       parameters:
       - description: Season (e.g., 2025)
         in: query
@@ -33,13 +129,19 @@ paths:
         in: query
         name: pageSize
         type: integer
-      - description: Field to sort by (e.g., per, games, winShares)
+      - default: winShares
+        description: Field to sort by
         in: query
         name: sortBy
         type: string
-      - description: Sort ascending (default false)
+      - default: false
+        description: Sort ascending
         in: query
         name: ascending
+        type: boolean
+      - description: Whether playoffs?
+        in: query
+        name: isPlayoff
         type: boolean
       produces:
       - application/json
@@ -47,11 +149,16 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
+            $ref: '#/definitions/controllers.AdvancedStatsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
             type: object
       security:
       - ApiKeyAuth: []
-      summary: Get player stats
+      summary: Get player advanced stats
       tags:
       - PlayerStats
   /api/playertotals:
