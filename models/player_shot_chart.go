@@ -5,8 +5,8 @@ import "gorm.io/gorm"
 
 type PlayerShotChart struct {
     gorm.Model               `swaggerignore:"true"`
-    ExternalID         int    `json:"id"`
-    PlayerID           string `gorm:"not null;index:idx_shotchart_player_external,unique" json:"playerId"`
+    ExternalID         int    `gorm:"not null;uniqueIndex:idx_shotchart_player_external" json:"id"`
+    PlayerID           string `gorm:"not null;uniqueIndex:idx_shotchart_player_external" json:"playerId"`
     PlayerName         string `json:"playerName"`
     Top                int    `json:"top"`
     Left               int    `json:"left"`

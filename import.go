@@ -48,3 +48,13 @@ func importPlayerPlayoffs(db *gorm.DB) {
 		time.Sleep(1500 * time.Millisecond)
 	}
 }
+
+// importPlayerShotChart fetches shot-charts for every known player
+func importPlayerShotChart(db *gorm.DB) {
+	const firstID = "hardeja01"
+	log.Printf("▶️  importing shot chart for player %s…", firstID)
+    if err := services.FetchAndStoreShotChartForPlayer(db, firstID); err != nil {
+        log.Printf("shot chart import failed for %s: %v", firstID, err)
+    }
+	// you can add more IDs here or just rely on the API endpoint after
+}

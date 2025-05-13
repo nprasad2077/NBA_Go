@@ -44,6 +44,8 @@ func main() {
 		log.Println("🎉 Player Totals Import completed successfully")
 		importPlayerPlayoffs(db)
 		log.Println("🎉 Player Totals Playoffs Import completed successfully")
+		importPlayerShotChart(db)
+		log.Println("🎉 Player Shot Chart Import Completed Successfully ")
 		log.Println("🎉 Import completed successfully")
 		return
 	}
@@ -80,6 +82,7 @@ func main() {
 	app.Use(middleware.APIKeyAuth(db))
 	routes.RegisterPlayerAdvancedRoutes(app, db)
 	routes.RegisterPlayerTotalRoutes(app, db)
+	routes.RegisterPlayerShotChartRoutes(app, db)
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
