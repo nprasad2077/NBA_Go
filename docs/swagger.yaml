@@ -18,14 +18,6 @@ definitions:
             type: integer
         type: object
     type: object
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
-    type: object
   models.PlayerAdvancedStat:
     properties:
       age:
@@ -36,16 +28,12 @@ definitions:
         type: number
       box:
         type: number
-      createdAt:
-        type: string
       defensiveBox:
         type: number
       defensiveRBPercent:
         type: number
       defensiveWS:
         type: number
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       ftr:
         type: number
       games:
@@ -84,8 +72,6 @@ definitions:
         type: number
       turnoverPercent:
         type: number
-      updatedAt:
-        type: string
       usagePercent:
         type: number
       vorp:

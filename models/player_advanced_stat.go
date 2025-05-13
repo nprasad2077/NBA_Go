@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type PlayerAdvancedStat struct {
-	gorm.Model
+	gorm.Model	`swaggerignore:"true"`
 	ExternalID          int     `json:"id"`
 	PlayerID            string  `gorm:"not null;index:idx_player_season_team,unique" json:"playerId"`
 	PlayerName          string  `json:"playerName"`
