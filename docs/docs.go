@@ -106,6 +106,113 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/playershotchart": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns shot-chart points, optionally filtered by playerId and/or season",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PlayerShotChart"
+                ],
+                "summary": "Get shot-chart data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Player ID (e.g., hardeja01)",
+                        "name": "playerId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Season (e.g., 2023)",
+                        "name": "season",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PlayerShotChart"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/playershotchart/fetch": {
+            "get": {
+                "description": "Imports shot-chart data for the given playerId and stores/updates in DB",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PlayerShotChart"
+                ],
+                "summary": "Fetch a single player's shot-chart data from external API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Player ID (e.g., hardeja01)",
+                        "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/playertotals": {
             "get": {
                 "security": [
@@ -318,6 +425,62 @@ const docTemplate = `{
                 },
                 "winSharesPer": {
                     "type": "number"
+                }
+            }
+        },
+        "models.PlayerShotChart": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "distanceFt": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lead": {
+                    "type": "boolean"
+                },
+                "left": {
+                    "type": "integer"
+                },
+                "opponent": {
+                    "type": "string"
+                },
+                "opponentTeamScore": {
+                    "type": "integer"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "playerName": {
+                    "type": "string"
+                },
+                "qtr": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "boolean"
+                },
+                "season": {
+                    "type": "integer"
+                },
+                "shotType": {
+                    "type": "string"
+                },
+                "team": {
+                    "type": "string"
+                },
+                "teamScore": {
+                    "type": "integer"
+                },
+                "timeRemaining": {
+                    "type": "string"
+                },
+                "top": {
+                    "type": "integer"
                 }
             }
         }

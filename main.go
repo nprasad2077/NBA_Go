@@ -36,14 +36,24 @@ func main() {
 	// ——— One-off import-data mode ———
 	if len(os.Args) > 1 && os.Args[1] == "import-data" {
 		db := config.InitDB()
+
 		importPlayerAdvanced(db)
 		log.Println("🎉 Player Advanced Import completed successfully")
 		importPlayerAdvancedPlayoffs(db)
 		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
-		importPlayerTotals(db)
-		log.Println("🎉 Player Totals Import completed successfully")
-		importPlayerPlayoffs(db)
-		log.Println("🎉 Player Totals Playoffs Import completed successfully")
+		
+		// importPlayerTotals(db)
+		// log.Println("🎉 Player Totals Import completed successfully")
+		// importPlayerPlayoffs(db)
+		// log.Println("🎉 Player Totals Playoffs Import completed successfully")
+
+		importPlayerTotalsScrape(db)
+        log.Println("🎉 Player Totals (scraped) Import completed successfully")
+        importPlayerPlayoffsScrape(db)
+        log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
+
+		importPlayerShotChart(db)
+		log.Println("🎉 Player Shot Chart Import Completed Successfully ")
 		log.Println("🎉 Import completed successfully")
 		return
 	}
@@ -80,6 +90,7 @@ func main() {
 	app.Use(middleware.APIKeyAuth(db))
 	routes.RegisterPlayerAdvancedRoutes(app, db)
 	routes.RegisterPlayerTotalRoutes(app, db)
+	routes.RegisterPlayerShotChartRoutes(app, db)
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {

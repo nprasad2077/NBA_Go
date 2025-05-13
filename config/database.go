@@ -21,6 +21,7 @@ func InitDB() *gorm.DB {
     // Auto migrate models
     db.AutoMigrate(&models.PlayerAdvancedStat{})
     db.AutoMigrate(&models.PlayerTotalStat{})
+    db.AutoMigrate(&models.PlayerShotChart{})
 
     db.AutoMigrate(&models.APIKey{})
     

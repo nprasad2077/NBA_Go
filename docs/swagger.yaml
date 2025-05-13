@@ -81,6 +81,43 @@ definitions:
       winSharesPer:
         type: number
     type: object
+  models.PlayerShotChart:
+    properties:
+      date:
+        type: string
+      distanceFt:
+        type: integer
+      id:
+        type: integer
+      lead:
+        type: boolean
+      left:
+        type: integer
+      opponent:
+        type: string
+      opponentTeamScore:
+        type: integer
+      playerId:
+        type: string
+      playerName:
+        type: string
+      qtr:
+        type: string
+      result:
+        type: boolean
+      season:
+        type: integer
+      shotType:
+        type: string
+      team:
+        type: string
+      teamScore:
+        type: integer
+      timeRemaining:
+        type: string
+      top:
+        type: integer
+    type: object
 info:
   contact: {}
   description: Stats service with API-key auth
@@ -147,6 +184,77 @@ paths:
       summary: Get player advanced stats
       tags:
       - PlayerStats
+  /api/playershotchart:
+    get:
+      consumes:
+      - application/json
+      description: Returns shot-chart points, optionally filtered by playerId and/or
+        season
+      parameters:
+      - description: Player ID (e.g., hardeja01)
+        in: query
+        name: playerId
+        type: string
+      - description: Season (e.g., 2023)
+        in: query
+        name: season
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PlayerShotChart'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get shot-chart data
+      tags:
+      - PlayerShotChart
+  /api/playershotchart/fetch:
+    get:
+      consumes:
+      - application/json
+      description: Imports shot-chart data for the given playerId and stores/updates
+        in DB
+      parameters:
+      - description: Player ID (e.g., hardeja01)
+        in: query
+        name: playerId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Fetch a single player's shot-chart data from external API
+      tags:
+      - PlayerShotChart
   /api/playertotals:
     get:
       consumes:
