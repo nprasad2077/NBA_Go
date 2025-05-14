@@ -8,7 +8,6 @@ import (
     "io"
     "log"
     "net/http"
-    "strconv"
     "strings"
 
     "github.com/PuerkitoBio/goquery"
@@ -156,16 +155,4 @@ func FetchAndStorePlayerTotalScrapedStats(db *gorm.DB, season int, isPlayoff boo
     })
 
     return nil
-}
-
-// mustAtoi parses integer or returns 0
-func mustAtoi(s string) int {
-    i, _ := strconv.Atoi(s)
-    return i
-}
-
-// mustParseFloat parses float or returns 0.0
-func mustParseFloat(s string) float64 {
-    f, _ := strconv.ParseFloat(s, 64)
-    return f
 }

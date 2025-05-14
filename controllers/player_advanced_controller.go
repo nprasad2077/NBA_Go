@@ -35,6 +35,29 @@ func FetchPlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 	}
 }
 
+// ScrapePlayerAdvancedStats godoc
+// @Summary     Scrape player advanced stats from BR website
+// @Tags        PlayerStats
+// @Param       season    query  int  true  "Season (e.g. 2025)"
+// @Param       isPlayoff query  bool false "Whether playoffs?"
+// @Success     200       {object} map[string]string
+// @Failure     400,500   {object} map[string]string
+// @Router      /api/playeradvancedstats/scrape [get]
+func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        season := c.QueryInt("season", 0)
+        if season == 0 {
+            return c.Status(400).JSON(fiber.Map{"error":"season is required"})
+        }
+        isPlayoff := c.QueryBool("isPlayoff", false)
+
+        if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, isPlayoff); err != nil {
+            return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+        }
+        return c.JSON(fiber.Map{"message":"scrape+store complete"})
+    }
+}
+
 // GetAllAdvancedPlayerStats godoc
 // @Security    ApiKeyAuth
 // @Summary     Get player advanced stats

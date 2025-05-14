@@ -25,7 +25,7 @@ func main() {
         os.Exit(1)
     }
 
-    url := fmt.Sprintf("https://www.basketball-reference.com/leagues/NBA_%d_advanced.html", *season)
+    url := fmt.Sprintf("https://www.basketball-reference.com/playoffs/NBA_%d_advanced.html", *season)
     fmt.Println("Fetching:", url)
     resp, err := http.Get(url)
     if err != nil {
@@ -42,7 +42,7 @@ func main() {
 
     // --- Extract headers ---
     var headers []string
-    doc.Find("#div_advanced table#advanced thead tr th").EachWithBreak(func(i int, s *goquery.Selection) bool {
+    doc.Find("#div_advanced_stats table#advanced_stats thead tr th").EachWithBreak(func(i int, s *goquery.Selection) bool {
         // grab first 29 columns, then we'll append our own PlayerID
         text := strings.TrimSpace(s.Text())
         if i < 29 {
@@ -55,7 +55,7 @@ func main() {
 
     // --- Extract data rows ---
     var rows [][]string
-    doc.Find("#div_advanced table#advanced tbody tr").Each(func(_ int, row *goquery.Selection) {
+    doc.Find("#div_advanced_stats table#advanced_stats tbody tr").Each(func(_ int, row *goquery.Selection) {
         if row.HasClass("thead") { // skip repeated headers
             return
         }

@@ -1,4 +1,3 @@
-// NBA_Go/controllers/player_shot_chart_controller.go
 package controllers
 
 import (
@@ -8,29 +7,60 @@ import (
     "gorm.io/gorm"
 )
 
-// FetchPlayerShotChart godoc
-// @Summary     Fetch a single player's shot-chart data from external API
-// @Description Imports shot-chart data for the given playerId and stores/updates in DB
+// FetchPlayerShotChartAPI godoc
+// @Summary     Fetch a player's shot-chart from NBA-API and store in DB
 // @Tags        PlayerShotChart
+// @Param       playerId query string true "Player ID (e.g. hardeja01)"
 // @Accept      json
 // @Produce     json
-// @Param       playerId query  string true "Player ID (e.g., hardeja01)"
 // @Success     200      {object} map[string]string
-// @Failure     400      {object} map[string]string
-// @Failure     500      {object} map[string]string
+// @Failure     400,500  {object} map[string]string
 // @Router      /api/playershotchart/fetch [get]
-func FetchPlayerShotChart(db *gorm.DB) fiber.Handler {
+func FetchPlayerShotChartAPI(db *gorm.DB) fiber.Handler {
     return func(c *fiber.Ctx) error {
         pid := c.Query("playerId")
         if pid == "" {
-            return c.Status(400).JSON(fiber.Map{
-                "error": "playerId query parameter is required",
-            })
+            return c.Status(400).JSON(fiber.Map{"error": "playerId query parameter is required"})
         }
         if err := services.FetchAndStoreShotChartForPlayer(db, pid); err != nil {
             return c.Status(500).JSON(fiber.Map{"error": err.Error()})
         }
         return c.JSON(fiber.Map{"message": "Shot chart for " + pid + " fetched and saved."})
+    }
+}
+
+// ScrapePlayerShotChart godoc
+// @Summary     Scrape a player's shot-chart from BR website
+// @Description Scrapes seasons [startSeason…endSeason] for the given playerId
+//              (playerName is auto-detected).
+// @Tags        PlayerShotChart
+// @Accept      json
+// @Produce     json
+// @Param       playerId    query  string true  "Player ID (e.g. derozde01)"
+// @Param       startSeason query  int    true  "Start season (e.g. 2024)"
+// @Param       endSeason   query  int    true  "End season (e.g. 2021)"
+// @Success     200         {object} map[string]string
+// @Failure     400,500     {object} map[string]string
+// @Router      /api/playershotchart/scrape [get]
+func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        pid := c.Query("playerId")
+        start := c.QueryInt("startSeason", 0)
+        end := c.QueryInt("endSeason", 0)
+        if pid == "" || start == 0 || end == 0 {
+            return c.Status(400).JSON(fiber.Map{
+                "error": "playerId, startSeason and endSeason are required",
+            })
+        }
+        if start < end {
+            return c.Status(400).JSON(fiber.Map{
+                "error": "startSeason must be >= endSeason",
+            })
+        }
+        if err := services.FetchAndStoreShotChartScrapedForPlayer(db, pid, start, end); err != nil {
+            return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+        }
+        return c.JSON(fiber.Map{"message": "Shot chart scraped and saved for " + pid})
     }
 }
 
@@ -50,24 +80,18 @@ func GetPlayerShotChart(db *gorm.DB) fiber.Handler {
     return func(c *fiber.Ctx) error {
         var shots []models.PlayerShotChart
 
-        // Start with the base model
         query := db.Model(&models.PlayerShotChart{})
 
-        // Optional filter: playerId
         if pid := c.Query("playerId"); pid != "" {
             query = query.Where("player_id = ?", pid)
         }
-
-        // Optional filter: season
         if s := c.QueryInt("season", 0); s != 0 {
             query = query.Where("season = ?", s)
         }
 
-        // Execute
         if err := query.Find(&shots).Error; err != nil {
             return c.Status(500).JSON(fiber.Map{"error": err.Error()})
         }
-
         return c.JSON(shots)
     }
 }
