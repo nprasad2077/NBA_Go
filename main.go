@@ -26,6 +26,7 @@ import (
 	fiberswagger "github.com/swaggo/fiber-swagger"
 
 	"github.com/nprasad2077/NBA_Go/config"
+	"github.com/nprasad2077/NBA_Go/utils"
 	"github.com/nprasad2077/NBA_Go/controllers"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/middleware"
@@ -39,6 +40,8 @@ func main() {
 
 		importPlayerAdvanced(db)
 		log.Println("🎉 Player Advanced Import completed successfully")
+		utils.SleepWithJitter(1100 * time.Millisecond)
+
 		importPlayerAdvancedPlayoffs(db)
 		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
 		
@@ -49,7 +52,7 @@ func main() {
 
 		importPlayerTotalsScrape(db)
         log.Println("🎉 Player Totals (scraped) Import completed successfully")
-        importPlayerPlayoffsScrape(db)
+        importPlayerTotalsPlayoffsScrape(db)
         log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
 
 		// importPlayerShotChart(db)

@@ -11,7 +11,7 @@ import (
 // importPlayerAdvanced fetches and stores advanced stats for seasons 2023–2025
 func importPlayerAdvanced(db *gorm.DB) {
 	for season := 2023; season <= 2025; season++ {
-		if err := services.FetchAndStorePlayerAdvancedStats(db, season, false); err != nil {
+		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
 		time.Sleep(1100 * time.Millisecond)
@@ -21,8 +21,8 @@ func importPlayerAdvanced(db *gorm.DB) {
 // importPlayerAdvancedPlayoffs fetches and stores advanced stats for playoffs seasons 2023–2025
 
 func importPlayerAdvancedPlayoffs(db *gorm.DB) {
-	for season := 2023; season <= 2024; season++ {
-		if err := services.FetchAndStorePlayerAdvancedPlayoffsStats(db, season, true); err != nil {
+	for season := 2023; season <= 2025; season++ {
+		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
 		time.Sleep(1100 * time.Millisecond)
@@ -70,8 +70,8 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 }
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
-func importPlayerPlayoffsScrape(db *gorm.DB) {
-    for season := 2023; season <= 2024; season++ {
+func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
+    for season := 2023; season <= 2025; season++ {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
             log.Printf("scraped playoffs import failed for %d: %v", season, err)
         }
