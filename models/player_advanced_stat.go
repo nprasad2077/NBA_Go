@@ -1,9 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type PlayerAdvancedStat struct {
-	gorm.Model	`swaggerignore:"true"`
+	ID					uint	`gorm:"primaryKey" swaggerignore:"true"`
 	ExternalID          int     `json:"id"`
 	PlayerID            string  `gorm:"not null;index:idx_player_season_team,unique" json:"playerId"`
 	PlayerName          string  `json:"playerName"`
@@ -34,4 +38,8 @@ type PlayerAdvancedStat struct {
 	Team                string  `gorm:"not null;index:idx_player_season_team,unique" json:"team"`
 	Season              int     `gorm:"not null;index:idx_player_season_team,unique" json:"season"`
 	IsPlayoff			bool	`gorm:"not null;default:false;index:idx_player_season_team,unique" json:"isPlayoff"`
+	
+	CreatedAt 			time.Time	`swaggerignore:"true"`
+	UpdatedAt 			time.Time	`swaggerignore:"true"`
+	DeletedAt 			gorm.DeletedAt	`gorm:"index" swaggerignore:"true"`
 }

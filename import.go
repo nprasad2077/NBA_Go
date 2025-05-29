@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 	"github.com/nprasad2077/NBA_Go/services"
+	"github.com/nprasad2077/NBA_Go/utils"
 )
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons 2023–2025
@@ -14,7 +15,9 @@ func importPlayerAdvanced(db *gorm.DB) {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
+		log.Printf("Advanced import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
+		utils.SleepWithJitter(1500 * time.Millisecond)
 	}
 }
 
@@ -25,7 +28,9 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
+		log.Printf("Advanced Playoffs import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
+		utils.SleepWithJitter(1500 * time.Millisecond)
 	}
 }
 
@@ -65,7 +70,9 @@ func importPlayerTotalsScrape(db *gorm.DB) {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
             log.Printf("scraped totals import failed for %d: %v", season, err)
         }
+		log.Printf("Player Totals import for season: %d", season)
         time.Sleep(1100 * time.Millisecond)
+		utils.SleepWithJitter(1500 * time.Millisecond)
     }
 }
 
@@ -75,6 +82,8 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
             log.Printf("scraped playoffs import failed for %d: %v", season, err)
         }
+		log.Printf("Player Playoffs Totals import for season: %d", season)
         time.Sleep(1500 * time.Millisecond)
+		utils.SleepWithJitter(1500 * time.Millisecond)
     }
 }
