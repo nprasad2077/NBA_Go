@@ -17,7 +17,7 @@ func importPlayerAdvanced(db *gorm.DB) {
 		}
 		log.Printf("Advanced import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
-		utils.SleepWithJitter(1500 * time.Millisecond)
+		utils.SleepWithJitter(1000 * time.Millisecond)
 	}
 }
 
@@ -30,29 +30,9 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 		}
 		log.Printf("Advanced Playoffs import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
-		utils.SleepWithJitter(1500 * time.Millisecond)
+		utils.SleepWithJitter(1250 * time.Millisecond)
 	}
 }
-
-// importPlayerTotals fetches and stores regular-season total stats for seasons 2023–2025
-// func importPlayerTotals(db *gorm.DB) {
-// 	for season := 2023; season <= 2025; season++ {
-// 		if err := services.FetchAndStorePlayerTotalStats(db, season, false); err != nil {
-// 			log.Printf("totals import failed for %d: %v", season, err)
-// 		}
-// 		time.Sleep(1000 * time.Millisecond)
-// 	}
-// }
-
-// // importPlayerPlayoffs fetches and stores playoff total stats for seasons 2023–2024
-// func importPlayerPlayoffs(db *gorm.DB) {
-// 	for season := 2023; season <= 2024; season++ {
-// 		if err := services.FetchAndStorePlayerTotalPlayoffsStats(db, season, true); err != nil {
-// 			log.Printf("playoffs import failed for %d: %v", season, err)
-// 		}
-// 		time.Sleep(1500 * time.Millisecond)
-// 	}
-// }
 
 // importPlayerShotChart fetches shot-charts for every known player
 func importPlayerShotChart(db *gorm.DB) {
@@ -66,7 +46,7 @@ func importPlayerShotChart(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-    for season := 2023; season <= 2025; season++ {
+    for season := 1993; season <= 2025; season++ {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
             log.Printf("scraped totals import failed for %d: %v", season, err)
         }
@@ -78,12 +58,12 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-    for season := 2023; season <= 2025; season++ {
+    for season := 1993; season <= 2025; season++ {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
             log.Printf("scraped playoffs import failed for %d: %v", season, err)
         }
 		log.Printf("Player Playoffs Totals import for season: %d", season)
-        time.Sleep(1500 * time.Millisecond)
-		utils.SleepWithJitter(1500 * time.Millisecond)
+        time.Sleep(1100 * time.Millisecond)
+		utils.SleepWithJitter(1750 * time.Millisecond)
     }
 }
