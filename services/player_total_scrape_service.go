@@ -170,43 +170,6 @@ func FetchAndStorePlayerTotalScrapedStats(db *gorm.DB, season int, isPlayoff boo
         IsPlayoff:     isPlayoff,
     }
 
-        // // 3) map into GORM model
-        // stat := models.PlayerTotalStat{
-        //     ExternalID:    mustAtoi(data["rk"]),
-        //     PlayerID:      playerID,
-        //     PlayerName:    data["player"],
-        //     Position:      data["pos"],
-        //     Age:           mustAtoi(data["age"]),
-        //     Games:         mustAtoi(data["g"]),
-        //     GamesStarted:  mustAtoi(data["gs"]),
-        //     MinutesPG:     mustParseFloat(data["mp"]),   // TOTAL minutes as float
-        //     FieldGoals:    mustAtoi(data["fg"]),
-        //     FieldAttempts: mustAtoi(data["fga"]),
-        //     FieldPercent:  mustParseFloat(data["fg_pct"]),
-        //     ThreeFG:       mustAtoi(data["fg3"]),
-        //     ThreeAttempts: mustAtoi(data["fg3a"]),
-        //     ThreePercent:  mustParseFloat(data["fg3_pct"]),
-        //     TwoFG:         mustAtoi(data["fg2"]),
-        //     TwoAttempts:   mustAtoi(data["fg2a"]),
-        //     TwoPercent:    mustParseFloat(data["fg2_pct"]),
-        //     EffectFGPercent: mustParseFloat(data["efg_pct"]),
-        //     FT:            mustAtoi(data["ft"]),
-        //     FTAttempts:    mustAtoi(data["fta"]),
-        //     FTPercent:     mustParseFloat(data["ft_pct"]),
-        //     OffensiveRB:   mustAtoi(data["orb"]),
-        //     DefensiveRB:   mustAtoi(data["drb"]),
-        //     TotalRB:       mustAtoi(data["trb"]),
-        //     Assists:       mustAtoi(data["ast"]),
-        //     Steals:        mustAtoi(data["stl"]),
-        //     Blocks:        mustAtoi(data["blk"]),
-        //     Turnovers:     mustAtoi(data["tov"]),
-        //     PersonalFouls: mustAtoi(data["pf"]),
-        //     Points:        mustAtoi(data["pts"]),
-        //     Team:          data["team_id"],
-        //     Season:        season,
-        //     IsPlayoff:     isPlayoff,
-        // }
-
         // 4) upsert on (player_id, season, team, is_playoff)
         if err := db.Clauses(clause.OnConflict{
             Columns: []clause.Column{
