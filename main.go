@@ -21,6 +21,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	fiberswagger "github.com/swaggo/fiber-swagger"
@@ -72,6 +73,9 @@ func main() {
 			return c.Status(code).JSON(fiber.Map{"error": err.Error()})
 		},
 	})
+
+	// — CORS Allow ALL origins (development) —
+    app.Use(cors.New())
 
 	// middlewares
 	app.Use(logger.New())

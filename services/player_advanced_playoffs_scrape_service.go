@@ -54,7 +54,7 @@ func FetchAndStorePlayerAdvancedScrapedStats(db *gorm.DB, season int, isPlayoff 
         return err
     }
 
-    // 📌 pick the right table selector
+    // pick the right table selector
     var table *goquery.Selection
     if isPlayoff {
         table = doc.Find("#div_advanced_stats table#advanced_stats")
@@ -96,19 +96,38 @@ func FetchAndStorePlayerAdvancedScrapedStats(db *gorm.DB, season int, isPlayoff 
         }
         data["player-additional"] = playerID
 
-        // 3. map into your model
+        // 4) pick the correct keys for ExternalID, PlayerName, Team, depending on season vs. playoff
+        //    - playoffs tables still use "rk", "player", "team_id"
+        //    - regular‐season advanced uses "ranker", "name_display", "team_name_abbr"
+        extID := mustAtoi(data["rk"])
+        if extID == 0 {
+            extID = mustAtoi(data["ranker"])
+        }
+
+        playerName := data["player"]
+        if playerName == "" {
+            playerName = data["name_display"]
+        }
+
+        teamID := data["team_id"]
+        if teamID == "" {
+            teamID = data["team_name_abbr"]
+        }
+
+        // 5) map into your GORM model
         stat := models.PlayerAdvancedStat{
-            ExternalID:         mustAtoi(data["rk"]),
+            ExternalID:         extID,
             PlayerID:           playerID,
-            PlayerName:         data["player"],
+            PlayerName:         playerName,
             Position:           data["pos"],
             Age:                mustAtoi(data["age"]),
             Games:              mustAtoi(data["g"]),
+            GamesStarted:       mustAtoi(data["games_started"]),
             MinutesPlayed:      mustAtoi(data["mp"]),
             PER:                mustParseFloat(data["per"]),
             TSPercent:          mustParseFloat(data["ts_pct"]),
-            ThreePAR:           mustParseFloat(data["three_par"]),
-            FTR:                mustParseFloat(data["ftr"]),
+            ThreePAR:           mustParseFloat(data["fg3a_per_fga_pct"]),
+            FTR:                mustParseFloat(data["fta_per_fga_pct"]),
             OffensiveRBPercent: mustParseFloat(data["orb_pct"]),
             DefensiveRBPercent: mustParseFloat(data["drb_pct"]),
             TotalRBPercent:     mustParseFloat(data["trb_pct"]),
@@ -125,12 +144,12 @@ func FetchAndStorePlayerAdvancedScrapedStats(db *gorm.DB, season int, isPlayoff 
             DefensiveBox:       mustParseFloat(data["dbpm"]),
             Box:                mustParseFloat(data["bpm"]),
             VORP:               mustParseFloat(data["vorp"]),
-            Team:               data["team_id"],
+            Team:               teamID,
             Season:             season,
             IsPlayoff:          isPlayoff,
         }
 
-        // 4. upsert
+        // 6) upsert on (player_id, season, team, is_playoff)
         if err := db.Clauses(clause.OnConflict{
             Columns: []clause.Column{
                 {Name: "player_id"},
@@ -139,7 +158,8 @@ func FetchAndStorePlayerAdvancedScrapedStats(db *gorm.DB, season int, isPlayoff 
                 {Name: "is_playoff"},
             },
             DoUpdates: clause.AssignmentColumns([]string{
-                "external_id", "player_name", "position", "age", "games", "minutes_played",
+                "external_id", "player_name", "position", "age", "games", "games_started", 
+                "minutes_played",
                 "per", "ts_percent", "three_par", "ftr",
                 "offensive_rb_percent", "defensive_rb_percent", "total_rb_percent",
                 "assist_percent", "steal_percent", "block_percent", "turnover_percent",
@@ -153,3 +173,61 @@ func FetchAndStorePlayerAdvancedScrapedStats(db *gorm.DB, season int, isPlayoff 
 
     return nil
 }
+
+//         // 3. map into your model
+        // stat := models.PlayerAdvancedStat{
+//             ExternalID:         mustAtoi(data["rk"]),
+//             PlayerID:           playerID,
+//             PlayerName:         data["player"],
+//             Position:           data["pos"],
+//             Age:                mustAtoi(data["age"]),
+//             Games:              mustAtoi(data["g"]),
+//             MinutesPlayed:      mustAtoi(data["mp"]),
+//             PER:                mustParseFloat(data["per"]),
+//             TSPercent:          mustParseFloat(data["ts_pct"]),
+//             ThreePAR:           mustParseFloat(data["three_par"]),
+//             FTR:                mustParseFloat(data["ftr"]),
+//             OffensiveRBPercent: mustParseFloat(data["orb_pct"]),
+//             DefensiveRBPercent: mustParseFloat(data["drb_pct"]),
+//             TotalRBPercent:     mustParseFloat(data["trb_pct"]),
+//             AssistPercent:      mustParseFloat(data["ast_pct"]),
+//             StealPercent:       mustParseFloat(data["stl_pct"]),
+//             BlockPercent:       mustParseFloat(data["blk_pct"]),
+//             TurnoverPercent:    mustParseFloat(data["tov_pct"]),
+//             UsagePercent:       mustParseFloat(data["usg_pct"]),
+//             OffensiveWS:        mustParseFloat(data["ows"]),
+//             DefensiveWS:        mustParseFloat(data["dws"]),
+//             WinShares:          mustParseFloat(data["ws"]),
+//             WinSharesPer:       mustParseFloat(data["ws_per_48"]),
+//             OffensiveBox:       mustParseFloat(data["obpm"]),
+//             DefensiveBox:       mustParseFloat(data["dbpm"]),
+//             Box:                mustParseFloat(data["bpm"]),
+//             VORP:               mustParseFloat(data["vorp"]),
+//             Team:               data["team_id"],
+//             Season:             season,
+//             IsPlayoff:          isPlayoff,
+//         }
+
+//         // 4. upsert
+//         if err := db.Clauses(clause.OnConflict{
+//             Columns: []clause.Column{
+//                 {Name: "player_id"},
+//                 {Name: "season"},
+//                 {Name: "team"},
+//                 {Name: "is_playoff"},
+//             },
+//             DoUpdates: clause.AssignmentColumns([]string{
+//                 "external_id", "player_name", "position", "age", "games", "minutes_played",
+//                 "per", "ts_percent", "three_par", "ftr",
+//                 "offensive_rb_percent", "defensive_rb_percent", "total_rb_percent",
+//                 "assist_percent", "steal_percent", "block_percent", "turnover_percent",
+//                 "usage_percent", "offensive_ws", "defensive_ws", "win_shares",
+//                 "win_shares_per", "offensive_box", "defensive_box", "box", "vorp",
+//             }),
+//         }).Create(&stat).Error; err != nil {
+//             log.Printf("Failed upsert advanced for %s: %v", stat.PlayerID, err)
+//         }
+//     })
+
+//     return nil
+// }
