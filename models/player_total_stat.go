@@ -1,9 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type PlayerTotalStat struct {
-	gorm.Model
+	ID				uint	`gorm:"primaryKey" swaggerignore:"true"`
+
 	ExternalID      int     `json:"id"`
 	PlayerID        string  `gorm:"not null;uniqueIndex:idx_total_player_season_team" json:"playerId"`
 	PlayerName      string  `json:"playerName"`
@@ -37,4 +42,8 @@ type PlayerTotalStat struct {
 	Team            string  `gorm:"not null;uniqueIndex:idx_total_player_season_team" json:"team"`
 	Season          int     `gorm:"not null;uniqueIndex:idx_total_player_season_team" json:"season"`
 	IsPlayoff		bool	`gorm:"not null;default:false;uniqueIndex:idx_total_player_season_team" json:"isPlayoff"`
+	
+	CreatedAt 		time.Time	`swaggerignore:"true"`
+	UpdatedAt 		time.Time	`swaggerignore:"true"`
+	DeletedAt 		gorm.DeletedAt	`gorm:"index" swaggerignore:"true"`
 }

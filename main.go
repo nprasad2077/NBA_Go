@@ -21,6 +21,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	fiberswagger "github.com/swaggo/fiber-swagger"
@@ -39,22 +40,21 @@ func main() {
 
 		importPlayerAdvanced(db)
 		log.Println("🎉 Player Advanced Import completed successfully")
+
 		importPlayerAdvancedPlayoffs(db)
 		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
-		
-		// importPlayerTotals(db)
-		// log.Println("🎉 Player Totals Import completed successfully")
-		// importPlayerPlayoffs(db)
-		// log.Println("🎉 Player Totals Playoffs Import completed successfully")
+	
 
 		importPlayerTotalsScrape(db)
         log.Println("🎉 Player Totals (scraped) Import completed successfully")
-        importPlayerPlayoffsScrape(db)
+
+        importPlayerTotalsPlayoffsScrape(db)
         log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
 
-		importPlayerShotChart(db)
-		log.Println("🎉 Player Shot Chart Import Completed Successfully ")
-		log.Println("🎉 Import completed successfully")
+		// importPlayerShotChart(db)
+		// log.Println("🎉 Player Shot Chart Import Completed Successfully ")
+		
+		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
 	}
 
@@ -73,6 +73,9 @@ func main() {
 			return c.Status(code).JSON(fiber.Map{"error": err.Error()})
 		},
 	})
+
+	// — CORS Allow ALL origins (development) —
+    app.Use(cors.New())
 
 	// middlewares
 	app.Use(logger.New())
