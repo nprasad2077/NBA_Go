@@ -14,7 +14,6 @@ type PlayerAdvancedStat struct {
 	Position            string  `json:"position"`
 	Age                 int     `json:"age"`
 	Games               int     `json:"games"`
-	GamesStarted        int     `json:"gamesStarted"`
 	MinutesPlayed       int     `json:"minutesPlayed"`
 	PER                 float64 `json:"per"`
 	TSPercent           float64 `json:"tsPercent"`

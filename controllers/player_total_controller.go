@@ -19,19 +19,19 @@ import (
 	"github.com/nprasad2077/NBA_Go/models"
 )
 
-func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		season := c.QueryInt("season", 2025)
-		isPlayoff := c.QueryBool("isPlayoff", false)
+// func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		season := c.QueryInt("season", 2025)
+// 		isPlayoff := c.QueryBool("isPlayoff", false)
 
-		err := services.FetchAndStorePlayerTotalStats(db, season, isPlayoff)
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-		}
+// 		err := services.FetchAndStorePlayerTotalStats(db, season, isPlayoff)
+// 		if err != nil {
+// 			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+// 		}
 
-		return c.JSON(fiber.Map{"message": "Player total stats fetched and saved."})
-	}
-}
+// 		return c.JSON(fiber.Map{"message": "Player total stats fetched and saved."})
+// 	}
+// }
 
 // ScrapePlayerTotalStats godoc
 // @Summary     Scrape player total stats from BR website

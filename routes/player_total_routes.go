@@ -9,7 +9,7 @@ import (
 func RegisterPlayerTotalRoutes(app *fiber.App, db *gorm.DB) {
 	api := app.Group("/api/playertotals")
 
-	api.Get("/fetch", controllers.FetchPlayerTotalStats(db))
+	// api.Get("/fetch", controllers.FetchPlayerTotalStats(db))
 	api.Get("/scrape", controllers.ScrapePlayerTotalStats(db))
 	api.Get("/", controllers.GetPlayerTotalStats(db))
 }

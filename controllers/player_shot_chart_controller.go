@@ -16,18 +16,18 @@ import (
 // @Success     200      {object} map[string]string
 // @Failure     400,500  {object} map[string]string
 // @Router      /api/playershotchart/fetch [get]
-func FetchPlayerShotChartAPI(db *gorm.DB) fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        pid := c.Query("playerId")
-        if pid == "" {
-            return c.Status(400).JSON(fiber.Map{"error": "playerId query parameter is required"})
-        }
-        if err := services.FetchAndStoreShotChartForPlayer(db, pid); err != nil {
-            return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-        }
-        return c.JSON(fiber.Map{"message": "Shot chart for " + pid + " fetched and saved."})
-    }
-}
+// func FetchPlayerShotChartAPI(db *gorm.DB) fiber.Handler {
+//     return func(c *fiber.Ctx) error {
+//         pid := c.Query("playerId")
+//         if pid == "" {
+//             return c.Status(400).JSON(fiber.Map{"error": "playerId query parameter is required"})
+//         }
+//         if err := services.FetchAndStoreShotChartForPlayer(db, pid); err != nil {
+//             return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+//         }
+//         return c.JSON(fiber.Map{"message": "Shot chart for " + pid + " fetched and saved."})
+//     }
+// }
 
 // ScrapePlayerShotChart godoc
 // @Summary     Scrape a player's shot-chart from BR website

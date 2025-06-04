@@ -134,14 +134,26 @@ func FetchAndStorePlayerTotalScrapedStats(db *gorm.DB, season int, isPlayoff boo
         teamID = data["team_name_abbr"]
     }
 
+    // pick “games” → fallback to “g” if empty
+    g := mustAtoi(data["games"])
+    if g == 0 {
+        g = mustAtoi(data["g"])
+    }
+
+    // pick “games_started” → fallback to “gs” if empty
+    gs := mustAtoi(data["games_started"])
+    if gs == 0 {
+        gs = mustAtoi(data["gs"])
+    }
+
     stat := models.PlayerTotalStat{
         ExternalID:    extID,
         PlayerID:      playerID,
         PlayerName:    playerName,
         Position:      data["pos"],
         Age:           mustAtoi(data["age"]),
-        Games:         mustAtoi(data["games"]),
-        GamesStarted:  mustAtoi(data["games_started"]),
+        Games:         g,
+        GamesStarted:  gs,
         MinutesPG:     mustParseFloat(data["mp"]),
         FieldGoals:    mustAtoi(data["fg"]),
         FieldAttempts: mustAtoi(data["fga"]),
@@ -169,43 +181,6 @@ func FetchAndStorePlayerTotalScrapedStats(db *gorm.DB, season int, isPlayoff boo
         Season:        season,
         IsPlayoff:     isPlayoff,
     }
-
-        // // 3) map into GORM model
-        // stat := models.PlayerTotalStat{
-        //     ExternalID:    mustAtoi(data["rk"]),
-        //     PlayerID:      playerID,
-        //     PlayerName:    data["player"],
-        //     Position:      data["pos"],
-        //     Age:           mustAtoi(data["age"]),
-        //     Games:         mustAtoi(data["g"]),
-        //     GamesStarted:  mustAtoi(data["gs"]),
-        //     MinutesPG:     mustParseFloat(data["mp"]),   // TOTAL minutes as float
-        //     FieldGoals:    mustAtoi(data["fg"]),
-        //     FieldAttempts: mustAtoi(data["fga"]),
-        //     FieldPercent:  mustParseFloat(data["fg_pct"]),
-        //     ThreeFG:       mustAtoi(data["fg3"]),
-        //     ThreeAttempts: mustAtoi(data["fg3a"]),
-        //     ThreePercent:  mustParseFloat(data["fg3_pct"]),
-        //     TwoFG:         mustAtoi(data["fg2"]),
-        //     TwoAttempts:   mustAtoi(data["fg2a"]),
-        //     TwoPercent:    mustParseFloat(data["fg2_pct"]),
-        //     EffectFGPercent: mustParseFloat(data["efg_pct"]),
-        //     FT:            mustAtoi(data["ft"]),
-        //     FTAttempts:    mustAtoi(data["fta"]),
-        //     FTPercent:     mustParseFloat(data["ft_pct"]),
-        //     OffensiveRB:   mustAtoi(data["orb"]),
-        //     DefensiveRB:   mustAtoi(data["drb"]),
-        //     TotalRB:       mustAtoi(data["trb"]),
-        //     Assists:       mustAtoi(data["ast"]),
-        //     Steals:        mustAtoi(data["stl"]),
-        //     Blocks:        mustAtoi(data["blk"]),
-        //     Turnovers:     mustAtoi(data["tov"]),
-        //     PersonalFouls: mustAtoi(data["pf"]),
-        //     Points:        mustAtoi(data["pts"]),
-        //     Team:          data["team_id"],
-        //     Season:        season,
-        //     IsPlayoff:     isPlayoff,
-        // }
 
         // 4) upsert on (player_id, season, team, is_playoff)
         if err := db.Clauses(clause.OnConflict{
