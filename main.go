@@ -25,6 +25,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	fiberswagger "github.com/swaggo/fiber-swagger"
+	// "gorm.io/gorm"
 
 	"github.com/nprasad2077/NBA_Go/config"
 	"github.com/nprasad2077/NBA_Go/controllers"
@@ -36,29 +37,26 @@ import (
 func main() {
 	// ——— One-off import-data mode ———
 	if len(os.Args) > 1 && os.Args[1] == "import-data" {
-		db := config.InitDB()
+		// Run all migrations + import steps exactly once
+		db := config.InitDB(true)
 
 		importPlayerAdvanced(db)
 		log.Println("🎉 Player Advanced Import completed successfully")
 
 		importPlayerAdvancedPlayoffs(db)
 		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
-	
 
 		importPlayerTotalsScrape(db)
-        log.Println("🎉 Player Totals (scraped) Import completed successfully")
+		log.Println("🎉 Player Totals (scraped) Import completed successfully")
 
-        importPlayerTotalsPlayoffsScrape(db)
-        log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
+		importPlayerTotalsPlayoffsScrape(db)
+		log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
 
-		// importPlayerShotChart(db)
-		// log.Println("🎉 Player Shot Chart Import Completed Successfully ")
-		
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
 	}
 
-	// gracefull shutdown context
+	// ——— Normal API startup: skip AutoMigrate ———
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -75,14 +73,14 @@ func main() {
 	})
 
 	// — CORS Allow ALL origins (development) —
-    app.Use(cors.New())
+	app.Use(cors.New())
 
 	// middlewares
 	app.Use(logger.New())
 	app.Use(middleware.MetricsMiddleware())
 
-	// DB connection
-	db := config.InitDB()
+	// DB connection (no migrations on API startup)
+	db := config.InitDB(false)
 
 	/* ---------- PUBLIC ROUTES (no API key) ---------- */
 	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))

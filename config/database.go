@@ -8,24 +8,28 @@ import (
     "github.com/nprasad2077/NBA_Go/utils/metrics"
 )
 
-func InitDB() *gorm.DB {
+func InitDB(shouldMigrate bool) *gorm.DB {
     db, err := gorm.Open(sqlite.Open("/app/data/nba.db"), &gorm.Config{})
     if err != nil {
-        log.Printf("/app/config/database.go:11\n[error] failed to initialize database, got error %v", err)
-        log.Fatal("Failed to connect database")
+        log.Fatalf("failed to connect database: %v", err)
     }
-    
-    // Track database operations
     metrics.DBOperationsTotal.WithLabelValues("connect", "database").Inc()
-    
-    // Auto migrate models
-    db.AutoMigrate(&models.PlayerAdvancedStat{})
-    db.AutoMigrate(&models.PlayerTotalStat{})
-    db.AutoMigrate(&models.PlayerShotChart{})
 
-    db.AutoMigrate(&models.APIKey{})
-    
-    metrics.DBOperationsTotal.WithLabelValues("migrate", "database").Inc()
-    
+    if shouldMigrate {
+        if err := db.AutoMigrate(&models.PlayerAdvancedStat{}); err != nil {
+            log.Fatalf("migrate PlayerAdvancedStat: %v", err)
+        }
+        if err := db.AutoMigrate(&models.PlayerTotalStat{}); err != nil {
+            log.Fatalf("migrate PlayerTotalStat: %v", err)
+        }
+        if err := db.AutoMigrate(&models.PlayerShotChart{}); err != nil {
+            log.Fatalf("migrate PlayerShotChart: %v", err)
+        }
+        if err := db.AutoMigrate(&models.APIKey{}); err != nil {
+            log.Fatalf("migrate APIKey: %v", err)
+        }
+        metrics.DBOperationsTotal.WithLabelValues("migrate", "database").Inc()
+    }
+
     return db
 }
