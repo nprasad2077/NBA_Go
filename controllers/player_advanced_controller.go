@@ -44,18 +44,18 @@ type AdvancedStatsResponse struct {
 // @Failure     400,500   {object} map[string]string
 // @Router      /api/playeradvancedstats/scrape [get]
 func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        season := c.QueryInt("season", 0)
-        if season == 0 {
-            return c.Status(400).JSON(fiber.Map{"error":"season is required"})
-        }
-        isPlayoff := c.QueryBool("isPlayoff", false)
+	return func(c *fiber.Ctx) error {
+		season := c.QueryInt("season", 0)
+		if season == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "season is required"})
+		}
+		isPlayoff := c.QueryBool("isPlayoff", false)
 
-        if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, isPlayoff); err != nil {
-            return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-        }
-        return c.JSON(fiber.Map{"message":"scrape+store complete"})
-    }
+		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, isPlayoff); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		}
+		return c.JSON(fiber.Map{"message": "scrape+store complete"})
+	}
 }
 
 // GetAllAdvancedPlayerStats godoc

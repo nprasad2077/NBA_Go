@@ -14,9 +14,9 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/nprasad2077/NBA_Go/models"
 	"github.com/nprasad2077/NBA_Go/services"
 	"gorm.io/gorm"
-	"github.com/nprasad2077/NBA_Go/models"
 )
 
 // func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
@@ -42,23 +42,22 @@ import (
 // @Failure     400,500   {object} map[string]string
 // @Router      /api/playertotals/scrape [get]
 func ScrapePlayerTotalStats(db *gorm.DB) fiber.Handler {
-   return func(c *fiber.Ctx) error {
-       season := c.QueryInt("season", 0)
-       if season == 0 {
-           return c.Status(400).JSON(fiber.Map{"error":"season is required"})
-       }
-       isPlayoff := c.QueryBool("isPlayoff", false)
+	return func(c *fiber.Ctx) error {
+		season := c.QueryInt("season", 0)
+		if season == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "season is required"})
+		}
+		isPlayoff := c.QueryBool("isPlayoff", false)
 
-       if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, isPlayoff); err != nil {
-           return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-       }
-       return c.JSON(fiber.Map{"message":"scrapestore complete"})
-   }
+		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, isPlayoff); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		}
+		return c.JSON(fiber.Map{"message": "scrapestore complete"})
+	}
 }
 
-
 // GetPlayerTotalStats godoc
-// @Security ApiKeyAuth 
+// @Security ApiKeyAuth
 // @Summary Get player total stats
 // @Description Filter and paginate player totals
 // @Tags PlayerTotals
