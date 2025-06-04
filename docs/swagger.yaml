@@ -88,6 +88,7 @@ definitions:
       distanceFt:
         type: integer
       id:
+        description: Auto‑increment primary key — works in SQLite and any other DB.
         type: integer
       lead:
         type: boolean
@@ -98,8 +99,10 @@ definitions:
       opponentTeamScore:
         type: integer
       playerId:
+        description: ──────────  "identity" columns (the dedup key)  ──────────
         type: string
       playerName:
+        description: ──────────  the rest of the payload  ──────────
         type: string
       qtr:
         type: string
@@ -184,6 +187,40 @@ paths:
       summary: Get player advanced stats
       tags:
       - PlayerStats
+  /api/playeradvancedstats/scrape:
+    get:
+      parameters:
+      - description: Season (e.g. 2025)
+        in: query
+        name: season
+        required: true
+        type: integer
+      - description: Whether playoffs?
+        in: query
+        name: isPlayoff
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Scrape player advanced stats from BR website
+      tags:
+      - PlayerStats
   /api/playershotchart:
     get:
       consumes:
@@ -219,18 +256,27 @@ paths:
       summary: Get shot-chart data
       tags:
       - PlayerShotChart
-  /api/playershotchart/fetch:
+  /api/playershotchart/scrape:
     get:
       consumes:
       - application/json
-      description: Imports shot-chart data for the given playerId and stores/updates
-        in DB
+      description: Scrapes seasons [startSeason…endSeason] for the given playerId
       parameters:
-      - description: Player ID (e.g., hardeja01)
+      - description: Player ID (e.g. derozde01)
         in: query
         name: playerId
         required: true
         type: string
+      - description: Start season (e.g. 2024)
+        in: query
+        name: startSeason
+        required: true
+        type: integer
+      - description: End season (e.g. 2021)
+        in: query
+        name: endSeason
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -252,7 +298,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Fetch a single player's shot-chart data from external API
+      summary: Scrape a player's shot-chart from BR website
       tags:
       - PlayerShotChart
   /api/playertotals:
@@ -312,6 +358,40 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get player total stats
+      tags:
+      - PlayerTotals
+  /api/playertotals/scrape:
+    get:
+      parameters:
+      - description: Season (e.g. 2025)
+        in: query
+        name: season
+        required: true
+        type: integer
+      - description: Whether playoffs?
+        in: query
+        name: isPlayoff
+        type: boolean
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Scrape player total stats from BR website
       tags:
       - PlayerTotals
 schemes:

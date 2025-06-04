@@ -106,6 +106,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/playeradvancedstats/scrape": {
+            "get": {
+                "tags": [
+                    "PlayerStats"
+                ],
+                "summary": "Scrape player advanced stats from BR website",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Season (e.g. 2025)",
+                        "name": "season",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether playoffs?",
+                        "name": "isPlayoff",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/playershotchart": {
             "get": {
                 "security": [
@@ -160,9 +212,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/playershotchart/fetch": {
+        "/api/playershotchart/scrape": {
             "get": {
-                "description": "Imports shot-chart data for the given playerId and stores/updates in DB",
+                "description": "Scrapes seasons [startSeason…endSeason] for the given playerId",
                 "consumes": [
                     "application/json"
                 ],
@@ -172,12 +224,26 @@ const docTemplate = `{
                 "tags": [
                     "PlayerShotChart"
                 ],
-                "summary": "Fetch a single player's shot-chart data from external API",
+                "summary": "Scrape a player's shot-chart from BR website",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Player ID (e.g., hardeja01)",
+                        "description": "Player ID (e.g. derozde01)",
                         "name": "playerId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Start season (e.g. 2024)",
+                        "name": "startSeason",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "End season (e.g. 2021)",
+                        "name": "endSeason",
                         "in": "query",
                         "required": true
                     }
@@ -289,6 +355,58 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/playertotals/scrape": {
+            "get": {
+                "tags": [
+                    "PlayerTotals"
+                ],
+                "summary": "Scrape player total stats from BR website",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Season (e.g. 2025)",
+                        "name": "season",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether playoffs?",
+                        "name": "isPlayoff",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "500": {
@@ -438,6 +556,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id": {
+                    "description": "Auto‑increment primary key — works in SQLite and any other DB.",
                     "type": "integer"
                 },
                 "lead": {
@@ -453,9 +572,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "playerId": {
+                    "description": "──────────  \"identity\" columns (the dedup key)  ──────────",
                     "type": "string"
                 },
                 "playerName": {
+                    "description": "──────────  the rest of the payload  ──────────",
                     "type": "string"
                 },
                 "qtr": {
