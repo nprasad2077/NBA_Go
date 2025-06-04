@@ -22,18 +22,18 @@ type AdvancedStatsResponse struct {
 
 // FetchPlayerAdvancedStats returns a handler that imports advanced stats for a season
 // Note: not exposed in Swagger docs, only internal use.
-func FetchPlayerAdvancedStats(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		season := c.QueryInt("season", 2025)
-		isPlayoff := c.QueryBool("isPlayoff", false)
+// func FetchPlayerAdvancedStats(db *gorm.DB) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		season := c.QueryInt("season", 2025)
+// 		isPlayoff := c.QueryBool("isPlayoff", false)
 
-		if err := services.FetchAndStorePlayerAdvancedStats(db, season, isPlayoff); err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-		}
+// 		if err := services.FetchAndStorePlayerAdvancedStats(db, season, isPlayoff); err != nil {
+// 			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+// 		}
 
-		return c.JSON(fiber.Map{"message": "Player stats fetched and saved."})
-	}
-}
+// 		return c.JSON(fiber.Map{"message": "Player stats fetched and saved."})
+// 	}
+// }
 
 // ScrapePlayerAdvancedStats godoc
 // @Summary     Scrape player advanced stats from BR website

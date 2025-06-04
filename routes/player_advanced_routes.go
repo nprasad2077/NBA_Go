@@ -9,7 +9,7 @@ import (
 func RegisterPlayerAdvancedRoutes(app *fiber.App, db *gorm.DB) {
 	api := app.Group("/api/playeradvancedstats")
 
-	api.Get("/fetch", controllers.FetchPlayerAdvancedStats(db))
+	// api.Get("/fetch", controllers.FetchPlayerAdvancedStats(db))
 	api.Get("/scrape", controllers.ScrapePlayerAdvancedStats(db))
 	api.Get("/", controllers.GetAllAdvancedPlayerStats(db))
 }

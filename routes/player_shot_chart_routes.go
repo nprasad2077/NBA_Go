@@ -9,7 +9,7 @@ import (
 // RegisterPlayerShotChartRoutes sets up the shot-chart endpoints
 func RegisterPlayerShotChartRoutes(app *fiber.App, db *gorm.DB) {
     api := app.Group("/api/playershotchart")
-    api.Get("/fetch",  controllers.FetchPlayerShotChartAPI(db))
+    // api.Get("/fetch",  controllers.FetchPlayerShotChartAPI(db))
     api.Get("/scrape", controllers.ScrapePlayerShotChart(db))
     api.Get("/",        controllers.GetPlayerShotChart(db))
 }

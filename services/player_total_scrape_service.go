@@ -134,14 +134,26 @@ func FetchAndStorePlayerTotalScrapedStats(db *gorm.DB, season int, isPlayoff boo
         teamID = data["team_name_abbr"]
     }
 
+    // pick “games” → fallback to “g” if empty
+    g := mustAtoi(data["games"])
+    if g == 0 {
+        g = mustAtoi(data["g"])
+    }
+
+    // pick “games_started” → fallback to “gs” if empty
+    gs := mustAtoi(data["games_started"])
+    if gs == 0 {
+        gs = mustAtoi(data["gs"])
+    }
+
     stat := models.PlayerTotalStat{
         ExternalID:    extID,
         PlayerID:      playerID,
         PlayerName:    playerName,
         Position:      data["pos"],
         Age:           mustAtoi(data["age"]),
-        Games:         mustAtoi(data["games"]),
-        GamesStarted:  mustAtoi(data["games_started"]),
+        Games:         g,
+        GamesStarted:  gs,
         MinutesPG:     mustParseFloat(data["mp"]),
         FieldGoals:    mustAtoi(data["fg"]),
         FieldAttempts: mustAtoi(data["fga"]),

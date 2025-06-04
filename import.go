@@ -34,14 +34,14 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 }
 
 // importPlayerShotChart fetches shot-charts for every known player
-func importPlayerShotChart(db *gorm.DB) {
-	const firstID = "hardeja01"
-	log.Printf("▶️  importing shot chart for player %s…", firstID)
-    if err := services.FetchAndStoreShotChartForPlayer(db, firstID); err != nil {
-        log.Printf("shot chart import failed for %s: %v", firstID, err)
-    }
-	// you can add more IDs here or just rely on the API endpoint after
-}
+// func importPlayerShotChart(db *gorm.DB) {
+// 	const firstID = "hardeja01"
+// 	log.Printf("▶️  importing shot chart for player %s…", firstID)
+//     if err := services.FetchAndStoreShotChartForPlayer(db, firstID); err != nil {
+//         log.Printf("shot chart import failed for %s: %v", firstID, err)
+//     }
+// 	// you can add more IDs here or just rely on the API endpoint after
+// }
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
