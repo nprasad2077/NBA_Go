@@ -24,7 +24,7 @@ services:
   db-init:
     build: .
     env_file: .env
-    command: ["/nba_go"]
+    command: ["/nba_go", "import-data"]
     depends_on:
       postgres:
         condition: service_healthy

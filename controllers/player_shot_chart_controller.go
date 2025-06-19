@@ -44,6 +44,7 @@ import (
 // @Success     200         {object} map[string]string
 // @Failure     400,500     {object} map[string]string
 // @Router      /api/playershotchart/scrape [get]
+// @ignore
 func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		pid := c.Query("playerId")

@@ -19,6 +19,19 @@ import (
 	"gorm.io/gorm"
 )
 
+var totalSortMap = map[string]string{
+    "points":        "points",
+    "assists":       "assists",
+    "totalRb":       "total_rb",
+    "gamesStarted":  "games_started",
+    "fieldPercent":  "field_percent",
+    "threePercent":  "three_percent",
+    "ftPercent":     "ft_percent",
+    "playerId":      "player_id",
+    "season":        "season",
+    "team":          "team",
+}
+
 // func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
 // 	return func(c *fiber.Ctx) error {
 // 		season := c.QueryInt("season", 2025)
@@ -41,6 +54,7 @@ import (
 // @Success     200       {object} map[string]string
 // @Failure     400,500   {object} map[string]string
 // @Router      /api/playertotals/scrape [get]
+// @ignore
 func ScrapePlayerTotalStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		season := c.QueryInt("season", 0)
@@ -78,18 +92,33 @@ func GetPlayerTotalStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var stats []models.PlayerTotalStat
 
+		// --- MODIFICATION FOR FILTERS ---
+        playerId := c.Query("playerId")
+        if playerId == "" {
+            playerId = c.Query("player_id")
+        }
+
 		season := c.QueryInt("season", 0)
 		team := c.Query("team")
-		playerId := c.Query("playerId")
+		// playerId := c.Query("playerId")
 		page := c.QueryInt("page", 1)
 		pageSize := c.QueryInt("pageSize", 20)
-		sortBy := c.Query("sortBy", "points")
-		ascending := c.QueryBool("ascending", false)
-		offset := (page - 1) * pageSize
-		order := sortBy + " DESC"
-		if ascending {
-			order = sortBy + " ASC"
-		}
+
+		// --- MODIFICATION FOR SORTING ---
+        sortByParam := c.Query("sortBy", "points")
+        ascending := c.QueryBool("ascending", false)
+
+		// Translate sortBy param to a valid DB column, defaulting if not found.
+        sortBy, ok := totalSortMap[sortByParam]
+        if !ok {
+            sortBy = "points" // Safe default
+        }
+
+        offset := (page - 1) * pageSize
+        order := sortBy + " DESC"
+        if ascending {
+            order = sortBy + " ASC"
+        }
 
 		query := db.Model(&models.PlayerTotalStat{})
 
