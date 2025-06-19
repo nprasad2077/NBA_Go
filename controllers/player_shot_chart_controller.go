@@ -30,6 +30,7 @@ import (
 // }
 
 // ScrapePlayerShotChart godoc
+// @ignore
 // @Summary     Scrape a player's shot-chart from BR website
 // @Description Scrapes seasons [startSeason…endSeason] for the given playerId
 //
@@ -43,8 +44,7 @@ import (
 // @Param       endSeason   query  int    true  "End season (e.g. 2021)"
 // @Success     200         {object} map[string]string
 // @Failure     400,500     {object} map[string]string
-// @Router      /api/playershotchart/scrape [get]
-// @ignore
+// //@Router      /api/playershotchart/scrape [get]
 func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		pid := c.Query("playerId")

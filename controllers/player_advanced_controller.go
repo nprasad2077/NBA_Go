@@ -45,14 +45,14 @@ type AdvancedStatsResponse struct {
 // }
 
 // ScrapePlayerAdvancedStats godoc
+// @ignore
 // @Summary     Scrape player advanced stats from BR website
 // @Tags        PlayerStats
 // @Param       season    query  int  true  "Season (e.g. 2025)"
 // @Param       isPlayoff query  bool false "Whether playoffs?"
 // @Success     200       {object} map[string]string
 // @Failure     400,500   {object} map[string]string
-// @Router      /api/playeradvancedstats/scrape [get]
-// @ignore
+// //@Router      /api/playeradvancedstats/scrape [get]
 func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		season := c.QueryInt("season", 0)
