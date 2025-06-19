@@ -1,15 +1,27 @@
 package config
 
 import (
+	"fmt"
+	"log"
+	"os"
+
 	"github.com/nprasad2077/NBA_Go/models"
 	"github.com/nprasad2077/NBA_Go/utils/metrics"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func InitDB(shouldMigrate bool) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("/app/data/nba.db"), &gorm.Config{})
+	// CHANGE: Build the DSN from environment variables
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{}) // <- CHANGE: Use the postgres driver
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
