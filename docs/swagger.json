@@ -5,7 +5,7 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "Stats service with API-key auth",
+        "description": "Stats service, now with public access!",
         "title": "NBA_Go API",
         "contact": {},
         "version": "1.0"
@@ -14,11 +14,6 @@
     "paths": {
         "/api/playeradvancedstats": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Returns filtered and paginated player advanced stats",
                 "consumes": [
                     "application/json"
@@ -157,11 +152,6 @@
         },
         "/api/playershotchart": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Returns shot-chart points, optionally filtered by playerId and/or season",
                 "consumes": [
                     "application/json"
@@ -278,11 +268,6 @@
         },
         "/api/playertotals": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Filter and paginate player totals",
                 "consumes": [
                     "application/json"
@@ -601,13 +586,6 @@
                     "type": "integer"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "X-API-Key",
-            "in": "header"
         }
     }
 }

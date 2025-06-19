@@ -1,12 +1,17 @@
 // @title       NBA_Go API
 // @version     1.0
-// @description Stats service with API-key auth
+// @description Stats service, now with public access!
 // @schemes     http https
 // @BasePath    /
 //
-// @securityDefinitions.apikey ApiKeyAuth
-// @in   header
-// @name X-API-Key
+// To re-enable security docs:
+// 1. Uncomment the securityDefinitions block below.
+// 2. Uncomment the @Security annotation in each controller.
+// 3. Run 'swag init'.
+//
+// //@securityDefinitions.apikey ApiKeyAuth
+// //@in   header
+// //@name X-API-Key
 package main
 
 import (
@@ -88,7 +93,8 @@ func main() {
 	controllers.RegisterKeyAdminRoutes(app, db)
 
 	/* ---------- PROTECTED ROUTES ---------- */
-	app.Use(middleware.APIKeyAuth(db))
+	// Remove Comment to re-enable api key middleware.
+	// app.Use(middleware.APIKeyAuth(db))
 	routes.RegisterPlayerAdvancedRoutes(app, db)
 	routes.RegisterPlayerTotalRoutes(app, db)
 	routes.RegisterPlayerShotChartRoutes(app, db)

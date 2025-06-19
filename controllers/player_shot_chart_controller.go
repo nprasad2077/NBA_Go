@@ -67,7 +67,7 @@ func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
 }
 
 // GetPlayerShotChart godoc
-// @Security    ApiKeyAuth
+// //@Security    ApiKeyAuth
 // @Summary     Get shot-chart data
 // @Description Returns shot-chart points, optionally filtered by playerId and/or season
 // @Tags        PlayerShotChart

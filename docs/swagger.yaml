@@ -123,7 +123,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: Stats service with API-key auth
+  description: Stats service, now with public access!
   title: NBA_Go API
   version: "1.0"
 paths:
@@ -182,8 +182,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Get player advanced stats
       tags:
       - PlayerStats
@@ -251,8 +249,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Get shot-chart data
       tags:
       - PlayerShotChart
@@ -355,8 +351,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Get player total stats
       tags:
       - PlayerTotals
@@ -397,9 +391,4 @@ paths:
 schemes:
 - http
 - https
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: X-API-Key
-    type: apiKey
 swagger: "2.0"

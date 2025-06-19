@@ -59,7 +59,7 @@ func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 }
 
 // GetAllAdvancedPlayerStats godoc
-// @Security    ApiKeyAuth
+// //@Security    ApiKeyAuth
 // @Summary     Get player advanced stats
 // @Description Returns filtered and paginated player advanced stats
 // @Tags        PlayerStats

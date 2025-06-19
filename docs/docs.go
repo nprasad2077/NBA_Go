@@ -17,11 +17,6 @@ const docTemplate = `{
     "paths": {
         "/api/playeradvancedstats": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Returns filtered and paginated player advanced stats",
                 "consumes": [
                     "application/json"
@@ -160,11 +155,6 @@ const docTemplate = `{
         },
         "/api/playershotchart": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Returns shot-chart points, optionally filtered by playerId and/or season",
                 "consumes": [
                     "application/json"
@@ -281,11 +271,6 @@ const docTemplate = `{
         },
         "/api/playertotals": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Filter and paginate player totals",
                 "consumes": [
                     "application/json"
@@ -605,13 +590,6 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "X-API-Key",
-            "in": "header"
-        }
     }
 }`
 
@@ -622,7 +600,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http", "https"},
 	Title:            "NBA_Go API",
-	Description:      "Stats service with API-key auth",
+	Description:      "Stats service, now with public access!",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
