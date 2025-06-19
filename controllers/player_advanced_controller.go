@@ -8,6 +8,15 @@ import (
 	"github.com/nprasad2077/NBA_Go/services"
 )
 
+var advancedSortMap = map[string]string{
+    "winShares":   "win_shares",
+    "per":         "per",
+    "tsPercent":   "ts_percent",
+    "playerId":    "player_id",
+    "season":      "season",
+    "team":        "team",
+}
+
 // AdvancedStatsResponse is the swagger response model for GetAllAdvancedPlayerStats
 // It wraps the returned player advanced stats and pagination metadata.
 type AdvancedStatsResponse struct {
@@ -36,13 +45,14 @@ type AdvancedStatsResponse struct {
 // }
 
 // ScrapePlayerAdvancedStats godoc
+// @ignore
 // @Summary     Scrape player advanced stats from BR website
 // @Tags        PlayerStats
 // @Param       season    query  int  true  "Season (e.g. 2025)"
 // @Param       isPlayoff query  bool false "Whether playoffs?"
 // @Success     200       {object} map[string]string
 // @Failure     400,500   {object} map[string]string
-// @Router      /api/playeradvancedstats/scrape [get]
+// //@Router      /api/playeradvancedstats/scrape [get]
 func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		season := c.QueryInt("season", 0)
@@ -59,7 +69,7 @@ func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 }
 
 // GetAllAdvancedPlayerStats godoc
-// @Security    ApiKeyAuth
+// //@Security    ApiKeyAuth
 // @Summary     Get player advanced stats
 // @Description Returns filtered and paginated player advanced stats
 // @Tags        PlayerStats
@@ -80,23 +90,38 @@ func GetAllAdvancedPlayerStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var stats []models.PlayerAdvancedStat
 
+		// --- MODIFICATION FOR FILTERS ---
+        // Allow both "playerId" and "player_id"
+        playerId := c.Query("playerId")
+        if playerId == "" {
+            playerId = c.Query("player_id")
+        }
+
 		// Filters
 		season := c.QueryInt("season", 0)
 		team := c.Query("team")
-		playerId := c.Query("playerId")
+		// playerId := c.Query("playerId")
 
 		// Pagination
 		page := c.QueryInt("page", 1)
 		pageSize := c.QueryInt("pageSize", 20)
 		offset := (page - 1) * pageSize
 
-		// Sorting
-		sortBy := c.Query("sortBy", "win_shares")
-		ascending := c.QueryBool("ascending", false)
-		order := sortBy + " DESC"
-		if ascending {
-			order = sortBy + " ASC"
-		}
+		// --- MODIFICATION FOR SORTING ---
+        // Sorting
+        sortByParam := c.Query("sortBy", "winShares") // Default to a common field
+        ascending := c.QueryBool("ascending", false)
+
+        // Translate sortBy param to a valid DB column, defaulting if not found.
+        sortBy, ok := advancedSortMap[sortByParam]
+        if !ok {
+            sortBy = "win_shares" // Safe default
+        }
+
+        order := sortBy + " DESC"
+        if ascending {
+            order = sortBy + " ASC"
+        }
 
 		// Build query
 		query := db.Model(&models.PlayerAdvancedStat{})

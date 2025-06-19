@@ -123,7 +123,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: Stats service with API-key auth
+  description: Stats service, now with public access!
   title: NBA_Go API
   version: "1.0"
 paths:
@@ -182,43 +182,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Get player advanced stats
-      tags:
-      - PlayerStats
-  /api/playeradvancedstats/scrape:
-    get:
-      parameters:
-      - description: Season (e.g. 2025)
-        in: query
-        name: season
-        required: true
-        type: integer
-      - description: Whether playoffs?
-        in: query
-        name: isPlayoff
-        type: boolean
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Scrape player advanced stats from BR website
       tags:
       - PlayerStats
   /api/playershotchart:
@@ -251,54 +215,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Get shot-chart data
-      tags:
-      - PlayerShotChart
-  /api/playershotchart/scrape:
-    get:
-      consumes:
-      - application/json
-      description: Scrapes seasons [startSeason…endSeason] for the given playerId
-      parameters:
-      - description: Player ID (e.g. derozde01)
-        in: query
-        name: playerId
-        required: true
-        type: string
-      - description: Start season (e.g. 2024)
-        in: query
-        name: startSeason
-        required: true
-        type: integer
-      - description: End season (e.g. 2021)
-        in: query
-        name: endSeason
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Scrape a player's shot-chart from BR website
       tags:
       - PlayerShotChart
   /api/playertotals:
@@ -355,51 +272,10 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - ApiKeyAuth: []
       summary: Get player total stats
-      tags:
-      - PlayerTotals
-  /api/playertotals/scrape:
-    get:
-      parameters:
-      - description: Season (e.g. 2025)
-        in: query
-        name: season
-        required: true
-        type: integer
-      - description: Whether playoffs?
-        in: query
-        name: isPlayoff
-        type: boolean
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Scrape player total stats from BR website
       tags:
       - PlayerTotals
 schemes:
 - http
 - https
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: X-API-Key
-    type: apiKey
 swagger: "2.0"

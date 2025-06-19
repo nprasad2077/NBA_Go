@@ -17,11 +17,6 @@ const docTemplate = `{
     "paths": {
         "/api/playeradvancedstats": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Returns filtered and paginated player advanced stats",
                 "consumes": [
                     "application/json"
@@ -106,65 +101,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/playeradvancedstats/scrape": {
-            "get": {
-                "tags": [
-                    "PlayerStats"
-                ],
-                "summary": "Scrape player advanced stats from BR website",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Season (e.g. 2025)",
-                        "name": "season",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Whether playoffs?",
-                        "name": "isPlayoff",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/playershotchart": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Returns shot-chart points, optionally filtered by playerId and/or season",
                 "consumes": [
                     "application/json"
@@ -212,80 +150,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/playershotchart/scrape": {
-            "get": {
-                "description": "Scrapes seasons [startSeason…endSeason] for the given playerId",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "PlayerShotChart"
-                ],
-                "summary": "Scrape a player's shot-chart from BR website",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Player ID (e.g. derozde01)",
-                        "name": "playerId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Start season (e.g. 2024)",
-                        "name": "startSeason",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "End season (e.g. 2021)",
-                        "name": "endSeason",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/playertotals": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Filter and paginate player totals",
                 "consumes": [
                     "application/json"
@@ -355,58 +221,6 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/playertotals/scrape": {
-            "get": {
-                "tags": [
-                    "PlayerTotals"
-                ],
-                "summary": "Scrape player total stats from BR website",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Season (e.g. 2025)",
-                        "name": "season",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Whether playoffs?",
-                        "name": "isPlayoff",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
                         }
                     },
                     "500": {
@@ -605,13 +419,6 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "X-API-Key",
-            "in": "header"
-        }
     }
 }`
 
@@ -622,7 +429,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http", "https"},
 	Title:            "NBA_Go API",
-	Description:      "Stats service with API-key auth",
+	Description:      "Stats service, now with public access!",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
