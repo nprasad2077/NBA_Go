@@ -1,4 +1,5 @@
-# docker-compose.yml - Final Version Using Server-Side Volumes
+# docker-compose.yml - Final Version with Static Port Mappings
+# import-data disabled
 
 services:
   db-init:
@@ -29,23 +30,21 @@ services:
   nginx:
     image: 'nginx:stable'
     volumes:
-      # --- MODIFICATION ---
-      # Point to the absolute path on the Coolify server.
       - '/data/nba-go-config/nginx:/etc/nginx:ro'
     depends_on:
       - api1
       - api2
       - api3
     ports:
-      - "8080"
+      # --- MODIFICATION ---
+      # Map container port 8080 to a static HOST port 8081.
+      - "8081:8080"
     networks:
       - api.network
 
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
-      # --- MODIFICATION ---
-      # Point to the absolute path on the Coolify server.
       - '/data/nba-go-config/prometheus:/etc/prometheus'
       - 'prometheus_data:/prometheus'
     command:
@@ -54,7 +53,9 @@ services:
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
     ports:
-      - "9090"
+      # --- MODIFICATION ---
+      # Map container port 9090 to a static HOST port 9091.
+      - "9091:9090"
     networks:
       - api.network
     restart: unless-stopped
@@ -62,15 +63,13 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000"
+      # --- MODIFICATION ---
+      # Map container port 3000 to a static HOST port 3001.
+      - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
-      # --- MODIFICATION ---
-      # Point to the absolute path on the Coolify server.
       - '/data/nba-go-config/grafana/provisioning:/etc/grafana/provisioning'
-      # This volume for user-created dashboards can remain relative or be removed
-      # if you only manage dashboards via provisioning.
       - './grafana/dashboards:/var/lib/grafana/dashboards'
       - 'grafana_data:/var/lib/grafana'
     networks:
