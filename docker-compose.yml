@@ -3,11 +3,11 @@ services:
   # --- The local postgres service is disabled for production deployment ---
   # postgres:
   #   ...
-
+  # Add "import-data" back into commands for DB import.
   db-init:
     build: .
     env_file: .env
-    command: ["/nba_go", "import-data"]
+    command: ["/nba_go"]
     networks:
       - api.network
     restart: "no"
