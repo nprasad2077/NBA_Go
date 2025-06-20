@@ -45,11 +45,11 @@ func main() {
 		// Run all migrations + import steps exactly once
 		db := config.InitDB(true)
 
-		// importPlayerAdvanced(db)
-		// log.Println("🎉 Player Advanced Import completed successfully")
+		importPlayerAdvanced(db)
+		log.Println("🎉 Player Advanced Import completed successfully")
 
-		// importPlayerAdvancedPlayoffs(db)
-		// log.Println("🎉 Player Advanced Playoffs Import completed successfully")
+		importPlayerAdvancedPlayoffs(db)
+		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
 
 		importPlayerTotalsScrape(db)
 		log.Println("🎉 Player Totals (scraped) Import completed successfully")
