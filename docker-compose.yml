@@ -1,12 +1,8 @@
-# Note: The 'version' attribute is obsolete in modern Docker Compose and has been removed.
+# docker-compose.yml - Final Version Using Server-Side Volumes
+
 services:
-  # --- The local postgres service is disabled for production deployment ---
-  # postgres:
-  #   ...
-  # Add "import-data" back into commands for DB import.
   db-init:
     build: .
-    env_file: .env
     command: ["/nba_go"]
     networks:
       - api.network
@@ -14,24 +10,18 @@ services:
 
   api1:
     build: .
-    env_file: .env
-    # --- MODIFICATION ---
-    # The API services do not need to be exposed directly.
-    # Nginx will handle routing to them internally.
     networks:
       - api.network
     restart: always
 
   api2:
     build: .
-    env_file: .env
     networks:
       - api.network
     restart: always
 
   api3:
     build: .
-    env_file: .env
     networks:
       - api.network
     restart: always
@@ -39,14 +29,13 @@ services:
   nginx:
     image: 'nginx:stable'
     volumes:
-      - './nginx:/etc/nginx:ro'
+      # --- MODIFICATION ---
+      # Point to the absolute path on the Coolify server.
+      - '/data/nba-go-config/nginx:/etc/nginx:ro'
     depends_on:
       - api1
       - api2
       - api3
-    # --- MODIFICATION ---
-    # We EXPOSE the container port, but do not PUBLISH it to the host.
-    # Coolify's proxy will connect to this internal port.
     ports:
       - "8080"
     networks:
@@ -55,15 +44,15 @@ services:
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
-      - './prometheus:/etc/prometheus'
+      # --- MODIFICATION ---
+      # Point to the absolute path on the Coolify server.
+      - '/data/nba-go-config/prometheus:/etc/prometheus'
       - 'prometheus_data:/prometheus'
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
-    # --- MODIFICATION ---
-    # Expose the internal port for the proxy.
     ports:
       - "9090"
     networks:
@@ -73,13 +62,15 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      # --- MODIFICATION ---
-      # Expose the internal port for the proxy.
       - "3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
-      - './grafana/provisioning:/etc/grafana/provisioning'
+      # --- MODIFICATION ---
+      # Point to the absolute path on the Coolify server.
+      - '/data/nba-go-config/grafana/provisioning:/etc/grafana/provisioning'
+      # This volume for user-created dashboards can remain relative or be removed
+      # if you only manage dashboards via provisioning.
       - './grafana/dashboards:/var/lib/grafana/dashboards'
       - 'grafana_data:/var/lib/grafana'
     networks:
