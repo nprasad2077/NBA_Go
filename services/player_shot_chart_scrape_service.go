@@ -17,29 +17,24 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// FetchAndStoreShotChartScrapedForPlayer scrapes the shot chart pages on
-// Basketball‑Reference for one player and upserts every shot into SQLite.
-// A *composite* unique key keeps duplicates out:
-//
-//   (player_id, season, date, qtr, time_remaining, top, left)
-//
-// The model therefore needs a matching unique index (see models package).
+// FetchAndStoreShotChartScrapedForPlayer scrapes the shot chart pages on
+// Basketball-Reference for one player and batch upserts every shot.
 func FetchAndStoreShotChartScrapedForPlayer(
 	db *gorm.DB,
 	playerID string,
 	startSeason, endSeason int,
 ) error {
-	// loop newest → oldest
+	// Loop newest → oldest season
 	for season := startSeason; season >= endSeason; season-- {
 		url := fmt.Sprintf(
 			"https://www.basketball-reference.com/players/%s/%s/shooting/%d",
 			playerID[:1], playerID, season,
 		)
 
-		// ─────────────────────── 1) HTTP GET  ────────────────────────
+		// 1) HTTP GET the page content
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
-			return fmt.Errorf("request creation error for %d: %w", season, err)
+			return fmt.Errorf("request creation error for season %d: %w", season, err)
 		}
 		req.Header.Set("User-Agent",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) "+
@@ -47,61 +42,66 @@ func FetchAndStoreShotChartScrapedForPlayer(
 		)
 		resp, err := (&http.Client{}).Do(req)
 		if err != nil {
-			return fmt.Errorf("HTTP error for %d: %w", season, err)
+			return fmt.Errorf("HTTP error for season %d: %w", season, err)
 		}
 		if resp.StatusCode != http.StatusOK {
 			resp.Body.Close()
-			return fmt.Errorf("unexpected status for %d: %s", season, resp.Status)
+			// This is not an error, just means the player might not have data for that season.
+			log.Printf("⚠️  Skipping season %d for player %s (Status: %s)", season, playerID, resp.Status)
+			continue
 		}
 		bodyBytes, err := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		if err != nil {
-			return fmt.Errorf("read error for %d: %w", season, err)
+			return fmt.Errorf("read error for season %d: %w", season, err)
 		}
 
-		// ─────────────────── 2) player name (nice to have) ───────────
+		// 2) Parse the player name (nice to have)
 		fullDoc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
 		if err != nil {
-			return fmt.Errorf("name‑parse error for %d: %w", season, err)
+			return fmt.Errorf("name-parse error for season %d: %w", season, err)
 		}
 		playerName := fullDoc.Find("#meta span[itemprop='name']").First().Text()
 		if playerName == "" {
 			playerName = playerID
 		}
 
-		// ───────────────── 3) commented‑out shot chart HTML ──────────
+		// 3) Extract the shot chart HTML, which is hidden inside a comment
 		shotHTML := extractCommentedShotChart(bodyBytes)
 		if shotHTML == "" {
-			log.Printf("⚠️  no shot‑chart comment found for %d", season)
+			log.Printf("⚠️  No shot-chart comment found for player %s in season %d", playerID, season)
 			continue
 		}
 		doc, err := goquery.NewDocumentFromReader(strings.NewReader(shotHTML))
 		if err != nil {
-			return fmt.Errorf("snippet‑parse error for %d: %w", season, err)
+			return fmt.Errorf("snippet-parse error for season %d: %w", season, err)
 		}
 		wrapper := doc.Find("div#div_shot-chart div#shot-wrapper")
 		if wrapper.Length() == 0 {
-			log.Printf("⚠️  no shot‑wrapper for %d", season)
+			log.Printf("⚠️  No shot-wrapper found for player %s in season %d", playerID, season)
 			continue
 		}
 
-		// ───────────────────── 4) scrape every tooltip ───────────────
-		var firstErr error // surface the first DB failure after the loop
+		// --- BATCHING LOGIC START ---
+		// Create a slice to hold all the shot data for the current season.
+		var shotsToUpsert []models.PlayerShotChart
+
+		// 4) Scrape every tooltip and collect the data into the slice.
 		wrapper.Find("div.tooltip.make, div.tooltip.miss").Each(func(_ int, s *goquery.Selection) {
-			// position on the court
+			// Position on the court
 			style, _ := s.Attr("style")
 			parts := strings.Split(style, ";")
 			top := parsePx(parts[0])
 			left := parsePx(parts[1])
 
-			// tooltip text
+			// Tooltip text
 			tip, _ := s.Attr("tip")
 			tipParts := strings.Split(tip, "<br>")
 
-			// date, team, opponent
-			header := tipParts[0]                       // e.g. "Oct 20, 2021, CHI at DET"
-			dateSegs := strings.SplitN(header, ", ", 3) // {"Oct 20", "2021", "CHI at DET"}
-			date := dateSegs[0] + "," + dateSegs[1]     // "Oct 20,2021"
+			// Date, team, opponent
+			header := tipParts[0]
+			dateSegs := strings.SplitN(header, ", ", 3)
+			date := dateSegs[0] + "," + dateSegs[1]
 
 			var team, opponent string
 			if len(dateSegs) == 3 {
@@ -113,18 +113,18 @@ func FetchAndStoreShotChartScrapedForPlayer(
 				}
 			}
 
-			// quarter & time remaining
+			// Quarter & time remaining
 			qt := strings.SplitN(tipParts[1], ",", 2)
 			quarter := qt[0]
 			timeRem := strings.Fields(qt[1])[0]
 
-			// result, shot type & distance
-			rt := strings.Fields(tipParts[2]) // ["Made","2-pointer","..."|"Missed",...]
+			// Result, shot type & distance
+			rt := strings.Fields(tipParts[2])
 			made := rt[0] == "Made"
 			shotType := rt[1]
 			distance := mustAtoi(rt[len(rt)-2])
 
-			// score & lead flag
+			// Score & lead flag
 			last := strings.Fields(tipParts[3])
 			sc := strings.Split(last[len(last)-1], "-")
 			teamScore, oppScore := mustAtoi(sc[0]), mustAtoi(sc[1])
@@ -148,31 +148,34 @@ func FetchAndStoreShotChartScrapedForPlayer(
 				Team:              team,
 				Season:            season,
 			}
+			// Add the parsed shot object to our slice.
+			shotsToUpsert = append(shotsToUpsert, shot)
+		})
 
-			// ─────────────── 5) upsert / dedup  ────────────────
+		// 5) Perform the batch upsert operation for the current season.
+		if len(shotsToUpsert) > 0 {
+			log.Printf("Attempting to batch upsert %d shots for player %s in season %d...", len(shotsToUpsert), playerID, season)
+
 			if err := db.Clauses(clause.OnConflict{
-				Columns: []clause.Column{ // MUST match the unique index order
-					{Name: "player_id"},
-					{Name: "season"},
-					{Name: "date"},
-					{Name: "qtr"},
-					{Name: "time_remaining"},
-					{Name: "top"},
-					{Name: "left"},
+				Columns: []clause.Column{ // MUST match the unique index order in the model
+					{Name: "player_id"}, {Name: "season"}, {Name: "date"},
+					{Name: "qtr"}, {Name: "time_remaining"}, {Name: "top"}, {Name: "left"},
 				},
 				DoUpdates: clause.AssignmentColumns([]string{
 					"player_name", "result", "shot_type", "distance_ft",
 					"lead", "team_score", "opponent_team_score",
 					"opponent", "team",
 				}),
-			}).Create(&shot).Error; err != nil && firstErr == nil {
-				firstErr = err
+			}).Create(&shotsToUpsert).Error; err != nil {
+				// If the batch operation fails, log the error and return it.
+				return fmt.Errorf("DB upsert error for player %s in season %d: %w", playerID, season, err)
 			}
-		})
 
-		if firstErr != nil {
-			return fmt.Errorf("DB upsert error for season %d: %w", season, firstErr)
+			log.Printf("✅ Successfully batch upserted %d shots for player %s in season %d.", len(shotsToUpsert), playerID, season)
+		} else {
+			log.Printf("No shots found to import for player %s in season %d.", playerID, season)
 		}
+		// --- BATCHING LOGIC END ---
 	}
 	return nil
 }
