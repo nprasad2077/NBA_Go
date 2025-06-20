@@ -11,7 +11,7 @@ import (
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons 2017–2025
 func importPlayerAdvanced(db *gorm.DB) {
-	for season := 2000; season <= 2014; season++ {
+	for season := 1991; season <= 1993; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -23,7 +23,7 @@ func importPlayerAdvanced(db *gorm.DB) {
 
 // importPlayerAdvancedPlayoffs fetches and stores advanced stats for playoffs seasons 2023–2025
 func importPlayerAdvancedPlayoffs(db *gorm.DB) {
-	for season := 2000; season <= 2014; season++ {
+	for season := 1991; season <= 1993; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -35,7 +35,7 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-    for season := 2000; season <= 2012; season++ {
+    for season := 1991; season <= 1993; season++ {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
             log.Printf("scraped totals import failed for %d: %v", season, err)
         }
@@ -47,7 +47,7 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-    for season := 2000; season <= 2012; season++ {
+    for season := 1991; season <= 1993; season++ {
         if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
             log.Printf("scraped playoffs import failed for %d: %v", season, err)
         }
