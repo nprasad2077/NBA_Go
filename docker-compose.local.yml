@@ -1,0 +1,101 @@
+# docker-compose.local.yml
+#
+# Use this file to run local services (API, Nginx, etc.) while
+# connecting to a REMOTE database.
+#
+# This version includes the 'db-init' service. Note that this service
+# will attempt to run its 'import-data' command every time you execute
+# 'docker-compose up'.
+
+services:
+  # This service runs the 'import-data' command against the remote database
+  # specified in your '.env.local' file. It has no 'depends_on' since there
+  # is no local postgres container to wait for.
+  db-init:
+    build: .
+    env_file: .env.local
+    command: ["/nba_go", "import-data"]
+    networks:
+      - api.network
+    restart: "no"
+
+  # API services now have no 'depends_on' section.
+  # They will start and immediately try to connect to the DB_HOST in your .env file.
+  api1:
+    build: .
+    env_file: .env.local
+    ports:
+      - '5001:5000'
+    networks:
+      - api.network
+    restart: always
+
+  api2:
+    build: .
+    env_file: .env.local
+    ports:
+      - '5002:5000'
+    networks:
+      - api.network
+    restart: always
+
+  api3:
+    build: .
+    env_file: .env.local
+    ports:
+      - '5003:5000'
+    networks:
+      - api.network
+    restart: always
+
+  nginx:
+    image: 'nginx:stable'
+    volumes:
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+    depends_on:
+      - api1
+      - api2
+      - api3
+    ports:
+      - '8080:8080'
+    networks:
+      - api.network
+
+  prometheus:
+    image: 'prom/prometheus:latest'
+    volumes:
+      - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
+      - 'prometheus_data:/prometheus'
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    ports:
+      - '9090:9090'
+    networks:
+      - api.network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3001:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=testing
+    volumes:
+      - './grafana/provisioning/datasources:/etc/grafana/provisioning/datasources'
+      - './grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards'
+      - './grafana/dashboards:/var/lib/grafana/dashboards'
+      - 'grafana_data:/var/lib/grafana'
+    networks:
+      - api.network
+    restart: unless-stopped
+
+volumes:
+  # The 'postgres_data' volume is not needed in this configuration.
+  prometheus_data:
+  grafana_data:
+
+networks:
+  api.network: null

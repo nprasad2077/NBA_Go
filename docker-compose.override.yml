@@ -1,0 +1,34 @@
+# docker-compose.override.yml
+#
+# This file is used for local development to connect to a REMOTE database.
+# It overrides the main 'docker-compose.yml' by:
+#  1. Disabling the local 'postgres' service by replacing it with a container that runs forever.
+#  2. Removing the 'depends_on' conditions from other services that rely on the local database.
+
+services:
+  # This section effectively disables the local postgres service.
+  # Instead of `command: "true"`, which exits immediately, we use `tail -f /dev/null`
+  # to keep the container running indefinitely, satisfying Docker Compose.
+  postgres:
+    image: busybox
+    command: ["tail", "-f", "/dev/null"]
+    networks: []
+    healthcheck: {}
+    volumes: []
+
+  # Remove the dependency on the local postgres container for the db-init service.
+  # It will now start immediately and use the DB_HOST from your .env.local file.
+  db-init:
+    depends_on: {}
+
+  # Remove the dependency on the local postgres container for the api1 service.
+  api1:
+    depends_on: {}
+
+  # Remove the dependency on the local postgres container for the api2 service.
+  api2:
+    depends_on: {}
+
+  # Remove the dependency on the local postgres container for the api3 service.
+  api3:
+    depends_on: {}
