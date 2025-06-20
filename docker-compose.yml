@@ -55,7 +55,7 @@ services:
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
-      - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
+      - './prometheus:/etc/prometheus'
       - 'prometheus_data:/prometheus'
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -79,8 +79,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
-      - './grafana/provisioning/datasources:/etc/grafana/provisioning/datasources'
-      - './grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards'
+      - './grafana/provisioning:/etc/grafana/provisioning'
       - './grafana/dashboards:/var/lib/grafana/dashboards'
       - 'grafana_data:/var/lib/grafana'
     networks:
