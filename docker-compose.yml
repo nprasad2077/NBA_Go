@@ -1,47 +1,44 @@
 version: '3.8'
 
 services:
-  # NEW: Add a dedicated PostgreSQL database service
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - '${DB_PORT}:5432' # Expose DB port to host machine for local tools
-    volumes:
-      - postgres_data:/var/lib/postgresql/data # Persist data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - api.network
+  # --- MODIFICATION ---
+  # The local postgres service is commented out. Coolify will provide the database.
+  # postgres:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_DB: ${DB_NAME}
+  #   ports:
+  #     - '${DB_PORT}:5432'
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - api.network
 
-  # MODIFIED: This service now runs migrations and imports against the live Postgres DB
+  # This service will now run against the production database on deploy. Add import-data back into command for data import.
   db-init:
     build: .
     env_file: .env
-    command: ["/nba_go", "import-data"]
-    depends_on:
-      postgres:
-        condition: service_healthy
+    command: ["/nba_go"] 
+    # --- MODIFICATION ---
+    # depends_on is removed. It will use the DB_HOST from environment variables.
     networks:
       - api.network
     restart: "no"
 
-  # MODIFIED: All API services now depend on postgres being healthy.
-  # The volume mount for './data' is no longer needed.
   api1:
     build: .
     env_file: .env
     ports:
       - '5001:5000'
-    depends_on:
-      postgres:
-        condition: service_healthy
+    # --- MODIFICATION ---
+    # depends_on is removed.
     networks:
       - api.network
     restart: always
@@ -51,9 +48,8 @@ services:
     env_file: .env
     ports:
       - '5002:5000'
-    depends_on:
-      postgres:
-        condition: service_healthy
+    # --- MODIFICATION ---
+    # depends_on is removed.
     networks:
       - api.network
     restart: always
@@ -63,9 +59,8 @@ services:
     env_file: .env
     ports:
       - '5003:5000'
-    depends_on:
-      postgres:
-        condition: service_healthy
+    # --- MODIFICATION ---
+    # depends_on is removed.
     networks:
       - api.network
     restart: always
@@ -115,7 +110,8 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data: # New volume for Postgres
+  # --- MODIFICATION ---
+  # postgres_data volume is no longer needed.
   prometheus_data:
   grafana_data:
 
