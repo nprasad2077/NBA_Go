@@ -1,33 +1,13 @@
-version: '3.8'
-
+# Note: The 'version' attribute is obsolete in modern Docker Compose and has been removed.
 services:
-  # --- MODIFICATION ---
-  # The local postgres service is commented out. Coolify will provide the database.
+  # --- The local postgres service is disabled for production deployment ---
   # postgres:
-  #   image: postgres:15-alpine
-  #   environment:
-  #     POSTGRES_USER: ${DB_USER}
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
-  #     POSTGRES_DB: ${DB_NAME}
-  #   ports:
-  #     - '${DB_PORT}:5432'
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   networks:
-  #     - api.network
+  #   ...
 
-  # This service will now run against the production database on deploy. Add import-data back into command for data import.
   db-init:
     build: .
     env_file: .env
-    command: ["/nba_go"] 
-    # --- MODIFICATION ---
-    # depends_on is removed. It will use the DB_HOST from environment variables.
+    command: ["/nba_go", "import-data"]
     networks:
       - api.network
     restart: "no"
@@ -35,10 +15,9 @@ services:
   api1:
     build: .
     env_file: .env
-    ports:
-      - '5001:5000'
     # --- MODIFICATION ---
-    # depends_on is removed.
+    # The API services do not need to be exposed directly.
+    # Nginx will handle routing to them internally.
     networks:
       - api.network
     restart: always
@@ -46,10 +25,6 @@ services:
   api2:
     build: .
     env_file: .env
-    ports:
-      - '5002:5000'
-    # --- MODIFICATION ---
-    # depends_on is removed.
     networks:
       - api.network
     restart: always
@@ -57,10 +32,6 @@ services:
   api3:
     build: .
     env_file: .env
-    ports:
-      - '5003:5000'
-    # --- MODIFICATION ---
-    # depends_on is removed.
     networks:
       - api.network
     restart: always
@@ -73,8 +44,11 @@ services:
       - api1
       - api2
       - api3
+    # --- MODIFICATION ---
+    # We EXPOSE the container port, but do not PUBLISH it to the host.
+    # Coolify's proxy will connect to this internal port.
     ports:
-      - '8080:8080'
+      - "8080"
     networks:
       - api.network
 
@@ -88,8 +62,10 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
+    # --- MODIFICATION ---
+    # Expose the internal port for the proxy.
     ports:
-      - '9090:9090'
+      - "9090"
     networks:
       - api.network
     restart: unless-stopped
@@ -97,7 +73,9 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - '3001:3000'
+      # --- MODIFICATION ---
+      # Expose the internal port for the proxy.
+      - "3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
@@ -110,8 +88,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  # --- MODIFICATION ---
-  # postgres_data volume is no longer needed.
   prometheus_data:
   grafana_data:
 
