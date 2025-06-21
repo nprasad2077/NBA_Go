@@ -5,24 +5,28 @@ services:
     command: ["/nba_go"]
     networks:
       - coolify-shared
+      - api_network
     restart: "no"
 
   api1:
     build: .
     networks:
-      - coolify-shared
+      # - coolify-shared
+      - api_network
     restart: always
 
   api2:
     build: .
     networks:
-      - coolify-shared
+      # - coolify-shared
+      - api_network
     restart: always
 
   api3:
     build: .
     networks:
-      - coolify-shared
+      # - coolify-shared
+      - api_network
     restart: always
 
   nginx:
@@ -39,6 +43,7 @@ services:
       - "8081:8080"
     networks:
       - coolify-shared
+      - api_network
 
   prometheus:
     image: 'prom/prometheus:latest'
@@ -56,6 +61,7 @@ services:
       - "9091:9090"
     networks:
       - coolify-shared
+      - api_network
     restart: unless-stopped
 
   grafana:
@@ -72,6 +78,7 @@ services:
       - 'grafana_data:/var/lib/grafana'
     networks:
       - coolify-shared
+      - api_network
     restart: unless-stopped
 
 volumes:
@@ -79,6 +86,8 @@ volumes:
   grafana_data:
 
 networks:
+  api_network:
+    driver: bridge
   coolify-shared:
     name: coolify
     external: true
