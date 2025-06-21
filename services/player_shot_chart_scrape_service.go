@@ -85,6 +85,9 @@ func FetchAndStoreShotChartScrapedForPlayer(
 		// --- BATCHING LOGIC START ---
 		// Create a slice to hold all the shot data for the current season.
 		var shotsToUpsert []models.PlayerShotChart
+		// >>>>>>>>>> FIX START: Add a map to track unique shots to prevent duplicates.
+		uniqueShots := make(map[string]struct{})
+		// <<<<<<<<<< FIX END
 
 		// 4) Scrape every tooltip and collect the data into the slice.
 		wrapper.Find("div.tooltip.make, div.tooltip.miss").Each(func(_ int, s *goquery.Selection) {
@@ -130,6 +133,18 @@ func FetchAndStoreShotChartScrapedForPlayer(
 			teamScore, oppScore := mustAtoi(sc[0]), mustAtoi(sc[1])
 			lead := teamScore > oppScore
 
+			// >>>>>>>>>> FIX START: Create a unique key based on the conflict columns.
+			uniqueKey := fmt.Sprintf("%s|%d|%s|%s|%s|%d|%d",
+				playerID, season, date, quarter, timeRem, top, left)
+			
+			// If we have already seen this key, skip this iteration.
+			if _, exists := uniqueShots[uniqueKey]; exists {
+				return
+			}
+			uniqueShots[uniqueKey] = struct{}{}
+			// <<<<<<<<<< FIX END
+
+
 			shot := models.PlayerShotChart{
 				PlayerID:          playerID,
 				PlayerName:        playerName,
@@ -156,6 +171,8 @@ func FetchAndStoreShotChartScrapedForPlayer(
 		if len(shotsToUpsert) > 0 {
 			log.Printf("Attempting to batch upsert %d shots for player %s in season %d...", len(shotsToUpsert), playerID, season)
 
+			// NOTE: I am assuming the column name for the "Quarter" field is "qtr".
+			// If not, you must update the clause.OnConflict below.
 			if err := db.Clauses(clause.OnConflict{
 				Columns: []clause.Column{ // MUST match the unique index order in the model
 					{Name: "player_id"}, {Name: "season"}, {Name: "date"},
@@ -183,6 +200,7 @@ func FetchAndStoreShotChartScrapedForPlayer(
 // extractCommentedShotChart returns the inner HTML of the comment block that
 // contains <div id="div_shot-chart" …>. BR hides the SVG there for ad reasons.
 func extractCommentedShotChart(htmlBytes []byte) string {
+	// ... (this function remains unchanged)
 	root, err := html.Parse(bytes.NewReader(htmlBytes))
 	if err != nil {
 		return ""
@@ -204,6 +222,7 @@ func extractCommentedShotChart(htmlBytes []byte) string {
 
 // parsePx turns "left:244px" or "top:18px" into int(244 / 18).
 func parsePx(s string) int {
+	// ... (this function remains unchanged)
 	parts := strings.Split(s, ":")
 	return mustAtoi(strings.TrimSuffix(parts[1], "px"))
 }
