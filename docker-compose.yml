@@ -1,22 +1,30 @@
-# import-data disabled
 services:
   db-init:
     build: .
-    command: ["/nba_go"]
-    restart: "no"
-
+    command:
+      - /nba_go
+      - import-data
+    restart: 'no'
+    networks:
+      - coolify_shared
   api1:
-    build: .   
+    build: .
     restart: always
-
+    networks:
+      - api_network
+      - coolify_shared
   api2:
-    build: .    
+    build: .
     restart: always
-
+    networks:
+      - api_network
+      - coolify_shared
   api3:
-    build: .   
+    build: .
     restart: always
-
+    networks:
+      - api_network
+      - coolify_shared
   nginx:
     image: 'nginx:stable'
     volumes:
@@ -26,10 +34,10 @@ services:
       - api2
       - api3
     ports:
-      # --- MODIFICATION ---
-      # Map container port 8080 to a static HOST port 8081.
-      - "8081:8080"
-
+      - '8081:8080'
+    networks:
+      - api_network
+      - coolify_shared
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
@@ -37,21 +45,16 @@ services:
       - 'prometheus_data:/prometheus'
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
     ports:
-      # --- MODIFICATION ---
-      # Map container port 9090 to a static HOST port 9091.
-      - "9091:9090"
+      - '9091:9090'
     restart: unless-stopped
-
+    networks:
+      - api_network
+      - coolify_shared
   grafana:
-    image: grafana/grafana:latest
+    image: 'grafana/grafana:latest'
     ports:
-      # --- MODIFICATION ---
-      # Map container port 3000 to a static HOST port 3001.
-      - "3001:3000"
+      - '3001:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
@@ -59,12 +62,15 @@ services:
       - './grafana/dashboards:/var/lib/grafana/dashboards'
       - 'grafana_data:/var/lib/grafana'
     restart: unless-stopped
-
+    networks:
+      - api_network
+      - coolify_shared
 volumes:
-  prometheus_data:
-  grafana_data:
-
+  prometheus_data: null
+  grafana_data: null
 networks:
-  default:
+  api_network:
+    driver: bridge
+  coolify_shared:
     name: coolify
     external: true
