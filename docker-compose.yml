@@ -1,30 +1,34 @@
+# import-data disabled
 services:
   db-init:
     build: .
-    command:
-      - /nba_go
-      - import-data
-    restart: 'no'
+    command: ["/nba_go"]
     networks:
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+    restart: "no"
+
   api1:
     build: .
-    restart: always
     networks:
-      - api_network
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+    restart: always
+
   api2:
     build: .
-    restart: always
     networks:
-      - api_network
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+    restart: always
+
   api3:
     build: .
-    restart: always
     networks:
-      - api_network
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+    restart: always
+
   nginx:
     image: 'nginx:stable'
     volumes:
@@ -34,10 +38,13 @@ services:
       - api2
       - api3
     ports:
-      - '8081:8080'
+      # --- MODIFICATION ---
+      # Map container port 8080 to a static HOST port 8081.
+      - "8081:8080"
     networks:
-      - api_network
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
@@ -45,32 +52,42 @@ services:
       - 'prometheus_data:/prometheus'
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
     ports:
-      - '9091:9090'
-    restart: unless-stopped
+      # --- MODIFICATION ---
+      # Map container port 9090 to a static HOST port 9091.
+      - "9091:9090"
     networks:
-      - api_network
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+    restart: unless-stopped
+
   grafana:
-    image: 'grafana/grafana:latest'
+    image: grafana/grafana:latest
     ports:
-      - '3001:3000'
+      # --- MODIFICATION ---
+      # Map container port 3000 to a static HOST port 3001.
+      - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
       - '/data/nba-go-config/grafana/provisioning:/etc/grafana/provisioning'
       - './grafana/dashboards:/var/lib/grafana/dashboards'
       - 'grafana_data:/var/lib/grafana'
-    restart: unless-stopped
     networks:
-      - api_network
-      - coolify_shared
+      - coolify-shared
+      # - api_network
+    restart: unless-stopped
+
 volumes:
-  prometheus_data: null
-  grafana_data: null
+  prometheus_data:
+  grafana_data:
+
 networks:
-  api_network:
-    driver: bridge
-  coolify_shared:
+  # api_network:
+  #   driver: bridge
+  coolify-shared:
     name: coolify
-    external: true
+    # external: true
