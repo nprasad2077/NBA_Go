@@ -3,30 +3,18 @@ services:
   db-init:
     build: .
     command: ["/nba_go"]
-    networks:
-      - coolify-shared
-      - api_network
     restart: "no"
 
   api1:
-    build: .
-    networks:
-      # - coolify-shared
-      - api_network
+    build: .   
     restart: always
 
   api2:
-    build: .
-    networks:
-      # - coolify-shared
-      - api_network
+    build: .    
     restart: always
 
   api3:
-    build: .
-    networks:
-      # - coolify-shared
-      - api_network
+    build: .   
     restart: always
 
   nginx:
@@ -41,9 +29,6 @@ services:
       # --- MODIFICATION ---
       # Map container port 8080 to a static HOST port 8081.
       - "8081:8080"
-    networks:
-      - coolify-shared
-      - api_network
 
   prometheus:
     image: 'prom/prometheus:latest'
@@ -59,9 +44,6 @@ services:
       # --- MODIFICATION ---
       # Map container port 9090 to a static HOST port 9091.
       - "9091:9090"
-    networks:
-      - coolify-shared
-      - api_network
     restart: unless-stopped
 
   grafana:
@@ -76,9 +58,6 @@ services:
       - '/data/nba-go-config/grafana/provisioning:/etc/grafana/provisioning'
       - './grafana/dashboards:/var/lib/grafana/dashboards'
       - 'grafana_data:/var/lib/grafana'
-    networks:
-      - coolify-shared
-      - api_network
     restart: unless-stopped
 
 volumes:
@@ -86,8 +65,6 @@ volumes:
   grafana_data:
 
 networks:
-  api_network:
-    driver: bridge
-  coolify-shared:
+  default:
     name: coolify
     external: true
