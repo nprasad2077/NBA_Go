@@ -90,4 +90,4 @@ networks:
   #   driver: bridge
   coolify-shared:
     name: coolify
-    # external: true
+    external: true
