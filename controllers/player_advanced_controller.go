@@ -9,12 +9,34 @@ import (
 )
 
 var advancedSortMap = map[string]string{
-    "winShares":   "win_shares",
-    "per":         "per",
-    "tsPercent":   "ts_percent",
-    "playerId":    "player_id",
-    "season":      "season",
-    "team":        "team",
+	"playerId":           "player_id",
+	"playerName":         "player_name",
+	"position":           "position",
+	"age":                "age",
+	"games":              "games",
+	"minutesPlayed":      "minutes_played",
+	"per":                "per",
+	"tsPercent":          "ts_percent",
+	"threePAR":           "three_par",
+	"ftr":                "ftr",
+	"offensiveRBPercent": "offensive_rb_percent",
+	"defensiveRBPercent": "defensive_rb_percent",
+	"totalRBPercent":     "total_rb_percent",
+	"assistPercent":      "assist_percent",
+	"stealPercent":       "steal_percent",
+	"blockPercent":       "block_percent",
+	"turnoverPercent":    "turnover_percent",
+	"usagePercent":       "usage_percent",
+	"offensiveWS":        "offensive_ws",
+	"defensiveWS":        "defensive_ws",
+	"winShares":          "win_shares",
+	"winSharesPer":       "win_shares_per",
+	"offensiveBox":       "offensive_box",
+	"defensiveBox":       "defensive_box",
+	"box":                "box",
+	"vorp":               "vorp",
+	"team":               "team",
+	"season":             "season",
 }
 
 // AdvancedStatsResponse is the swagger response model for GetAllAdvancedPlayerStats
@@ -136,6 +158,7 @@ func GetAllAdvancedPlayerStats(db *gorm.DB) fiber.Handler {
 			query = query.Where("player_id = ?", playerId)
 		}
 
+		// Only apply the isPlayoff filter if the parameter is actually present in the query string
 		if c.Query("isPlayoff") != "" {
 			isPlayoff := c.QueryBool("isPlayoff", false)
 			query = query.Where("is_playoff = ?", isPlayoff)
