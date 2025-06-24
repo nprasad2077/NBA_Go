@@ -20,16 +20,37 @@ import (
 )
 
 var totalSortMap = map[string]string{
-    "points":        "points",
-    "assists":       "assists",
-    "totalRb":       "total_rb",
-    "gamesStarted":  "games_started",
-    "fieldPercent":  "field_percent",
-    "threePercent":  "three_percent",
-    "ftPercent":     "ft_percent",
-    "playerId":      "player_id",
-    "season":        "season",
-    "team":          "team",
+	"playerId":        "player_id",
+	"playerName":      "player_name",
+	"position":        "position",
+	"age":             "age",
+	"games":           "games",
+	"gamesStarted":    "games_started",
+	"minutesPg":       "minutes_pg",
+	"fieldGoals":      "field_goals",
+	"fieldAttempts":   "field_attempts",
+	"fieldPercent":    "field_percent",
+	"threeFg":         "three_fg",
+	"threeAttempts":   "three_attempts",
+	"threePercent":    "three_percent",
+	"twoFg":           "two_fg",
+	"twoAttempts":     "two_attempts",
+	"twoPercent":      "two_percent",
+	"effectFgPercent": "effect_fg_percent",
+	"ft":              "ft",
+	"ftAttempts":      "ft_attempts",
+	"ftPercent":       "ft_percent",
+	"offensiveRb":     "offensive_rb",
+	"defensiveRb":     "defensive_rb",
+	"totalRb":         "total_rb",
+	"assists":         "assists",
+	"steals":          "steals",
+	"blocks":          "blocks",
+	"turnovers":       "turnovers",
+	"personalFouls":   "personal_fouls",
+	"points":          "points",
+	"team":            "team",
+	"season":          "season",
 }
 
 // func FetchPlayerTotalStats(db *gorm.DB) fiber.Handler {
@@ -92,7 +113,7 @@ func GetPlayerTotalStats(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var stats []models.PlayerTotalStat
 
-		// --- MODIFICATION FOR FILTERS ---
+		// --- FILTERS ---
         playerId := c.Query("playerId")
         if playerId == "" {
             playerId = c.Query("player_id")
