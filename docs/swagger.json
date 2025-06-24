@@ -98,55 +98,6 @@
                 }
             }
         },
-        "/api/playershotchart": {
-            "get": {
-                "description": "Returns shot-chart points, optionally filtered by playerId and/or season",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "PlayerShotChart"
-                ],
-                "summary": "Get shot-chart data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Player ID (e.g., hardeja01)",
-                        "name": "playerId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Season (e.g., 2023)",
-                        "name": "season",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.PlayerShotChart"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/playertotals": {
             "get": {
                 "description": "Filter and paginate player totals",

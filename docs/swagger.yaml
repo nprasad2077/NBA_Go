@@ -185,39 +185,6 @@ paths:
       summary: Get player advanced stats
       tags:
       - PlayerStats
-  /api/playershotchart:
-    get:
-      consumes:
-      - application/json
-      description: Returns shot-chart points, optionally filtered by playerId and/or
-        season
-      parameters:
-      - description: Player ID (e.g., hardeja01)
-        in: query
-        name: playerId
-        type: string
-      - description: Season (e.g., 2023)
-        in: query
-        name: season
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.PlayerShotChart'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get shot-chart data
-      tags:
-      - PlayerShotChart
   /api/playertotals:
     get:
       consumes:

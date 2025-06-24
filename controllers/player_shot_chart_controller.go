@@ -78,7 +78,7 @@ func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
 // @Param       season   query  int    false "Season (e.g., 2023)"
 // @Success     200      {array}  models.PlayerShotChart
 // @Failure     500      {object} map[string]string
-// @Router      /api/playershotchart [get]
+// //@Router      /api/playershotchart [get]
 func GetPlayerShotChart(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var shots []models.PlayerShotChart
