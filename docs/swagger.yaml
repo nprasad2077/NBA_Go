@@ -185,6 +185,7 @@ paths:
       summary: Get player advanced stats
       tags:
       - PlayerStats
+      x-order: 2
   /api/playershotchart:
     get:
       consumes:
@@ -242,6 +243,7 @@ paths:
       summary: Get shot-chart data
       tags:
       - PlayerShotChart
+      x-order: 3
   /api/playertotals:
     get:
       consumes:
@@ -299,6 +301,11 @@ paths:
       summary: Get player total stats
       tags:
       - PlayerTotals
+      x-order: 1
 schemes:
 - https
 swagger: "2.0"
+tags:
+- name: PlayerTotals
+- name: PlayerStats
+- name: PlayerShotChart

@@ -4,6 +4,9 @@
 // @schemes     https
 // @BasePath    /
 //
+// @tag.name    PlayerTotals
+// @tag.name    PlayerStats
+// @tag.name    PlayerShotChart
 // To re-enable security docs:
 // 1. Uncomment the securityDefinitions block below.
 // 2. Uncomment the @Security annotation in each controller.

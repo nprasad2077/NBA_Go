@@ -72,6 +72,8 @@ func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
 // @Summary      Get shot-chart data
 // @Description  Returns a paginated list of shot-chart points, optionally filtered by various parameters.
 // @Tags         PlayerShotChart
+// @x-order 3
+// @Group Player-Specific
 // @Accept       json
 // @Produce      json
 // @Param        page      query  int     false  "Page number for pagination (defaults to 1)"

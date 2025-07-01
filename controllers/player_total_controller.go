@@ -96,6 +96,8 @@ func ScrapePlayerTotalStats(db *gorm.DB) fiber.Handler {
 // @Summary Get player total stats
 // @Description Filter and paginate player totals
 // @Tags PlayerTotals
+// @x-order 1
+// @Group Player Stats
 // @Accept  json
 // @Produce  json
 // @Param season query int false "Season (e.g. 2000)"
