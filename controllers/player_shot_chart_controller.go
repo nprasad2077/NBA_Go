@@ -67,33 +67,69 @@ func ScrapePlayerShotChart(db *gorm.DB) fiber.Handler {
 	}
 }
 
+
 // GetPlayerShotChart godoc
-// //@Security    ApiKeyAuth
-// @Summary     Get shot-chart data
-// @Description Returns shot-chart points, optionally filtered by playerId and/or season
-// @Tags        PlayerShotChart
-// @Accept      json
-// @Produce     json
-// @Param       playerId query  string false "Player ID (e.g., hardeja01)"
-// @Param       season   query  int    false "Season (e.g., 2023)"
-// @Success     200      {array}  models.PlayerShotChart
-// @Failure     500      {object} map[string]string
-// //@Router      /api/playershotchart [get]
+// @Summary      Get shot-chart data
+// @Description  Returns a paginated list of shot-chart points, optionally filtered by various parameters.
+// @Tags         PlayerShotChart
+// @Accept       json
+// @Produce      json
+// @Param        page      query  int     false  "Page number for pagination (defaults to 1)"
+// @Param        playerId  query  string  false  "Player ID (e.g., hardeja01)"
+// @Param        season    query  int     false  "Season (e.g., 2023)"
+// @Param        date      query  string  false  "Game date (e.g., Oct 17, 2018)"
+// @Param        qtr       query  string  false  "Quarter (e.g., 1st Qtr)"
+// @Param        result    query  boolean false  "Shot result (true for made, false for missed)"
+// @Param        shot_type query  string  false  "Shot type (e.g., 2-pointer)"
+// @Param        opponent  query  string  false  "Opponent team (e.g., NOP)"
+// @Success      200       {array}   models.PlayerShotChart
+// @Failure      500       {object}  map[string]string
+// @Router       /api/playershotchart [get]
 func GetPlayerShotChart(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var shots []models.PlayerShotChart
 
 		query := db.Model(&models.PlayerShotChart{})
 
+		// --- Filtering Logic (unchanged) ---
 		if pid := c.Query("playerId"); pid != "" {
 			query = query.Where("player_id = ?", pid)
 		}
-		if s := c.QueryInt("season", 0); s != 0 {
+		if s := c.QueryInt("season"); s != 0 {
 			query = query.Where("season = ?", s)
 		}
+		if date := c.Query("date"); date != "" {
+			query = query.Where("date = ?", date)
+		}
+		if qtr := c.Query("qtr"); qtr != "" {
+			query = query.Where("qtr = ?", qtr)
+		}
+		if c.Query("result") != "" {
+			query = query.Where("result = ?", c.QueryBool("result"))
+		}
+		if shotType := c.Query("shot_type"); shotType != "" {
+			query = query.Where("shot_type = ?", shotType)
+		}
+		if opponent := c.Query("opponent"); opponent != "" {
+			query = query.Where("opponent = ?", opponent)
+		}
+
+		// --- Pagination Logic ---
+		// Set a fixed limit of 50 results per page.
+		limit := 50
+
+		// Get the page number from the query, defaulting to 1.
+		page := c.QueryInt("page", 1)
+
+		// Calculate the offset based on the page number and limit.
+		offset := (page - 1) * limit
+
+		// Apply Limit and Offset to the GORM query.
+		query = query.Limit(limit).Offset(offset)
+
 
 		if err := query.Find(&shots).Error; err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
 		return c.JSON(shots)
 	}

@@ -185,6 +185,63 @@ paths:
       summary: Get player advanced stats
       tags:
       - PlayerStats
+  /api/playershotchart:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of shot-chart points, optionally filtered
+        by various parameters.
+      parameters:
+      - description: Page number for pagination (defaults to 1)
+        in: query
+        name: page
+        type: integer
+      - description: Player ID (e.g., hardeja01)
+        in: query
+        name: playerId
+        type: string
+      - description: Season (e.g., 2023)
+        in: query
+        name: season
+        type: integer
+      - description: Game date (e.g., Oct 17, 2018)
+        in: query
+        name: date
+        type: string
+      - description: Quarter (e.g., 1st Qtr)
+        in: query
+        name: qtr
+        type: string
+      - description: Shot result (true for made, false for missed)
+        in: query
+        name: result
+        type: boolean
+      - description: Shot type (e.g., 2-pointer)
+        in: query
+        name: shot_type
+        type: string
+      - description: Opponent team (e.g., NOP)
+        in: query
+        name: opponent
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PlayerShotChart'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get shot-chart data
+      tags:
+      - PlayerShotChart
   /api/playertotals:
     get:
       consumes:

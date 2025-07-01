@@ -101,6 +101,91 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/playershotchart": {
+            "get": {
+                "description": "Returns a paginated list of shot-chart points, optionally filtered by various parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PlayerShotChart"
+                ],
+                "summary": "Get shot-chart data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination (defaults to 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Player ID (e.g., hardeja01)",
+                        "name": "playerId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Season (e.g., 2023)",
+                        "name": "season",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Game date (e.g., Oct 17, 2018)",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Quarter (e.g., 1st Qtr)",
+                        "name": "qtr",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Shot result (true for made, false for missed)",
+                        "name": "result",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Shot type (e.g., 2-pointer)",
+                        "name": "shot_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Opponent team (e.g., NOP)",
+                        "name": "opponent",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PlayerShotChart"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/playertotals": {
             "get": {
                 "description": "Filter and paginate player totals",
