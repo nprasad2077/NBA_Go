@@ -98,7 +98,8 @@ const docTemplate = `{
                             }
                         }
                     }
-                }
+                },
+                "x-order": 2
             }
         },
         "/api/playershotchart": {
@@ -183,7 +184,8 @@ const docTemplate = `{
                             }
                         }
                     }
-                }
+                },
+                "x-order": 3
             }
         },
         "/api/playertotals": {
@@ -268,7 +270,8 @@ const docTemplate = `{
                             }
                         }
                     }
-                }
+                },
+                "x-order": 1
             }
         }
     },
@@ -455,7 +458,18 @@ const docTemplate = `{
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "PlayerTotals"
+        },
+        {
+            "name": "PlayerStats"
+        },
+        {
+            "name": "PlayerShotChart"
+        }
+    ]
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

@@ -95,6 +95,7 @@ func ScrapePlayerAdvancedStats(db *gorm.DB) fiber.Handler {
 // @Summary     Get player advanced stats
 // @Description Returns filtered and paginated player advanced stats
 // @Tags        PlayerStats
+// @x-order 2
 // @Group Player Stats
 // @Accept      json
 // @Produce     json
