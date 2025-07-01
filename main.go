@@ -91,6 +91,11 @@ func main() {
 	db := config.InitDB(false)
 
 	/* ---------- PUBLIC ROUTES (no API key) ---------- */
+	// Redirect root to swagger docs
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/swagger/index.html")
+	})
+
 	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	app.Get("/swagger/*", fiberswagger.WrapHandler)
 	controllers.RegisterKeyAdminRoutes(app, db)
