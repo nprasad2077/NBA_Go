@@ -82,3 +82,15 @@ CREATE INDEX IF NOT EXISTS idx_total_stats_player_name_trgm ON public.player_tot
 With this type of index, queries using `ILIKE '%davis%'` become extremely fast. This is something to keep in mind as you add more features.
 
 For now, running the standard `CREATE INDEX` commands listed above will give you excellent, comprehensive performance for a wide variety of common queries and sorting operations. You've built a truly robust and high-performance API.
+
+
+---
+## Player Shots
+
+```SQL
+CREATE INDEX idx_player_season_filters ON public.player_shot_charts (player_id, season, "date", qtr, result, shot_type, opponent);
+
+CREATE INDEX idx_player_shot_charts_date ON public.player_shot_charts ("date");
+CREATE INDEX idx_player_shot_charts_opponent ON public.player_shot_charts (opponent);
+CREATE INDEX idx_player_shot_charts_shot_type ON public.player_shot_charts (shot_type);
+```
