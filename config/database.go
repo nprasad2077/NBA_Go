@@ -40,6 +40,17 @@ func InitDB(shouldMigrate bool) *gorm.DB {
 		if err := db.AutoMigrate(&models.APIKey{}); err != nil {
 			log.Fatalf("migrate APIKey: %v", err)
 		}
+		// Game Models
+		if err := db.AutoMigrate(
+			&models.Game{},
+			&models.LineScore{},
+			&models.PlayerGameBasicStat{},
+			&models.PlayerGameAdvStat{},
+			&models.TeamGameBasicStat{},
+			&models.TeamGameAdvStat{},
+		); err != nil {
+			log.Fatalf("migrate game models: %v", err)
+		}
 		metrics.DBOperationsTotal.WithLabelValues("migrate", "database").Inc()
 	}
 
