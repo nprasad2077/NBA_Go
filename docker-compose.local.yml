@@ -99,6 +99,8 @@ services:
     networks:
       - api.network
     restart: unless-stopped
+    logging:
+      driver: "none"
 
   grafana:
     image: grafana/grafana:latest
@@ -114,6 +116,8 @@ services:
     networks:
       - api.network
     restart: unless-stopped
+    logging:
+      driver: none
 
 volumes:
   postgres_data: # New volume for Postgres
