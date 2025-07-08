@@ -1,3 +1,5 @@
+// File: config/database.go
+
 package config
 
 import (
@@ -12,7 +14,7 @@ import (
 )
 
 func InitDB(shouldMigrate bool) *gorm.DB {
-	// CHANGE: Build the DSN from environment variables
+	// ... (DSN setup code is unchanged) ...
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USER"),
@@ -21,13 +23,32 @@ func InitDB(shouldMigrate bool) *gorm.DB {
 		os.Getenv("DB_PORT"),
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{}) // <- CHANGE: Use the postgres driver
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 	metrics.DBOperationsTotal.WithLabelValues("connect", "database").Inc()
 
 	if shouldMigrate {
+		// --- ADD THIS BLOCK TO DROP STALE TABLES ---
+		// Drop tables in reverse order of dependency (children first).
+		// This ensures a clean migration every time the import process runs.
+		log.Println("⚠️ Dropping existing game-related tables for a clean migration...")
+		if err := db.Migrator().DropTable(
+			&models.LineScore{},
+			&models.PlayerGameBasicStat{},
+			&models.PlayerGameAdvStat{},
+			&models.TeamGameBasicStat{},
+			&models.TeamGameAdvStat{},
+			&models.Game{}, // Drop parent table last
+		); err != nil {
+			log.Fatalf("failed to drop tables: %v", err)
+		}
+		log.Println("✅ Tables dropped successfully.")
+		// --- END OF ADDED BLOCK ---
+
+
+		// Your existing AutoMigrate calls will now work correctly
 		if err := db.AutoMigrate(&models.PlayerAdvancedStat{}); err != nil {
 			log.Fatalf("migrate PlayerAdvancedStat: %v", err)
 		}
@@ -40,7 +61,7 @@ func InitDB(shouldMigrate bool) *gorm.DB {
 		if err := db.AutoMigrate(&models.APIKey{}); err != nil {
 			log.Fatalf("migrate APIKey: %v", err)
 		}
-		// Game Models
+		// Game Models will be recreated with the correct schema
 		if err := db.AutoMigrate(
 			&models.Game{},
 			&models.LineScore{},
