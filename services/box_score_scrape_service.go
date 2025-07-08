@@ -86,9 +86,10 @@ func parseAndStoreLineScore(db *gorm.DB, doc *goquery.Document, gameID string) e
 		ls.Q2 = mustAtoi(row.Find(`td[data-stat="2"]`).Text())
 		ls.Q3 = mustAtoi(row.Find(`td[data-stat="3"]`).Text())
 		ls.Q4 = mustAtoi(row.Find(`td[data-stat="4"]`).Text())
-		ls.OT1 = mustAtoi(row.Find(`td[data-stat="OT1"]`).Text())
-		ls.OT2 = mustAtoi(row.Find(`td[data-stat="OT2"]`).Text())
-		ls.OT3 = mustAtoi(row.Find(`td[data-stat="OT3"]`).Text())
+		// FIX: Corrected the data-stat attribute for overtime periods.
+		ls.OT1 = mustAtoi(row.Find(`td[data-stat="1OT"]`).Text())
+		ls.OT2 = mustAtoi(row.Find(`td[data-stat="2OT"]`).Text())
+		ls.OT3 = mustAtoi(row.Find(`td[data-stat="3OT"]`).Text())
 		ls.Total = mustAtoi(row.Find(`td[data-stat="T"]`).Text())
 		lineScores = append(lineScores, ls)
 	})

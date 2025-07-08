@@ -65,7 +65,7 @@ func main() {
 		log.Println("🎉 Game Imports completed successfully 🏀")
 
 		importBoxScores(db)
-		log.Println("🎉 Related Box-Score Imports completed successfully 📦")
+		log.Println("🎉 Related Box Score Imports completed successfully 📦")
 
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
