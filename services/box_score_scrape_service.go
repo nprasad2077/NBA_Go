@@ -1,4 +1,3 @@
-// File: services/box_score_scrape_service.go
 package services
 
 import (
@@ -16,6 +15,21 @@ import (
 )
 
 const boxScoreURLBase = "https://www.basketball-reference.com"
+
+// uncommentDoc finds and replaces commented out HTML sections.
+func uncommentDoc(doc *goquery.Document) *goquery.Document {
+	doc.Find("*").Contents().FilterFunction(func(i int, s *goquery.Selection) bool {
+		return goquery.NodeName(s) == "#comment"
+	}).Each(func(i int, s *goquery.Selection) {
+		// Use .Data on the underlying html.Node to get the comment content.
+		commentText := s.Nodes[0].Data
+		if strings.Contains(commentText, "<table") {
+			// Replace the comment node with its content.
+			s.ReplaceWithHtml(commentText)
+		}
+	})
+	return doc
+}
 
 // FetchAndStoreBoxScoreDataForDateRange fetches all games in a date range and scrapes their box scores.
 func FetchAndStoreBoxScoreDataForDateRange(db *gorm.DB, from, to time.Time) error {
@@ -62,44 +76,19 @@ func scrapeBoxScorePage(db *gorm.DB, url, gameID string) error {
 		return err
 	}
 
-	// The content is often inside a comment, so we need to extract it.
+	// 1. Uncomment all tables in the document first.
 	doc = uncommentDoc(doc)
 
-	// --- Scrape all data types from the page ---
-	if err := parseAndStoreLineScore(db, doc, gameID); err != nil {
-		return err
+	// 2. Call the dedicated service to handle line scores.
+	if err := FetchAndStoreLineScore(db, doc, gameID); err != nil {
+		log.Printf("Error processing line score for game %s: %v", gameID, err)
 	}
+
+	// 3. The existing box score parser will now work because its tables are visible.
 	if err := parseAndStoreBoxScores(db, doc, gameID); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// parseAndStoreLineScore scrapes the line score table.
-func parseAndStoreLineScore(db *gorm.DB, doc *goquery.Document, gameID string) error {
-	var lineScores []models.LineScore
-	doc.Find("table#line_score tbody tr").Each(func(i int, row *goquery.Selection) {
-		ls := models.LineScore{GameID: gameID}
-		ls.Team = row.Find(`th[data-stat="team"] a`).Text()
-		ls.Q1 = mustAtoi(row.Find(`td[data-stat="1"]`).Text())
-		ls.Q2 = mustAtoi(row.Find(`td[data-stat="2"]`).Text())
-		ls.Q3 = mustAtoi(row.Find(`td[data-stat="3"]`).Text())
-		ls.Q4 = mustAtoi(row.Find(`td[data-stat="4"]`).Text())
-		// FIX: Corrected the data-stat attribute for overtime periods.
-		ls.OT1 = mustAtoi(row.Find(`td[data-stat="1OT"]`).Text())
-		ls.OT2 = mustAtoi(row.Find(`td[data-stat="2OT"]`).Text())
-		ls.OT3 = mustAtoi(row.Find(`td[data-stat="3OT"]`).Text())
-		ls.Total = mustAtoi(row.Find(`td[data-stat="T"]`).Text())
-		lineScores = append(lineScores, ls)
-	})
-
-	if len(lineScores) > 0 {
-		return db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "game_id"}, {Name: "team"}},
-			DoUpdates: clause.AssignmentColumns([]string{"q1", "q2", "q3", "q4", "ot1", "ot2", "ot3", "total"}),
-		}).Create(&lineScores).Error
-	}
 	return nil
 }
 
@@ -304,19 +293,7 @@ func batchUpsertAll(db *gorm.DB, pbs []models.PlayerGameBasicStat, pas []models.
 	return nil
 }
 
-// uncommentDoc finds and replaces commented out HTML sections.
-func uncommentDoc(doc *goquery.Document) *goquery.Document {
-	doc.Find("#content").Find(".placeholder, .section_heading").Each(func(i int, s *goquery.Selection) {
-		s.NextUntil(".placeholder, .section_heading").FilterFunction(func(i int, s *goquery.Selection) bool {
-			return goquery.NodeName(s) == "#comment"
-		}).Each(func(i int, s *goquery.Selection) {
-			uncommented, _ := goquery.NewDocumentFromReader(strings.NewReader(s.Text()))
-			// FIX: Use ReplaceWithSelection, as the argument is a goquery selection, not a string.
-			s.ReplaceWithSelection(uncommented.Find("body").Children())
-		})
-	})
-	return doc
-}
+
 
 // getModelColumns is a placeholder for a more robust reflection-based column name generator.
 // For now, it returns hardcoded lists.

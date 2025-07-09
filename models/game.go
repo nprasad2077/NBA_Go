@@ -34,8 +34,8 @@ type Game struct {
 // LineScore holds the scoring for each team by quarter for a specific game.
 type LineScore struct {
 	ID     uint   `gorm:"primaryKey" swaggerignore:"true"`
-	GameID string `gorm:"not null;index" json:"gameId"`
-	Team   string `gorm:"not null;index" json:"team"`
+	GameID string `gorm:"not null;uniqueIndex:idx_line_score,priority:1" json:"gameId"`
+	Team   string `gorm:"not null;uniqueIndex:idx_line_score,priority:2" json:"team"`
 	Q1     int    `json:"q1"`
 	Q2     int    `json:"q2"`
 	Q3     int    `json:"q3"`
