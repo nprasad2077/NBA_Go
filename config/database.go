@@ -33,18 +33,18 @@ func InitDB(shouldMigrate bool) *gorm.DB {
 		// --- ADD THIS BLOCK TO DROP STALE TABLES ---
 		// Drop tables in reverse order of dependency (children first).
 		// This ensures a clean migration every time the import process runs.
-		log.Println("⚠️ Dropping existing game-related tables for a clean migration...")
-		if err := db.Migrator().DropTable(
-			&models.LineScore{},
-			&models.PlayerGameBasicStat{},
-			&models.PlayerGameAdvStat{},
-			&models.TeamGameBasicStat{},
-			&models.TeamGameAdvStat{},
-			&models.Game{}, // Drop parent table last
-		); err != nil {
-			log.Fatalf("failed to drop tables: %v", err)
-		}
-		log.Println("✅ Tables dropped successfully.")
+		// log.Println("⚠️ Dropping existing game-related tables for a clean migration...")
+		// if err := db.Migrator().DropTable(
+		// 	&models.LineScore{},
+		// 	&models.PlayerGameBasicStat{},
+		// 	&models.PlayerGameAdvStat{},
+		// 	&models.TeamGameBasicStat{},
+		// 	&models.TeamGameAdvStat{},
+		// 	&models.Game{}, // Drop parent table last
+		// ); err != nil {
+		// 	log.Fatalf("failed to drop tables: %v", err)
+		// }
+		// log.Println("✅ Tables dropped successfully.")
 		// --- END OF ADDED BLOCK ---
 
 

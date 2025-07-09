@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	"gorm.io/gorm"
 	"github.com/nprasad2077/NBA_Go/services"
 	"github.com/nprasad2077/NBA_Go/utils"
+	"gorm.io/gorm"
 )
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons 2017–2025
@@ -35,37 +35,39 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-    for season := 2025; season <= 2025; season++ {
-        if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
-            log.Printf("scraped totals import failed for %d: %v", season, err)
-        }
+	for season := 2025; season <= 2025; season++ {
+		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
+			log.Printf("scraped totals import failed for %d: %v", season, err)
+		}
 		log.Printf("Player Totals import for season: %d", season)
-        time.Sleep(1100 * time.Millisecond)
+		time.Sleep(1100 * time.Millisecond)
 		utils.SleepWithJitter(1500 * time.Millisecond)
-    }
+	}
 }
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-    for season := 2025; season <= 2025; season++ {
-        if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
-            log.Printf("scraped playoffs import failed for %d: %v", season, err)
-        }
+	for season := 2025; season <= 2025; season++ {
+		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
+			log.Printf("scraped playoffs import failed for %d: %v", season, err)
+		}
 		log.Printf("Player Playoffs Totals import for season: %d", season)
-        time.Sleep(1100 * time.Millisecond)
+		time.Sleep(1100 * time.Millisecond)
 		utils.SleepWithJitter(1750 * time.Millisecond)
-    }
+	}
 }
 
 // importGameSchedules fetches and stores game schedules
 func importGameSchedules(db *gorm.DB) {
 	// An NBA season typically runs from October to June
 	months := []string{
-		"october", "november", "december", "january",
-		"february", "march", "april", "may", "june",
+		// "october", "november", "december", "january",
+		// "february", "march", "april", "may", "june",
+		"december", "january",
+		"february", "march", "april",
 	}
 
-	for season := 2025; season <= 2025; season++ {
+	for season := 2023; season <= 2024; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			// The service will print a warning and skip if a month has no data (e.g. May/June for a season not yet finished)
@@ -82,14 +84,15 @@ func importGameSchedules(db *gorm.DB) {
 	}
 }
 
-
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
 	// Define the date range for the import.
-	// This example fetches data for games in the last 90 days.
-	to := time.Now()
-	from := to.AddDate(0, -1, 1) // 0 years, -3 months, 0 days
+
+	// The format is: time.Date(year, month, day, hour, min, sec, nsec, location)
+    to := time.Date(2025, time.April, 10, 0, 0, 0, 0, time.UTC)
+ 	// to := time.Now()
+	from := to.AddDate(0, -1, 0) // 0 years, -3 months, 0 days
 
 	log.Printf("--- Starting Box Score Data Import from %s to %s ---", from.Format("2006-01-02"), to.Format("2006-01-02"))
 
@@ -99,9 +102,6 @@ func importBoxScores(db *gorm.DB) {
 
 	log.Printf("--- Finished Box Score Data Import ---")
 }
-
-
-
 
 // importPlayerShotChart fetches shot-charts for every known player
 // func importPlayerShotChart(db *gorm.DB) {
