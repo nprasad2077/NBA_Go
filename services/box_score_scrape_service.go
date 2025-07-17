@@ -49,7 +49,7 @@ func FetchAndStoreBoxScoreDataForDateRange(db *gorm.DB, from, to time.Time) erro
 			log.Printf("Error processing box score for game %s: %v", game.GameID, err)
 		}
 		// Be a good internet citizen and pause between requests.
-		utils.SleepWithJitter(3000 * time.Millisecond)
+		utils.SleepWithJitter(2300 * time.Millisecond)
 	}
 	return nil
 }

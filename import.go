@@ -11,7 +11,7 @@ import (
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons 2017–2025
 func importPlayerAdvanced(db *gorm.DB) {
-	for season := 2025; season <= 2025; season++ {
+	for season := 2024; season <= 2025; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -23,37 +23,37 @@ func importPlayerAdvanced(db *gorm.DB) {
 
 // importPlayerAdvancedPlayoffs fetches and stores advanced stats for playoffs seasons 2023–2025
 func importPlayerAdvancedPlayoffs(db *gorm.DB) {
-	for season := 2025; season <= 2025; season++ {
+	for season := 2024; season <= 2025; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
 		log.Printf("Advanced Playoffs import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
-		utils.SleepWithJitter(1250 * time.Millisecond)
+		utils.SleepWithJitter(1500 * time.Millisecond)
 	}
 }
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-	for season := 2025; season <= 2025; season++ {
+	for season := 2024; season <= 2025; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
 			log.Printf("scraped totals import failed for %d: %v", season, err)
 		}
 		log.Printf("Player Totals import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
-		utils.SleepWithJitter(1500 * time.Millisecond)
+		utils.SleepWithJitter(1250 * time.Millisecond)
 	}
 }
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-	for season := 2025; season <= 2025; season++ {
+	for season := 2024; season <= 2025; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
 			log.Printf("scraped playoffs import failed for %d: %v", season, err)
 		}
 		log.Printf("Player Playoffs Totals import for season: %d", season)
 		time.Sleep(1100 * time.Millisecond)
-		utils.SleepWithJitter(1750 * time.Millisecond)
+		utils.SleepWithJitter(1700 * time.Millisecond)
 	}
 }
 
@@ -61,13 +61,13 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 func importGameSchedules(db *gorm.DB) {
 	// An NBA season typically runs from October to June
 	months := []string{
-		// "october", "november", "december", "january",
+		"october", "november", "december", "january",
+		"february", "march", "april", "may", "june",
+
 		// "february", "march", "april", "may", "june",
-		"december", "january",
-		"february", "march", "april",
 	}
 
-	for season := 2023; season <= 2024; season++ {
+	for season := 2018; season <= 2025; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			// The service will print a warning and skip if a month has no data (e.g. May/June for a season not yet finished)
@@ -78,7 +78,7 @@ func importGameSchedules(db *gorm.DB) {
 			log.Printf("Game schedule import for %s, %d complete.", month, season)
 			// Respectful delay between requests
 			time.Sleep(1100 * time.Millisecond)
-			utils.SleepWithJitter(1000 * time.Millisecond)
+			utils.SleepWithJitter(1800 * time.Millisecond)
 		}
 		log.Printf("--- Finished Game Schedule Import for Season: %d ---", season)
 	}
@@ -90,9 +90,9 @@ func importBoxScores(db *gorm.DB) {
 	// Define the date range for the import.
 
 	// The format is: time.Date(year, month, day, hour, min, sec, nsec, location)
-    to := time.Date(2025, time.April, 10, 0, 0, 0, 0, time.UTC)
- 	// to := time.Now()
-	from := to.AddDate(0, -1, 0) // 0 years, -3 months, 0 days
+    // to := time.Date(2019, time.June, 14, 0, 0, 0, 0, time.UTC)
+ 	to := time.Now()
+	from := to.AddDate(-1, 0, 0) // 0 years, -3 months, 0 days
 
 	log.Printf("--- Starting Box Score Data Import from %s to %s ---", from.Format("2006-01-02"), to.Format("2006-01-02"))
 
