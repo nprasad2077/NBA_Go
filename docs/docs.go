@@ -15,6 +15,104 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/games": {
+            "get": {
+                "description": "Returns a paginated list of games with optional filters and included associations.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Games"
+                ],
+                "summary": "Get game data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by date (YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by team abbreviation (e.g., LAL)",
+                        "name": "team",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by a specific Game ID",
+                        "name": "gameId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter for playoff games",
+                        "name": "isPlayoff",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "date",
+                        "description": "Field to sort by (e.g., date)",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Sort ascending",
+                        "name": "ascending",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated list of associations to include (e.g., lineScores,playerGameBasicStats,teamGameAdvStats)",
+                        "name": "include",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.GamesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/playeradvancedstats": {
             "get": {
                 "description": "Returns filtered and paginated player advanced stats",
@@ -304,6 +402,393 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.GameResponseDTO": {
+            "type": "object",
+            "properties": {
+                "arena": {
+                    "type": "string"
+                },
+                "boxScoreUrl": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "gameDuration": {
+                    "type": "string"
+                },
+                "gameId": {
+                    "type": "string"
+                },
+                "homePts": {
+                    "type": "integer"
+                },
+                "homeTeam": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isPlayoff": {
+                    "type": "boolean"
+                },
+                "lineScores": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.LineScoreDTO"
+                    }
+                },
+                "playerGameAdvStats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.PlayerGameAdvStatDTO"
+                    }
+                },
+                "playerGameBasicStats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.PlayerGameBasicStatDTO"
+                    }
+                },
+                "startTimeET": {
+                    "type": "string"
+                },
+                "teamGameAdvStats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.TeamGameAdvStatDTO"
+                    }
+                },
+                "teamGameBasicStats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.TeamGameBasicStatDTO"
+                    }
+                },
+                "visitorPts": {
+                    "type": "integer"
+                },
+                "visitorTeam": {
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.GamesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.GameResponseDTO"
+                    }
+                },
+                "pagination": {
+                    "type": "object",
+                    "properties": {
+                        "page": {
+                            "type": "integer"
+                        },
+                        "pageSize": {
+                            "type": "integer"
+                        },
+                        "pages": {
+                            "type": "integer"
+                        },
+                        "total": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "controllers.LineScoreDTO": {
+            "type": "object",
+            "properties": {
+                "ot1": {
+                    "type": "integer"
+                },
+                "ot2": {
+                    "type": "integer"
+                },
+                "ot3": {
+                    "type": "integer"
+                },
+                "q1": {
+                    "type": "integer"
+                },
+                "q2": {
+                    "type": "integer"
+                },
+                "q3": {
+                    "type": "integer"
+                },
+                "q4": {
+                    "type": "integer"
+                },
+                "team": {
+                    "description": "Abbreviation",
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "controllers.PlayerGameAdvStatDTO": {
+            "type": "object",
+            "properties": {
+                "astPercent": {
+                    "type": "number"
+                },
+                "blkPercent": {
+                    "type": "number"
+                },
+                "bpm": {
+                    "type": "number"
+                },
+                "dRtg": {
+                    "type": "integer"
+                },
+                "drbPercent": {
+                    "type": "number"
+                },
+                "efgPercent": {
+                    "type": "number"
+                },
+                "fTr": {
+                    "type": "number"
+                },
+                "mp": {
+                    "type": "string"
+                },
+                "oRtg": {
+                    "type": "integer"
+                },
+                "orbPercent": {
+                    "type": "number"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "playerName": {
+                    "type": "string"
+                },
+                "stlPercent": {
+                    "type": "number"
+                },
+                "team": {
+                    "description": "Abbreviation",
+                    "type": "string"
+                },
+                "threePAr": {
+                    "type": "number"
+                },
+                "tovPercent": {
+                    "type": "number"
+                },
+                "trbPercent": {
+                    "type": "number"
+                },
+                "tsPercent": {
+                    "type": "number"
+                },
+                "usgPercent": {
+                    "type": "number"
+                }
+            }
+        },
+        "controllers.PlayerGameBasicStatDTO": {
+            "type": "object",
+            "properties": {
+                "ast": {
+                    "type": "integer"
+                },
+                "blk": {
+                    "type": "integer"
+                },
+                "drb": {
+                    "type": "integer"
+                },
+                "fg": {
+                    "type": "integer"
+                },
+                "fgPercent": {
+                    "type": "number"
+                },
+                "fga": {
+                    "type": "integer"
+                },
+                "ft": {
+                    "type": "integer"
+                },
+                "ftPercent": {
+                    "type": "number"
+                },
+                "fta": {
+                    "type": "integer"
+                },
+                "gmSc": {
+                    "type": "number"
+                },
+                "mp": {
+                    "type": "string"
+                },
+                "orb": {
+                    "type": "integer"
+                },
+                "pf": {
+                    "type": "integer"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "playerName": {
+                    "type": "string"
+                },
+                "plusMinus": {
+                    "type": "integer"
+                },
+                "pts": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "stl": {
+                    "type": "integer"
+                },
+                "team": {
+                    "description": "Abbreviation",
+                    "type": "string"
+                },
+                "threeP": {
+                    "type": "integer"
+                },
+                "threePPercent": {
+                    "type": "number"
+                },
+                "threePa": {
+                    "type": "integer"
+                },
+                "tov": {
+                    "type": "integer"
+                },
+                "trb": {
+                    "type": "integer"
+                }
+            }
+        },
+        "controllers.TeamGameAdvStatDTO": {
+            "type": "object",
+            "properties": {
+                "astPercent": {
+                    "type": "number"
+                },
+                "blkPercent": {
+                    "type": "number"
+                },
+                "dRtg": {
+                    "type": "number"
+                },
+                "drbPercent": {
+                    "type": "number"
+                },
+                "efgPercent": {
+                    "type": "number"
+                },
+                "fTr": {
+                    "type": "number"
+                },
+                "oRtg": {
+                    "type": "number"
+                },
+                "orbPercent": {
+                    "type": "number"
+                },
+                "stlPercent": {
+                    "type": "number"
+                },
+                "team": {
+                    "description": "Abbreviation",
+                    "type": "string"
+                },
+                "threePAr": {
+                    "type": "number"
+                },
+                "tovPercent": {
+                    "type": "number"
+                },
+                "trbPercent": {
+                    "type": "number"
+                },
+                "tsPercent": {
+                    "type": "number"
+                }
+            }
+        },
+        "controllers.TeamGameBasicStatDTO": {
+            "type": "object",
+            "properties": {
+                "ast": {
+                    "type": "integer"
+                },
+                "blk": {
+                    "type": "integer"
+                },
+                "drb": {
+                    "type": "integer"
+                },
+                "fg": {
+                    "type": "integer"
+                },
+                "fgPercent": {
+                    "type": "number"
+                },
+                "fga": {
+                    "type": "integer"
+                },
+                "ft": {
+                    "type": "integer"
+                },
+                "ftPercent": {
+                    "type": "number"
+                },
+                "fta": {
+                    "type": "integer"
+                },
+                "orb": {
+                    "type": "integer"
+                },
+                "pf": {
+                    "type": "integer"
+                },
+                "pts": {
+                    "type": "integer"
+                },
+                "stl": {
+                    "type": "integer"
+                },
+                "team": {
+                    "description": "Abbreviation",
+                    "type": "string"
+                },
+                "threeP": {
+                    "type": "integer"
+                },
+                "threePPercent": {
+                    "type": "number"
+                },
+                "threePa": {
+                    "type": "integer"
+                },
+                "tov": {
+                    "type": "integer"
+                },
+                "trb": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.PlayerAdvancedStat": {
             "type": "object",
             "properties": {
@@ -460,6 +945,9 @@ const docTemplate = `{
         }
     },
     "tags": [
+        {
+            "name": "Games"
+        },
         {
             "name": "PlayerTotals"
         },
