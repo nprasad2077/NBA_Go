@@ -1,8 +1,8 @@
 // @title       NBA_Go API
 // @version     1.0
 // @description Stats service, now with public access!
-// //@schemes     https
-// @schemes     http
+// @schemes     https http
+// //@schemes     http
 // @BasePath    /
 //
 // @tag.name    Games

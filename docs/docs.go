@@ -965,7 +965,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"https", "http"},
 	Title:            "NBA_Go API",
 	Description:      "Stats service, now with public access!",
 	InfoInstanceName: "swagger",
