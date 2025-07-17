@@ -87,20 +87,18 @@ func importGameSchedules(db *gorm.DB) {
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
-	// Define the date range for the import.
+    // Define the date range for the 2023-2024 NBA season.
+    // The regular season typically starts in October and playoffs end in June.
+    from := time.Date(2023, time.October, 1, 0, 0, 0, 0, time.UTC)
+    to := time.Date(2024, time.July, 1, 0, 0, 0, 0, time.UTC)
 
-	// The format is: time.Date(year, month, day, hour, min, sec, nsec, location)
-    // to := time.Date(2019, time.June, 14, 0, 0, 0, 0, time.UTC)
- 	to := time.Now()
-	from := to.AddDate(-1, 0, 0) // 0 years, -3 months, 0 days
+    log.Printf("--- Starting Box Score Data Import for the 2023-2024 Season ---")
 
-	log.Printf("--- Starting Box Score Data Import from %s to %s ---", from.Format("2006-01-02"), to.Format("2006-01-02"))
+    if err := services.FetchAndStoreBoxScoreDataForDateRange(db, from, to); err != nil {
+        log.Fatalf("Box score import failed: %v", err)
+    }
 
-	if err := services.FetchAndStoreBoxScoreDataForDateRange(db, from, to); err != nil {
-		log.Fatalf("Box score import failed: %v", err)
-	}
-
-	log.Printf("--- Finished Box Score Data Import ---")
+    log.Printf("--- Finished Box Score Data Import ---")
 }
 
 // importPlayerShotChart fetches shot-charts for every known player
