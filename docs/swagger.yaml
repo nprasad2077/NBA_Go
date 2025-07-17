@@ -18,6 +18,263 @@ definitions:
             type: integer
         type: object
     type: object
+  controllers.GameResponseDTO:
+    properties:
+      arena:
+        type: string
+      boxScoreUrl:
+        type: string
+      date:
+        type: string
+      gameDuration:
+        type: string
+      gameId:
+        type: string
+      homePts:
+        type: integer
+      homeTeam:
+        type: string
+      id:
+        type: integer
+      isPlayoff:
+        type: boolean
+      lineScores:
+        items:
+          $ref: '#/definitions/controllers.LineScoreDTO'
+        type: array
+      playerGameAdvStats:
+        items:
+          $ref: '#/definitions/controllers.PlayerGameAdvStatDTO'
+        type: array
+      playerGameBasicStats:
+        items:
+          $ref: '#/definitions/controllers.PlayerGameBasicStatDTO'
+        type: array
+      startTimeET:
+        type: string
+      teamGameAdvStats:
+        items:
+          $ref: '#/definitions/controllers.TeamGameAdvStatDTO'
+        type: array
+      teamGameBasicStats:
+        items:
+          $ref: '#/definitions/controllers.TeamGameBasicStatDTO'
+        type: array
+      visitorPts:
+        type: integer
+      visitorTeam:
+        type: string
+    type: object
+  controllers.GamesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/controllers.GameResponseDTO'
+        type: array
+      pagination:
+        properties:
+          page:
+            type: integer
+          pageSize:
+            type: integer
+          pages:
+            type: integer
+          total:
+            type: integer
+        type: object
+    type: object
+  controllers.LineScoreDTO:
+    properties:
+      ot1:
+        type: integer
+      ot2:
+        type: integer
+      ot3:
+        type: integer
+      q1:
+        type: integer
+      q2:
+        type: integer
+      q3:
+        type: integer
+      q4:
+        type: integer
+      team:
+        description: Abbreviation
+        type: string
+      total:
+        type: integer
+    type: object
+  controllers.PlayerGameAdvStatDTO:
+    properties:
+      astPercent:
+        type: number
+      blkPercent:
+        type: number
+      bpm:
+        type: number
+      dRtg:
+        type: integer
+      drbPercent:
+        type: number
+      efgPercent:
+        type: number
+      fTr:
+        type: number
+      mp:
+        type: string
+      oRtg:
+        type: integer
+      orbPercent:
+        type: number
+      playerId:
+        type: string
+      playerName:
+        type: string
+      stlPercent:
+        type: number
+      team:
+        description: Abbreviation
+        type: string
+      threePAr:
+        type: number
+      tovPercent:
+        type: number
+      trbPercent:
+        type: number
+      tsPercent:
+        type: number
+      usgPercent:
+        type: number
+    type: object
+  controllers.PlayerGameBasicStatDTO:
+    properties:
+      ast:
+        type: integer
+      blk:
+        type: integer
+      drb:
+        type: integer
+      fg:
+        type: integer
+      fgPercent:
+        type: number
+      fga:
+        type: integer
+      ft:
+        type: integer
+      ftPercent:
+        type: number
+      fta:
+        type: integer
+      gmSc:
+        type: number
+      mp:
+        type: string
+      orb:
+        type: integer
+      pf:
+        type: integer
+      playerId:
+        type: string
+      playerName:
+        type: string
+      plusMinus:
+        type: integer
+      pts:
+        type: integer
+      status:
+        type: string
+      stl:
+        type: integer
+      team:
+        description: Abbreviation
+        type: string
+      threeP:
+        type: integer
+      threePPercent:
+        type: number
+      threePa:
+        type: integer
+      tov:
+        type: integer
+      trb:
+        type: integer
+    type: object
+  controllers.TeamGameAdvStatDTO:
+    properties:
+      astPercent:
+        type: number
+      blkPercent:
+        type: number
+      dRtg:
+        type: number
+      drbPercent:
+        type: number
+      efgPercent:
+        type: number
+      fTr:
+        type: number
+      oRtg:
+        type: number
+      orbPercent:
+        type: number
+      stlPercent:
+        type: number
+      team:
+        description: Abbreviation
+        type: string
+      threePAr:
+        type: number
+      tovPercent:
+        type: number
+      trbPercent:
+        type: number
+      tsPercent:
+        type: number
+    type: object
+  controllers.TeamGameBasicStatDTO:
+    properties:
+      ast:
+        type: integer
+      blk:
+        type: integer
+      drb:
+        type: integer
+      fg:
+        type: integer
+      fgPercent:
+        type: number
+      fga:
+        type: integer
+      ft:
+        type: integer
+      ftPercent:
+        type: number
+      fta:
+        type: integer
+      orb:
+        type: integer
+      pf:
+        type: integer
+      pts:
+        type: integer
+      stl:
+        type: integer
+      team:
+        description: Abbreviation
+        type: string
+      threeP:
+        type: integer
+      threePPercent:
+        type: number
+      threePa:
+        type: integer
+      tov:
+        type: integer
+      trb:
+        type: integer
+    type: object
   models.PlayerAdvancedStat:
     properties:
       age:
@@ -127,6 +384,73 @@ info:
   title: NBA_Go API
   version: "1.0"
 paths:
+  /api/games:
+    get:
+      description: Returns a paginated list of games with optional filters and included
+        associations.
+      parameters:
+      - description: Filter by date (YYYY-MM-DD)
+        in: query
+        name: date
+        type: string
+      - description: Filter by team abbreviation (e.g., LAL)
+        in: query
+        name: team
+        type: string
+      - description: Filter by a specific Game ID
+        in: query
+        name: gameId
+        type: string
+      - description: Filter for playoff games
+        in: query
+        name: isPlayoff
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - default: date
+        description: Field to sort by (e.g., date)
+        in: query
+        name: sortBy
+        type: string
+      - default: false
+        description: Sort ascending
+        in: query
+        name: ascending
+        type: boolean
+      - description: Comma-separated list of associations to include (e.g., lineScores,playerGameBasicStats,teamGameAdvStats)
+        in: query
+        name: include
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.GamesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get game data
+      tags:
+      - Games
   /api/playeradvancedstats:
     get:
       consumes:
@@ -306,6 +630,7 @@ schemes:
 - http
 swagger: "2.0"
 tags:
+- name: Games
 - name: PlayerTotals
 - name: PlayerStats
 - name: PlayerShotChart

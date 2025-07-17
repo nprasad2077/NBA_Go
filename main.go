@@ -5,6 +5,7 @@
 // @schemes     http
 // @BasePath    /
 //
+// @tag.name    Games
 // @tag.name    PlayerTotals
 // @tag.name    PlayerStats
 // @tag.name    PlayerShotChart
@@ -114,6 +115,7 @@ func main() {
 	routes.RegisterPlayerAdvancedRoutes(app, db)
 	routes.RegisterPlayerTotalRoutes(app, db)
 	routes.RegisterPlayerShotChartRoutes(app, db)
+	routes.RegisterGameRoutes(app, db)
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
