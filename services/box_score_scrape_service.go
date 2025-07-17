@@ -16,7 +16,7 @@ import (
 )
 
 const boxScoreURLBase = "https://www.basketball-reference.com"
-const numWorkers = 8 // Number of concurrent scrapers. Adjust based on your machine and network.
+const numWorkers = 5 // Number of concurrent scrapers. Adjust based on your machine and network.
 
 // ScrapedResult holds all the parsed stats from a single game.
 type ScrapedResult struct {

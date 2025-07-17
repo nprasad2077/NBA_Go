@@ -67,7 +67,7 @@ func importGameSchedules(db *gorm.DB) {
 		// "february", "march", "april", "may", "june",
 	}
 
-	for season := 2018; season <= 2025; season++ {
+	for season := 2025; season <= 2025; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			// The service will print a warning and skip if a month has no data (e.g. May/June for a season not yet finished)
@@ -89,8 +89,8 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
     // Define the date range for the 2023-2024 NBA season.
     // The regular season typically starts in October and playoffs end in June.
-    from := time.Date(2023, time.October, 1, 0, 0, 0, 0, time.UTC)
-    to := time.Date(2024, time.July, 1, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2022, time.October, 1, 0, 0, 0, 0, time.UTC)
+    to := time.Date(2023, time.July, 1, 0, 0, 0, 0, time.UTC)
 
     log.Printf("--- Starting Box Score Data Import for the 2023-2024 Season ---")
 
