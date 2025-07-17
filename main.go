@@ -1,7 +1,8 @@
 // @title       NBA_Go API
 // @version     1.0
 // @description Stats service, now with public access!
-// @schemes     https
+// //@schemes     https
+// @schemes     http
 // @BasePath    /
 //
 // @tag.name    PlayerTotals
@@ -45,7 +46,7 @@ import (
 func main() {
 	// ——— One-off import-data mode ———
 	if len(os.Args) > 1 && os.Args[1] == "import-data" {
-		// Run all migrations + import steps exactly once
+		// Run all DB migrations + import steps exactly once
 		db := config.InitDB(true)
 
 		importPlayerAdvanced(db)
@@ -59,6 +60,13 @@ func main() {
 
 		importPlayerTotalsPlayoffsScrape(db)
 		log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
+
+		importGameSchedules(db)
+		log.Println("🎉 Game Imports completed successfully 🏀")
+
+		importBoxScores(db)
+		log.Println("🎉 Related Box Score Imports completed successfully 📦")
+
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return

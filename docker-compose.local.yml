@@ -1,49 +1,72 @@
-# docker-compose.local.yml
-#
-# Use this file to run local services (API, Nginx, etc.) while
-# connecting to a REMOTE database.
-#
-# This version includes the 'db-init' service. Note that this service
-# will attempt to run its 'import-data' command every time you execute
-# 'docker-compose up'.
+version: '3.8'
 
 services:
-  # This service runs the 'import-data' command against the remote database
-  # specified in your '.env.local' file. It has no 'depends_on' since there
-  # is no local postgres container to wait for.
+  # NEW: Add a dedicated PostgreSQL database service
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - '${DB_PORT}:5432' # Expose DB port to host machine for local tools
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api.network
+
+  # MODIFIED: This service now runs migrations and imports against the live Postgres DB
+  # "import-data" on initial run to migrate and import data.
   db-init:
     build: .
-    env_file: .env.local
+    env_file: .env
     command: ["/nba_go", "import-data"]
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - api.network
     restart: "no"
 
-  # API services now have no 'depends_on' section.
-  # They will start and immediately try to connect to the DB_HOST in your .env file.
+  # MODIFIED: All API services now depend on postgres being healthy.
+  # The volume mount for './data' is no longer needed.
   api1:
     build: .
-    env_file: .env.local
+    env_file: .env
     ports:
       - '5001:5000'
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - api.network
     restart: always
 
   api2:
     build: .
-    env_file: .env.local
+    env_file: .env
     ports:
       - '5002:5000'
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - api.network
     restart: always
 
   api3:
     build: .
-    env_file: .env.local
+    env_file: .env
     ports:
       - '5003:5000'
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - api.network
     restart: always
@@ -57,7 +80,7 @@ services:
       - api2
       - api3
     ports:
-      - '8080:8080'
+      - '8081:8080'
     networks:
       - api.network
 
@@ -76,6 +99,8 @@ services:
     networks:
       - api.network
     restart: unless-stopped
+    logging:
+      driver: "none"
 
   grafana:
     image: grafana/grafana:latest
@@ -91,9 +116,11 @@ services:
     networks:
       - api.network
     restart: unless-stopped
+    logging:
+      driver: none
 
 volumes:
-  # The 'postgres_data' volume is not needed in this configuration.
+  postgres_data: # New volume for Postgres
   prometheus_data:
   grafana_data:
 
