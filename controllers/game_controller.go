@@ -117,7 +117,7 @@ type TeamGameAdvStatDTO struct {
 
 // GameResponseDTO is the top-level object for a single game in the response.
 type GameResponseDTO struct {
-	ID                   uint                       `json:"id"`
+	// ID                   uint                       `json:"id"`
 	GameID               string                     `json:"gameId"`
 	Date                 time.Time                  `json:"date"`
 	IsPlayoff            bool                       `json:"isPlayoff"`
@@ -128,7 +128,7 @@ type GameResponseDTO struct {
 	HomeTeam             string                     `json:"homeTeam"`
 	HomePTS              int                        `json:"homePts"`
 	GameDuration         string                     `json:"gameDuration"`
-	BoxScoreURL          string                     `json:"boxScoreUrl"`
+	// BoxScoreURL          string                     `json:"boxScoreUrl"`
 	LineScores           []LineScoreDTO             `json:"lineScores,omitempty"`
 	PlayerGameBasicStats []PlayerGameBasicStatDTO   `json:"playerGameBasicStats,omitempty"`
 	PlayerGameAdvStats   []PlayerGameAdvStatDTO     `json:"playerGameAdvStats,omitempty"`
@@ -267,7 +267,7 @@ func GetGames(db *gorm.DB) fiber.Handler {
 // toGameResponseDTO converts a Game model to its corresponding DTO, including nested associations.
 func toGameResponseDTO(game models.Game) GameResponseDTO {
 	dto := GameResponseDTO{
-		ID:           game.ID,
+		// ID:           game.ID,
 		GameID:       game.GameID,
 		Date:         game.Date,
 		IsPlayoff:    game.IsPlayoff,
@@ -278,7 +278,7 @@ func toGameResponseDTO(game models.Game) GameResponseDTO {
 		HomeTeam:     utils.GetAbbreviation(game.HomeTeam),
 		HomePTS:      game.HomePTS,
 		GameDuration: game.GameDuration,
-		BoxScoreURL:  game.BoxScoreURL,
+		// BoxScoreURL:  game.BoxScoreURL,
 	}
 
 	// Transform nested slices if they were loaded
