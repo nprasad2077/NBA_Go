@@ -4,7 +4,7 @@ definitions:
     properties:
       data:
         items:
-          $ref: '#/definitions/models.PlayerAdvancedStat'
+          $ref: '#/definitions/controllers.PlayerAdvancedStatDTO'
         type: array
       pagination:
         properties:
@@ -22,23 +22,21 @@ definitions:
     properties:
       arena:
         type: string
-      boxScoreUrl:
-        type: string
       date:
         type: string
       gameDuration:
         type: string
       gameId:
+        description: ID                   uint                       `json:"id"`
         type: string
       homePts:
         type: integer
       homeTeam:
         type: string
-      id:
-        type: integer
       isPlayoff:
         type: boolean
       lineScores:
+        description: BoxScoreURL          string                     `json:"boxScoreUrl"`
         items:
           $ref: '#/definitions/controllers.LineScoreDTO'
         type: array
@@ -104,6 +102,67 @@ definitions:
         type: string
       total:
         type: integer
+    type: object
+  controllers.PlayerAdvancedStatDTO:
+    properties:
+      age:
+        type: integer
+      assistPercent:
+        type: number
+      blockPercent:
+        type: number
+      box:
+        type: number
+      defensiveBox:
+        type: number
+      defensiveRBPercent:
+        type: number
+      defensiveWS:
+        type: number
+      ftr:
+        type: number
+      games:
+        type: integer
+      isPlayoff:
+        type: boolean
+      minutesPlayed:
+        type: integer
+      offensiveBox:
+        type: number
+      offensiveRBPercent:
+        type: number
+      offensiveWS:
+        type: number
+      per:
+        type: number
+      playerId:
+        type: string
+      playerName:
+        type: string
+      position:
+        type: string
+      season:
+        type: integer
+      stealPercent:
+        type: number
+      team:
+        type: string
+      threePAR:
+        type: number
+      totalRBPercent:
+        type: number
+      tsPercent:
+        type: number
+      turnoverPercent:
+        type: number
+      usagePercent:
+        type: number
+      vorp:
+        type: number
+      winShares:
+        type: number
+      winSharesPer:
+        type: number
     type: object
   controllers.PlayerGameAdvStatDTO:
     properties:
@@ -201,6 +260,91 @@ definitions:
       trb:
         type: integer
     type: object
+  controllers.PlayerTotalStatDTO:
+    properties:
+      age:
+        type: integer
+      assists:
+        type: integer
+      blocks:
+        type: integer
+      defensiveRb:
+        type: integer
+      effectFgPercent:
+        type: number
+      fieldAttempts:
+        type: integer
+      fieldGoals:
+        type: integer
+      fieldPercent:
+        type: number
+      ft:
+        type: integer
+      ftAttempts:
+        type: integer
+      ftPercent:
+        type: number
+      games:
+        type: integer
+      gamesStarted:
+        type: integer
+      isPlayoff:
+        type: boolean
+      minutesPg:
+        type: number
+      offensiveRb:
+        type: integer
+      personalFouls:
+        type: integer
+      playerId:
+        type: string
+      playerName:
+        type: string
+      points:
+        type: integer
+      position:
+        type: string
+      season:
+        type: integer
+      steals:
+        type: integer
+      team:
+        type: string
+      threeAttempts:
+        type: integer
+      threeFg:
+        type: integer
+      threePercent:
+        type: number
+      totalRb:
+        type: integer
+      turnovers:
+        type: integer
+      twoAttempts:
+        type: integer
+      twoFg:
+        type: integer
+      twoPercent:
+        type: number
+    type: object
+  controllers.PlayerTotalsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/controllers.PlayerTotalStatDTO'
+        type: array
+      pagination:
+        properties:
+          page:
+            type: integer
+          pageSize:
+            type: integer
+          pages:
+            type: integer
+          total:
+            type: integer
+        type: object
+    type: object
   controllers.TeamGameAdvStatDTO:
     properties:
       astPercent:
@@ -274,69 +418,6 @@ definitions:
         type: integer
       trb:
         type: integer
-    type: object
-  models.PlayerAdvancedStat:
-    properties:
-      age:
-        type: integer
-      assistPercent:
-        type: number
-      blockPercent:
-        type: number
-      box:
-        type: number
-      defensiveBox:
-        type: number
-      defensiveRBPercent:
-        type: number
-      defensiveWS:
-        type: number
-      ftr:
-        type: number
-      games:
-        type: integer
-      id:
-        type: integer
-      isPlayoff:
-        type: boolean
-      minutesPlayed:
-        type: integer
-      offensiveBox:
-        type: number
-      offensiveRBPercent:
-        type: number
-      offensiveWS:
-        type: number
-      per:
-        type: number
-      playerId:
-        type: string
-      playerName:
-        type: string
-      position:
-        type: string
-      season:
-        type: integer
-      stealPercent:
-        type: number
-      team:
-        type: string
-      threePAR:
-        type: number
-      totalRBPercent:
-        type: number
-      tsPercent:
-        type: number
-      turnoverPercent:
-        type: number
-      usagePercent:
-        type: number
-      vorp:
-        type: number
-      winShares:
-        type: number
-      winSharesPer:
-        type: number
     type: object
   models.PlayerShotChart:
     properties:
@@ -614,8 +695,7 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/controllers.PlayerTotalsResponse'
         "500":
           description: Internal Server Error
           schema:
