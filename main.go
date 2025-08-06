@@ -50,23 +50,26 @@ func main() {
 		// Run all DB migrations + import steps exactly once
 		db := config.InitDB(true)
 
-		importPlayerAdvanced(db)
-		log.Println("🎉 Player Advanced Import completed successfully")
+		// importPlayerAdvanced(db)
+		// log.Println("🎉 Player Advanced Import completed successfully")
 
-		importPlayerAdvancedPlayoffs(db)
-		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
+		// importPlayerAdvancedPlayoffs(db)
+		// log.Println("🎉 Player Advanced Playoffs Import completed successfully")
 
-		importPlayerTotalsScrape(db)
-		log.Println("🎉 Player Totals (scraped) Import completed successfully")
+		// importPlayerTotalsScrape(db)
+		// log.Println("🎉 Player Totals (scraped) Import completed successfully")
 
-		importPlayerTotalsPlayoffsScrape(db)
-		log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
+		// importPlayerTotalsPlayoffsScrape(db)
+		// log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
 
-		importGameSchedules(db)
-		log.Println("🎉 Game Imports completed successfully 🏀")
+		// importGameSchedules(db)
+		// log.Println("🎉 Game Imports completed successfully 🏀")
 
-		importBoxScores(db)
-		log.Println("🎉 Related Box Score Imports completed successfully 📦")
+		// importBoxScores(db)
+		// log.Println("🎉 Related Box Score Imports completed successfully 📦")
+
+		importPlayerShotCharts(db)
+		log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
 
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
