@@ -379,7 +379,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.PlayerAdvancedStat"
+                        "$ref": "#/definitions/controllers.PlayerAdvancedStatDTO"
                     }
                 },
                 "pagination": {
@@ -526,6 +526,98 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "controllers.PlayerAdvancedStatDTO": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "assistPercent": {
+                    "type": "number"
+                },
+                "blockPercent": {
+                    "type": "number"
+                },
+                "box": {
+                    "type": "number"
+                },
+                "defensiveBox": {
+                    "type": "number"
+                },
+                "defensiveRBPercent": {
+                    "type": "number"
+                },
+                "defensiveWS": {
+                    "type": "number"
+                },
+                "ftr": {
+                    "type": "number"
+                },
+                "games": {
+                    "type": "integer"
+                },
+                "isPlayoff": {
+                    "type": "boolean"
+                },
+                "minutesPlayed": {
+                    "type": "integer"
+                },
+                "offensiveBox": {
+                    "type": "number"
+                },
+                "offensiveRBPercent": {
+                    "type": "number"
+                },
+                "offensiveWS": {
+                    "type": "number"
+                },
+                "per": {
+                    "type": "number"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "playerName": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "season": {
+                    "type": "integer"
+                },
+                "stealPercent": {
+                    "type": "number"
+                },
+                "team": {
+                    "type": "string"
+                },
+                "threePAR": {
+                    "type": "number"
+                },
+                "totalRBPercent": {
+                    "type": "number"
+                },
+                "tsPercent": {
+                    "type": "number"
+                },
+                "turnoverPercent": {
+                    "type": "number"
+                },
+                "usagePercent": {
+                    "type": "number"
+                },
+                "vorp": {
+                    "type": "number"
+                },
+                "winShares": {
+                    "type": "number"
+                },
+                "winSharesPer": {
+                    "type": "number"
                 }
             }
         },
@@ -910,101 +1002,6 @@ const docTemplate = `{
                 },
                 "trb": {
                     "type": "integer"
-                }
-            }
-        },
-        "models.PlayerAdvancedStat": {
-            "type": "object",
-            "properties": {
-                "age": {
-                    "type": "integer"
-                },
-                "assistPercent": {
-                    "type": "number"
-                },
-                "blockPercent": {
-                    "type": "number"
-                },
-                "box": {
-                    "type": "number"
-                },
-                "defensiveBox": {
-                    "type": "number"
-                },
-                "defensiveRBPercent": {
-                    "type": "number"
-                },
-                "defensiveWS": {
-                    "type": "number"
-                },
-                "ftr": {
-                    "type": "number"
-                },
-                "games": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "isPlayoff": {
-                    "type": "boolean"
-                },
-                "minutesPlayed": {
-                    "type": "integer"
-                },
-                "offensiveBox": {
-                    "type": "number"
-                },
-                "offensiveRBPercent": {
-                    "type": "number"
-                },
-                "offensiveWS": {
-                    "type": "number"
-                },
-                "per": {
-                    "type": "number"
-                },
-                "playerId": {
-                    "type": "string"
-                },
-                "playerName": {
-                    "type": "string"
-                },
-                "position": {
-                    "type": "string"
-                },
-                "season": {
-                    "type": "integer"
-                },
-                "stealPercent": {
-                    "type": "number"
-                },
-                "team": {
-                    "type": "string"
-                },
-                "threePAR": {
-                    "type": "number"
-                },
-                "totalRBPercent": {
-                    "type": "number"
-                },
-                "tsPercent": {
-                    "type": "number"
-                },
-                "turnoverPercent": {
-                    "type": "number"
-                },
-                "usagePercent": {
-                    "type": "number"
-                },
-                "vorp": {
-                    "type": "number"
-                },
-                "winShares": {
-                    "type": "number"
-                },
-                "winSharesPer": {
-                    "type": "number"
                 }
             }
         },
