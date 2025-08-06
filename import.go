@@ -101,12 +101,61 @@ func importBoxScores(db *gorm.DB) {
     log.Printf("--- Finished Box Score Data Import ---")
 }
 
-// importPlayerShotChart fetches shot-charts for every known player
-// func importPlayerShotChart(db *gorm.DB) {
-// 	const firstID = "hardeja01"
-// 	log.Printf("▶️  importing shot chart for player %s…", firstID)
-//     if err := services.FetchAndStoreShotChartForPlayer(db, firstID); err != nil {
-//         log.Printf("shot chart import failed for %s: %v", firstID, err)
-//     }
-// 	// you can add more IDs here or just rely on the API endpoint after
-// }
+// importPlayerShotCharts fetches shot charts for a PREDEFINED list of players for a given range of seasons.
+func importPlayerShotCharts(db *gorm.DB) {
+	log.Println("--- Starting Player Shot Chart Import from Predefined List ---")
+
+	// 1. Define the season range. Your service fetches from newest to oldest.
+	startSeason := 2025
+	endSeason := 2017 // Basketball-Reference has data going back this far.
+
+	// 2. Define the static list of player IDs to import.
+	// You can add or remove any Basketball-Reference player ID here.
+	// Examples:
+	// LeBron James:  "jamesle01"
+	// Stephen Curry: "curryst01"
+	// Nikola Jokić:  "jokicni01"
+	// Luka Dončić:   "doncilu01"
+	targetPlayerIDs := []string{
+		"jamesle01",
+		"curryst01",
+		"jokicni01",
+		"doncilu01",
+		"hardeja01",
+		"irvinky01",
+		"duranke01",
+		// "youngtr01",
+		// "lillada01",
+		// "gilgesh01",
+		// "brunsja01",
+		// "edwaran01",
+		// "mitchdo01",
+		// "bookede01",
+		// "derozde01",
+
+		// Add more player IDs here as needed
+	}
+
+	if len(targetPlayerIDs) == 0 {
+		log.Println("⚠️ Player ID list is empty. Skipping shot chart import.")
+		return
+	}
+
+	log.Printf("Found %d players in the predefined list. Starting shot chart import for seasons %d down to %d.", len(targetPlayerIDs), startSeason, endSeason)
+
+	// 3. Loop through each player ID and fetch their shot chart data.
+	for i, playerID := range targetPlayerIDs {
+		log.Printf("(%d/%d) Importing shot charts for player: %s", i+1, len(targetPlayerIDs), playerID)
+
+		err := services.FetchAndStoreShotChartScrapedForPlayer(db, playerID, startSeason, endSeason)
+		if err != nil {
+			// Log the error but continue with the next player.
+			log.Printf("❌ Shot chart import failed for player %s: %v", playerID, err)
+		}
+
+		// 4. Be a good internet citizen. Pause between scraping each player.
+		utils.SleepWithJitter(10000 * time.Millisecond)
+	}
+
+	log.Println("--- Finished Player Shot Chart Import from Predefined List ---")
+}

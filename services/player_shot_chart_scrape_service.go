@@ -15,6 +15,9 @@ import (
 	"github.com/nprasad2077/NBA_Go/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"github.com/nprasad2077/NBA_Go/utils"
+	"time"  
 )
 
 // FetchAndStoreShotChartScrapedForPlayer scrapes the shot chart pages on
@@ -48,6 +51,7 @@ func FetchAndStoreShotChartScrapedForPlayer(
 			resp.Body.Close()
 			// This is not an error, just means the player might not have data for that season.
 			log.Printf("⚠️  Skipping season %d for player %s (Status: %s)", season, playerID, resp.Status)
+			utils.SleepWithJitter(2500 * time.Millisecond)
 			continue
 		}
 		bodyBytes, err := io.ReadAll(resp.Body)
@@ -193,6 +197,8 @@ func FetchAndStoreShotChartScrapedForPlayer(
 			log.Printf("No shots found to import for player %s in season %d.", playerID, season)
 		}
 		// --- BATCHING LOGIC END ---
+		log.Printf("Pausing before next season...")
+		utils.SleepWithJitter(3500 * time.Millisecond) // Adjust duration as needed
 	}
 	return nil
 }
