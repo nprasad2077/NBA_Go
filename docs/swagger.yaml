@@ -22,23 +22,21 @@ definitions:
     properties:
       arena:
         type: string
-      boxScoreUrl:
-        type: string
       date:
         type: string
       gameDuration:
         type: string
       gameId:
+        description: ID                   uint                       `json:"id"`
         type: string
       homePts:
         type: integer
       homeTeam:
         type: string
-      id:
-        type: integer
       isPlayoff:
         type: boolean
       lineScores:
+        description: BoxScoreURL          string                     `json:"boxScoreUrl"`
         items:
           $ref: '#/definitions/controllers.LineScoreDTO'
         type: array
@@ -200,6 +198,91 @@ definitions:
         type: integer
       trb:
         type: integer
+    type: object
+  controllers.PlayerTotalStatDTO:
+    properties:
+      age:
+        type: integer
+      assists:
+        type: integer
+      blocks:
+        type: integer
+      defensiveRb:
+        type: integer
+      effectFgPercent:
+        type: number
+      fieldAttempts:
+        type: integer
+      fieldGoals:
+        type: integer
+      fieldPercent:
+        type: number
+      ft:
+        type: integer
+      ftAttempts:
+        type: integer
+      ftPercent:
+        type: number
+      games:
+        type: integer
+      gamesStarted:
+        type: integer
+      isPlayoff:
+        type: boolean
+      minutesPg:
+        type: number
+      offensiveRb:
+        type: integer
+      personalFouls:
+        type: integer
+      playerId:
+        type: string
+      playerName:
+        type: string
+      points:
+        type: integer
+      position:
+        type: string
+      season:
+        type: integer
+      steals:
+        type: integer
+      team:
+        type: string
+      threeAttempts:
+        type: integer
+      threeFg:
+        type: integer
+      threePercent:
+        type: number
+      totalRb:
+        type: integer
+      turnovers:
+        type: integer
+      twoAttempts:
+        type: integer
+      twoFg:
+        type: integer
+      twoPercent:
+        type: number
+    type: object
+  controllers.PlayerTotalsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/controllers.PlayerTotalStatDTO'
+        type: array
+      pagination:
+        properties:
+          page:
+            type: integer
+          pageSize:
+            type: integer
+          pages:
+            type: integer
+          total:
+            type: integer
+        type: object
     type: object
   controllers.TeamGameAdvStatDTO:
     properties:
@@ -614,8 +697,7 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/controllers.PlayerTotalsResponse'
         "500":
           description: Internal Server Error
           schema:

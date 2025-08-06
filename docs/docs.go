@@ -355,8 +355,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/controllers.PlayerTotalsResponse"
                         }
                     },
                     "500": {
@@ -408,9 +407,6 @@ const docTemplate = `{
                 "arena": {
                     "type": "string"
                 },
-                "boxScoreUrl": {
-                    "type": "string"
-                },
                 "date": {
                     "type": "string"
                 },
@@ -418,6 +414,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "gameId": {
+                    "description": "ID                   uint                       ` + "`" + `json:\"id\"` + "`" + `",
                     "type": "string"
                 },
                 "homePts": {
@@ -426,13 +423,11 @@ const docTemplate = `{
                 "homeTeam": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "isPlayoff": {
                     "type": "boolean"
                 },
                 "lineScores": {
+                    "description": "BoxScoreURL          string                     ` + "`" + `json:\"boxScoreUrl\"` + "`" + `",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/controllers.LineScoreDTO"
@@ -675,6 +670,135 @@ const docTemplate = `{
                 },
                 "trb": {
                     "type": "integer"
+                }
+            }
+        },
+        "controllers.PlayerTotalStatDTO": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "assists": {
+                    "type": "integer"
+                },
+                "blocks": {
+                    "type": "integer"
+                },
+                "defensiveRb": {
+                    "type": "integer"
+                },
+                "effectFgPercent": {
+                    "type": "number"
+                },
+                "fieldAttempts": {
+                    "type": "integer"
+                },
+                "fieldGoals": {
+                    "type": "integer"
+                },
+                "fieldPercent": {
+                    "type": "number"
+                },
+                "ft": {
+                    "type": "integer"
+                },
+                "ftAttempts": {
+                    "type": "integer"
+                },
+                "ftPercent": {
+                    "type": "number"
+                },
+                "games": {
+                    "type": "integer"
+                },
+                "gamesStarted": {
+                    "type": "integer"
+                },
+                "isPlayoff": {
+                    "type": "boolean"
+                },
+                "minutesPg": {
+                    "type": "number"
+                },
+                "offensiveRb": {
+                    "type": "integer"
+                },
+                "personalFouls": {
+                    "type": "integer"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "playerName": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "season": {
+                    "type": "integer"
+                },
+                "steals": {
+                    "type": "integer"
+                },
+                "team": {
+                    "type": "string"
+                },
+                "threeAttempts": {
+                    "type": "integer"
+                },
+                "threeFg": {
+                    "type": "integer"
+                },
+                "threePercent": {
+                    "type": "number"
+                },
+                "totalRb": {
+                    "type": "integer"
+                },
+                "turnovers": {
+                    "type": "integer"
+                },
+                "twoAttempts": {
+                    "type": "integer"
+                },
+                "twoFg": {
+                    "type": "integer"
+                },
+                "twoPercent": {
+                    "type": "number"
+                }
+            }
+        },
+        "controllers.PlayerTotalsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controllers.PlayerTotalStatDTO"
+                    }
+                },
+                "pagination": {
+                    "type": "object",
+                    "properties": {
+                        "page": {
+                            "type": "integer"
+                        },
+                        "pageSize": {
+                            "type": "integer"
+                        },
+                        "pages": {
+                            "type": "integer"
+                        },
+                        "total": {
+                            "type": "integer"
+                        }
+                    }
                 }
             }
         },
