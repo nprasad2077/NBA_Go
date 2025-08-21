@@ -39,9 +39,9 @@ import (
 
 	"github.com/nprasad2077/NBA_Go/config"
 	"github.com/nprasad2077/NBA_Go/controllers"
+	_ "github.com/nprasad2077/NBA_Go/docs"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/middleware"
-	_ "github.com/nprasad2077/NBA_Go/docs"
 )
 
 func main() {
@@ -65,12 +65,11 @@ func main() {
 		// importGameSchedules(db)
 		// log.Println("🎉 Game Imports completed successfully 🏀")
 
-		// importBoxScores(db)
-		// log.Println("🎉 Related Box Score Imports completed successfully 📦")
+		importBoxScores(db)
+		log.Println("🎉 Related Box Score Imports completed successfully 📦")
 
-		importPlayerShotCharts(db)
-		log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
-
+		// importPlayerShotCharts(db)
+		// log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
