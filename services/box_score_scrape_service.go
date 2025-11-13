@@ -132,7 +132,7 @@ func scrapeAndParseWorker(id int, jobs <-chan models.Game, results chan<- Scrape
 	}
 
 	for game := range jobs {
-		log.Printf("Worker %d: Processing game %s", id, game.GameID)
+		log.Printf("🐝  Worker %d: Processing game %s", id, game.GameID)
 		fullURL := boxScoreURLBase + game.BoxScoreURL
 
 		utils.SleepWithJitter(baseDelay)

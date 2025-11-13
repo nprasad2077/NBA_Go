@@ -62,8 +62,8 @@ func main() {
 		// importPlayerTotalsPlayoffsScrape(db)
 		// log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
 
-		importGameSchedules(db)
-		log.Println("🎉 Game Imports completed successfully 🏀")
+		// importGameSchedules(db)
+		// log.Println("🎉 Game Imports completed successfully 🏀")
 
 		importBoxScores(db)
 		log.Println("🎉 Related Box Score Imports completed successfully 📦")

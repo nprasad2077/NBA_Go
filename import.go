@@ -62,13 +62,13 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 func importGameSchedules(db *gorm.DB) {
 	// An NBA season typically runs from October to June
 	months := []string{
-		"septempber", "october", "november", "december", "january",
+		"september", "october", "november", "december", "january",
 		"february", "march", "april", "may", "june",
 
 		// "february", "march", "april", "may", "june",
 	}
 
-	for season := 2024; season <= 2026; season++ {
+	for season := 2015; season <= 2015; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			// The service will print a warning and skip if a month has no data (e.g. May/June for a season not yet finished)
@@ -88,8 +88,8 @@ func importGameSchedules(db *gorm.DB) {
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
-    from := time.Date(2025, time.October, 1, 0, 0, 0, 0, time.UTC)
-    to := time.Date(2026, time.January, 1, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2025, time.November, 1, 0, 0, 0, 0, time.UTC)
+    to := time.Date(2025, time.December, 1, 0, 0, 0, 0, time.UTC)
 
     dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---", 
         from.Format("January 2, 2006"), 

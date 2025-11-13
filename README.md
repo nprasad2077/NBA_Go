@@ -1,6 +1,6 @@
 # NBA_Go
 
-### First‑time bootstrap
+## First‑time bootstrap
 
 ```bash
 # 1. build + run
@@ -18,19 +18,23 @@ curl http://localhost:8080/api/playeradvancedstats \
 
 ```
 
-### Swagger Initiate Docs
+## Swagger Initiate Docs
 
 ```bash
 swag init -g main.go -o docs
 ```
 
-### Test
+## Test
 
 ```bash
 go run loadtest.go -n 100 -c 10 -url "http://127.0.0.1:8080/api/playeradvancedstats?page=1&pageSize=20" -log results.log -key "xxx"
 ```
 
-### Local Environment
+## Local Environment
+
+```bash
+docker compose down
+```
 
 ```bash
 docker-compose -f docker-compose.local.yml up --build -d
