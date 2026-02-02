@@ -64,7 +64,7 @@ func importGameSchedules(db *gorm.DB) {
 	months := []string{
 		// "september", "october", "november", "december", "january",
 		// "february", "march", "april", "may", "june",
-		"december",
+		"january", "february",
 		// "february", "march", "april", "may", "june",
 		// "october", "november", "december",
 	}
@@ -91,9 +91,9 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
 	// now := time.Now()
 
-    from := time.Date(2025, time.December, 12, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2026, time.January, 27, 0, 0, 0, 0, time.UTC)
 	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
-    to := time.Date(2025, time.December, 31, 5, 30, 0, 0, time.UTC)
+    to := time.Date(2026, time.February, 28, 5, 30, 0, 0, time.UTC)
 
     dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---", 
         from.Format("January 2, 2006"), 
@@ -126,28 +126,28 @@ func importPlayerShotCharts(db *gorm.DB) {
 	// Nikola Jokić:  "jokicni01"
 	// Luka Dončić:   "doncilu01"
 	targetPlayerIDs := []string{
-		// "jamesle01",
-		// "curryst01",
-		// "jokicni01",
-		// "doncilu01",
-		// "hardeja01",
-		// "irvinky01",
-		// "duranke01",
-		// "youngtr01",
+		"jamesle01",
+		"curryst01",
+		"jokicni01",
+		"doncilu01",
+		"hardeja01",
+		"irvinky01",
+		"duranke01",
+		"youngtr01",
 		// "lillada01",
-		// "gilgesh01",
-		// "brunsja01",
-		// "edwaran01",
+		"gilgesh01",
+		"brunsja01",
+		"edwaran01",
 		// "mitchdo01",
 		// "bookede01",
-		// "derozde01",
+		"derozde01",
 		// "aldrila01",
-		// "westbru01",
+		"westbru01",
 		// "paulch01",
-		// "butleji01",
+		"butleji01",
 		"davisan02",
 		"leonaka01",
-		"youngtr01",
+		// "youngtr01",
 		"tatumja01",
 
 		// Add more player IDs here as needed
