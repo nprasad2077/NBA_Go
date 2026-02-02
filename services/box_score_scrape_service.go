@@ -16,7 +16,8 @@ import (
 )
 
 const boxScoreURLBase = "https://www.basketball-reference.com"
-const numWorkers = 5 // Number of concurrent scrapers. Adjust based on your machine and network.
+const numWorkers = 2 // Number of concurrent scrapers. Adjust based on your machine and network.
+const baseDelay = 2500 * time.Millisecond
 
 // ScrapedResult holds all the parsed stats from a single game.
 type ScrapedResult struct {
@@ -119,11 +120,23 @@ func FetchAndStoreBoxScoreDataForDateRange(db *gorm.DB, from, to time.Time) erro
 // scrapeAndParseWorker is a worker goroutine that receives games, scrapes them, and sends back the result.
 func scrapeAndParseWorker(id int, jobs <-chan models.Game, results chan<- ScrapedResult, wg *sync.WaitGroup) {
 	defer wg.Done()
+
+	// --- Stagger the start of each worker ---
+	// Calculate an offset based on the worker's ID to spread out the initial requests.
+	// We divide the base delay by the number of workers to get an even interval.
+	if numWorkers > 1 {
+		staggerAmount := time.Duration(int64(baseDelay) / int64(numWorkers))
+		initialDelay := time.Duration(id-1) * staggerAmount
+		log.Printf("Worker %d: Staggering start with an initial delay of %v", id, initialDelay)
+		time.Sleep(initialDelay)
+	}
+
 	for game := range jobs {
-		log.Printf("Worker %d: Processing game %s", id, game.GameID)
+		log.Printf("🐝  Worker %d: Processing game %s", id, game.GameID)
 		fullURL := boxScoreURLBase + game.BoxScoreURL
 
-		utils.SleepWithJitter(2300 * time.Millisecond)
+		utils.SleepWithJitter(baseDelay)
+		time.Sleep(1500 * time.Millisecond)
 
 		req, err := http.NewRequest("GET", fullURL, nil)
 		if err != nil {
@@ -226,9 +239,9 @@ func parseLineScore(doc *goquery.Document, gameID string) []models.LineScore {
 			Q2:     mustAtoi(row.Find(`td[data-stat="2"]`).Text()),
 			Q3:     mustAtoi(row.Find(`td[data-stat="3"]`).Text()),
 			Q4:     mustAtoi(row.Find(`td[data-stat="4"]`).Text()),
-			OT1:    mustAtoi(row.Find(`td[data-stat="OT1"]`).Text()),
-			OT2:    mustAtoi(row.Find(`td[data-stat="OT2"]`).Text()),
-			OT3:    mustAtoi(row.Find(`td[data-stat="OT3"]`).Text()),
+			OT1:    mustAtoi(row.Find(`td[data-stat="1OT"]`).Text()),
+			OT2:    mustAtoi(row.Find(`td[data-stat="2OT"]`).Text()),
+			OT3:    mustAtoi(row.Find(`td[data-stat="3OT"]`).Text()),
 			Total:  mustAtoi(row.Find(`td[data-stat="T"]`).Text()),
 		})
 	})
@@ -332,38 +345,81 @@ func parseTeamAdvStat(row *goquery.Selection, gameID, team string) models.TeamGa
 	}
 }
 
+
 func batchUpsertAll(db *gorm.DB, pbs []models.PlayerGameBasicStat, pas []models.PlayerGameAdvStat, tbs []models.TeamGameBasicStat, tas []models.TeamGameAdvStat) error {
+	const batchSize = 500 // 💡 A safe chunk size to stay under the limit.
+
+	// Batch upsert Player Basic Stats
 	if len(pbs) > 0 {
-		if err := db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "game_id"}, {Name: "player_id"}},
-			DoUpdates: clause.AssignmentColumns(getModelColumns(&models.PlayerGameBasicStat{})),
-		}).Create(&pbs).Error; err != nil {
-			return fmt.Errorf("failed to upsert player basic stats: %w", err)
+		for i := 0; i < len(pbs); i += batchSize {
+			end := i + batchSize
+			if end > len(pbs) {
+				end = len(pbs)
+			}
+			batch := pbs[i:end]
+			if err := db.Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "game_id"}, {Name: "player_id"}},
+				DoUpdates: clause.AssignmentColumns(getModelColumns(&models.PlayerGameBasicStat{})),
+			}).Create(&batch).Error; err != nil {
+				return fmt.Errorf("failed to upsert player basic stats batch: %w", err)
+			}
 		}
+		log.Printf("Successfully upserted %d player basic stats.", len(pbs))
 	}
+
+	// Batch upsert Player Advanced Stats
 	if len(pas) > 0 {
-		if err := db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "game_id"}, {Name: "player_id"}},
-			DoUpdates: clause.AssignmentColumns(getModelColumns(&models.PlayerGameAdvStat{})),
-		}).Create(&pas).Error; err != nil {
-			return fmt.Errorf("failed to upsert player advanced stats: %w", err)
+		for i := 0; i < len(pas); i += batchSize {
+			end := i + batchSize
+			if end > len(pas) {
+				end = len(pas)
+			}
+			batch := pas[i:end]
+			if err := db.Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "game_id"}, {Name: "player_id"}},
+				DoUpdates: clause.AssignmentColumns(getModelColumns(&models.PlayerGameAdvStat{})),
+			}).Create(&batch).Error; err != nil {
+				return fmt.Errorf("failed to upsert player advanced stats batch: %w", err)
+			}
 		}
+		log.Printf("Successfully upserted %d player advanced stats.", len(pas))
 	}
+
+	// Batch upsert Team Basic Stats
 	if len(tbs) > 0 {
-		if err := db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "game_id"}, {Name: "team"}},
-			DoUpdates: clause.AssignmentColumns(getModelColumns(&models.TeamGameBasicStat{})),
-		}).Create(&tbs).Error; err != nil {
-			return fmt.Errorf("failed to upsert team basic stats: %w", err)
+		for i := 0; i < len(tbs); i += batchSize {
+			end := i + batchSize
+			if end > len(tbs) {
+				end = len(tbs)
+			}
+			batch := tbs[i:end]
+			if err := db.Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "game_id"}, {Name: "team"}},
+				DoUpdates: clause.AssignmentColumns(getModelColumns(&models.TeamGameBasicStat{})),
+			}).Create(&batch).Error; err != nil {
+				return fmt.Errorf("failed to upsert team basic stats batch: %w", err)
+			}
 		}
+		log.Printf("Successfully upserted %d team basic stats.", len(tbs))
 	}
+
+	// Batch upsert Team Advanced Stats
 	if len(tas) > 0 {
-		if err := db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "game_id"}, {Name: "team"}},
-			DoUpdates: clause.AssignmentColumns(getModelColumns(&models.TeamGameAdvStat{})),
-		}).Create(&tas).Error; err != nil {
-			return fmt.Errorf("failed to upsert team advanced stats: %w", err)
+		for i := 0; i < len(tas); i += batchSize {
+			end := i + batchSize
+			if end > len(tas) {
+				end = len(tas)
+			}
+			batch := tas[i:end]
+			if err := db.Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "game_id"}, {Name: "team"}},
+				DoUpdates: clause.AssignmentColumns(getModelColumns(&models.TeamGameAdvStat{})),
+			}).Create(&batch).Error; err != nil {
+				return fmt.Errorf("failed to upsert team advanced stats batch: %w", err)
+			}
 		}
+		log.Printf("Successfully upserted %d team advanced stats.", len(tas))
 	}
+
 	return nil
 }

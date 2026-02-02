@@ -39,9 +39,9 @@ import (
 
 	"github.com/nprasad2077/NBA_Go/config"
 	"github.com/nprasad2077/NBA_Go/controllers"
+	_"github.com/nprasad2077/NBA_Go/docs"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/middleware"
-	_ "github.com/nprasad2077/NBA_Go/docs"
 )
 
 func main() {
@@ -53,8 +53,8 @@ func main() {
 		importPlayerAdvanced(db)
 		log.Println("🎉 Player Advanced Import completed successfully")
 
-		// importPlayerAdvancedPlayoffs(db)
-		// log.Println("🎉 Player Advanced Playoffs Import completed successfully")
+		// // importPlayerAdvancedPlayoffs(db)
+		// // log.Println("🎉 Player Advanced Playoffs Import completed successfully")
 
 		importPlayerTotalsScrape(db)
 		log.Println("🎉 Player Totals (scraped) Import completed successfully")
@@ -70,7 +70,6 @@ func main() {
 
 		// importPlayerShotCharts(db)
 		// log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
-
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return

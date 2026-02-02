@@ -29,4 +29,6 @@ go.work.sum
 data/nba.db
 /data/
 /data
-/data/*.DS_Store
+/data/*
+docs/restore_dump_remote.md
+./docs/restore_dump_remote.md
