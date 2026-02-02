@@ -29,4 +29,4 @@ go.work.sum
 data/nba.db
 /data/
 /data
-/data/*
+/data/*.DS_Store
