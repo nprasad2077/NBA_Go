@@ -1,0 +1,9 @@
+{
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.csv": "gc-excelviewer-csv-editor",
+        "*.pdf": "pdf.preview",
+        "*.parquet": "duckdb.dataFileViewer",
+        "*.tsv": "duckdb.dataFileViewer"
+    }
+}

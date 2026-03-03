@@ -64,12 +64,12 @@ func importGameSchedules(db *gorm.DB) {
 	months := []string{
 		// "september", "october", "november", "december", "january",
 		// "february", "march", "april", "may", "june",
-		"january", "february",
+		"february", "march", "april",
 		// "february", "march", "april", "may", "june",
 		// "october", "november", "december",
 	}
 
-	for season := 2025; season <= 2026; season++ {
+	for season := 2026; season <= 2026; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			// The service will print a warning and skip if a month has no data (e.g. May/June for a season not yet finished)
@@ -91,9 +91,9 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
 	// now := time.Now()
 
-    from := time.Date(2026, time.January, 27, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2026, time.February, 27, 0, 0, 0, 0, time.UTC)
 	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
-    to := time.Date(2026, time.February, 28, 5, 30, 0, 0, time.UTC)
+    to := time.Date(2026, time.April, 1, 5, 30, 0, 0, time.UTC)
 
     dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---", 
         from.Format("January 2, 2006"), 
