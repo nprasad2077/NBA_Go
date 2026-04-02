@@ -91,9 +91,9 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
 	// now := time.Now()
 
-    from := time.Date(2026, time.February, 27, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2026, time.March, 28, 0, 0, 0, 0, time.UTC)
 	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
-    to := time.Date(2026, time.April, 1, 5, 30, 0, 0, time.UTC)
+    to := time.Date(2026, time.May, 1, 5, 30, 0, 0, time.UTC)
 
     dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---", 
         from.Format("January 2, 2006"), 
