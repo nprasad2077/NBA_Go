@@ -64,7 +64,7 @@ func importGameSchedules(db *gorm.DB) {
 	months := []string{
 		// "september", "october", "november", "december", "january",
 		// "february", "march", "april", "may", "june",
-		"february", "march", "april",
+		"february", "march", "april", "may", "june",
 		// "february", "march", "april", "may", "june",
 		// "october", "november", "december",
 	}
@@ -91,7 +91,7 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
 	// now := time.Now()
 
-    from := time.Date(2026, time.March, 28, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2026, time.April, 10, 0, 0, 0, 0, time.UTC)
 	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
     to := time.Date(2026, time.May, 1, 5, 30, 0, 0, time.UTC)
 
