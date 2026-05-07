@@ -32,3 +32,4 @@ data/nba.db
 /data/*
 docs/restore_dump_remote.md
 ./docs/restore_dump_remote.md
+docs/notes/conversation_1.md

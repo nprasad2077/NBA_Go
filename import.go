@@ -17,7 +17,7 @@ func importPlayerAdvanced(db *gorm.DB) {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
 		log.Printf("Advanced import for season: %d", season)
-		time.Sleep(1300 * time.Millisecond)
+		time.Sleep(2000 * time.Millisecond)
 		utils.SleepWithJitter(1000 * time.Millisecond)
 	}
 }
@@ -29,7 +29,7 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
 		log.Printf("Advanced Playoffs import for season: %d", season)
-		time.Sleep(1300 * time.Millisecond)
+		time.Sleep(2000 * time.Millisecond)
 		utils.SleepWithJitter(1500 * time.Millisecond)
 	}
 }
@@ -41,7 +41,7 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 			log.Printf("scraped totals import failed for %d: %v", season, err)
 		}
 		log.Printf("Player Totals import for season: %d", season)
-		time.Sleep(1300 * time.Millisecond)
+		time.Sleep(2000 * time.Millisecond)
 		utils.SleepWithJitter(1250 * time.Millisecond)
 	}
 }
@@ -53,7 +53,7 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 			log.Printf("scraped playoffs import failed for %d: %v", season, err)
 		}
 		log.Printf("Player Playoffs Totals import for season: %d", season)
-		time.Sleep(1300 * time.Millisecond)
+		time.Sleep(2000 * time.Millisecond)
 		utils.SleepWithJitter(1700 * time.Millisecond)
 	}
 }
@@ -64,7 +64,7 @@ func importGameSchedules(db *gorm.DB) {
 	months := []string{
 		// "september", "october", "november", "december", "january",
 		// "february", "march", "april", "may", "june",
-		"february", "march", "april", "may", "june",
+		"may", "june",
 		// "february", "march", "april", "may", "june",
 		// "october", "november", "december",
 	}
@@ -79,7 +79,7 @@ func importGameSchedules(db *gorm.DB) {
 			}
 			log.Printf("Game schedule import for %s, %d complete.", month, season)
 			// Respectful delay between requests
-			time.Sleep(1400 * time.Millisecond)
+			time.Sleep(2500 * time.Millisecond)
 			utils.SleepWithJitter(1800 * time.Millisecond)
 		}
 		log.Printf("--- Finished Game Schedule Import for Season: %d ---", season)
@@ -91,9 +91,9 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
 	// now := time.Now()
 
-    from := time.Date(2026, time.April, 10, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2026, time.April, 28, 0, 0, 0, 0, time.UTC)
 	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
-    to := time.Date(2026, time.May, 1, 5, 30, 0, 0, time.UTC)
+    to := time.Date(2026, time.June, 15, 5, 30, 0, 0, time.UTC)
 
     dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---", 
         from.Format("January 2, 2006"), 

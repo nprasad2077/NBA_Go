@@ -96,6 +96,7 @@ func main() {
 
 	// middlewares
 	app.Use(logger.New())
+	app.Use(middleware.RateLimiter())
 	app.Use(middleware.MetricsMiddleware())
 
 	// DB connection (no migrations on API startup)
