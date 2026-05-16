@@ -9,7 +9,7 @@ A high-performance NBA statistics REST API built with Go (Fiber), PostgreSQL, an
 │  NGINX (reverse proxy / round-robin load balancer :8080) │
 ├──────────────────────────────────────────────────────────┤
 │  API Instance x3 (Fiber :5000 each)                      │
-│  ┌──────────┐  ┌─────────────┐  ┌───────────────────┐   │
+│  ┌──────────┐  ┌─────────────┐  ┌───────────────────┐    │
 │  │  Routes  │→ │ Controllers │→ │ Services (scraper) │   │
 │  └──────────┘  └─────────────┘  └───────────────────┘   │
 ├──────────────────────────────────────────────────────────┤
