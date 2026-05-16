@@ -102,7 +102,7 @@ All endpoints return paginated JSON:
     "total": 450,
     "page": 1,
     "pageSize": 20,
-    "pages": 23
+    "pages": 22
   }
 }
 ```
