@@ -240,6 +240,9 @@ func GetGames(db *gorm.DB) fiber.Handler {
 
 		page := c.QueryInt("page", 1)
 		pageSize := c.QueryInt("pageSize", 20)
+		if pageSize > 50 {
+			pageSize = 50
+		}
 		offset := (page - 1) * pageSize
 
 		var games []models.Game
