@@ -91,7 +91,7 @@ func importGameSchedules(db *gorm.DB) {
 func importBoxScores(db *gorm.DB) {
 	// now := time.Now()
 
-    from := time.Date(2026, time.April, 28, 0, 0, 0, 0, time.UTC)
+    from := time.Date(2026, time.May, 25, 0, 0, 0, 0, time.UTC)
 	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
     to := time.Date(2026, time.June, 15, 5, 30, 0, 0, time.UTC)
 
@@ -115,7 +115,7 @@ func importPlayerShotCharts(db *gorm.DB) {
 	log.Println("--- Starting Player Shot Chart Import from Predefined List ---")
 
 	// 1. Define the season range. Your service fetches from newest to oldest.
-	startSeason := 2025
+	startSeason := 2026
 	endSeason := 2017 // Basketball-Reference has data going back this far.
 
 	// 2. Define the static list of player IDs to import.
