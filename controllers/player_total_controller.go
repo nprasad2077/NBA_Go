@@ -150,6 +150,9 @@ func GetPlayerTotalStats(db *gorm.DB) fiber.Handler {
 		team := c.Query("team")
 		page := c.QueryInt("page", 1)
 		pageSize := c.QueryInt("pageSize", 20)
+		if pageSize > 50 {
+			pageSize = 50
+		}
 
 		// --- SORTING ---
 		sortByParam := c.Query("sortBy", "points")

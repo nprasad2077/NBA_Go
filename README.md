@@ -44,35 +44,35 @@ A high-performance NBA statistics REST API built with Go (Fiber), PostgreSQL, an
 
 ## API Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/games` | Game data with box scores, line scores, team/player stats |
-| GET | `/api/playeradvancedstats` | Advanced stats (PER, WS, VORP, BPM, etc.) |
-| GET | `/api/playertotals` | Season totals (points, rebounds, assists, etc.) |
-| GET | `/api/playershotchart` | Shot chart coordinate data |
-| GET | `/swagger/*` | Interactive Swagger UI documentation |
-| GET | `/metrics` | Prometheus metrics endpoint |
-| POST | `/admin/keys` | Create API key (requires `X-Admin-Secret` header) |
+| Method | Path                       | Description                                               |
+| ------ | -------------------------- | --------------------------------------------------------- |
+| GET    | `/api/games`               | Game data with box scores, line scores, team/player stats |
+| GET    | `/api/playeradvancedstats` | Advanced stats (PER, WS, VORP, BPM, etc.)                 |
+| GET    | `/api/playertotals`        | Season totals (points, rebounds, assists, etc.)           |
+| GET    | `/api/playershotchart`     | Shot chart coordinate data                                |
+| GET    | `/swagger/*`               | Interactive Swagger UI documentation                      |
+| GET    | `/metrics`                 | Prometheus metrics endpoint                               |
+| POST   | `/admin/keys`              | Create API key (requires `X-Admin-Secret` header)         |
 
 ### Query Parameters (all data endpoints)
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `page` | int | Page number (default: 1) |
-| `pageSize` | int | Results per page (default: 20) |
-| `sortBy` | string | Field to sort by (varies per endpoint) |
-| `ascending` | bool | Sort direction (default: false / descending) |
-| `season` | int | Filter by season year (e.g., 2025) |
-| `team` | string | Filter by team abbreviation (e.g., LAL, BOS) |
-| `playerId` | string | Filter by player ID (e.g., jamesle01) |
-| `isPlayoff` | bool | Filter for playoff stats |
+| Parameter   | Type   | Description                                  |
+| ----------- | ------ | -------------------------------------------- |
+| `page`      | int    | Page number (default: 1)                     |
+| `pageSize`  | int    | Results per page (default: 20)               |
+| `sortBy`    | string | Field to sort by (varies per endpoint)       |
+| `ascending` | bool   | Sort direction (default: false / descending) |
+| `season`    | int    | Filter by season year (e.g., 2025)           |
+| `team`      | string | Filter by team abbreviation (e.g., LAL, BOS) |
+| `playerId`  | string | Filter by player ID (e.g., jamesle01)        |
+| `isPlayoff` | bool   | Filter for playoff stats                     |
 
 #### Games-specific parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `date` | string | Filter by date (YYYY-MM-DD) |
-| `gameId` | string | Filter by specific game ID |
+| Parameter | Type   | Description                                                                                                                                   |
+| --------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `date`    | string | Filter by date (YYYY-MM-DD)                                                                                                                   |
+| `gameId`  | string | Filter by specific game ID                                                                                                                    |
 | `include` | string | Comma-separated associations to preload: `lineScores`, `playerGameBasicStats`, `playerGameAdvStats`, `teamGameBasicStats`, `teamGameAdvStats` |
 
 ### Example Requests
@@ -149,14 +149,14 @@ make up
 
 Services will be available at:
 
-| Service | URL |
-|---------|-----|
-| API (via NGINX) | http://localhost:8081 |
-| Prometheus | http://localhost:9090 |
-| Grafana | http://localhost:3001 (admin/testing) |
-| API instance 1 (direct) | http://localhost:5001 |
-| API instance 2 (direct) | http://localhost:5002 |
-| API instance 3 (direct) | http://localhost:5003 |
+| Service                 | URL                                     |
+| ----------------------- | --------------------------------------- |
+| API (via NGINX)         | <http://localhost:8081>                 |
+| Prometheus              | <http://localhost:9090>                 |
+| Grafana                 | <http://localhost:3001> (admin/testing) |
+| API instance 1 (direct) | <http://localhost:5001>                 |
+| API instance 2 (direct) | <http://localhost:5002>                 |
+| API instance 3 (direct) | <http://localhost:5003>                 |
 
 ### Importing Data
 
@@ -167,6 +167,7 @@ docker-compose -f docker-compose.local.yml run --rm db-init
 ```
 
 This runs `main.go` with the `import-data` argument, which:
+
 1. Runs all GORM AutoMigrate operations
 2. Scrapes Basketball Reference for player advanced stats, totals, game schedules, and box scores
 3. Upserts all data into PostgreSQL
@@ -238,14 +239,14 @@ go run loadtest.go -n 100 -c 10 -url "http://localhost:8080/api/playeradvancedst
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Language | Go 1.23+ |
-| Framework | Fiber v2 |
-| ORM | GORM |
-| Database | PostgreSQL 15 |
-| Scraping | goquery |
-| Load Balancer | NGINX |
-| Monitoring | Prometheus + Grafana |
-| Docs | Swagger (swaggo) |
+| Component        | Technology              |
+| ---------------- | ----------------------- |
+| Language         | Go 1.23+                |
+| Framework        | Fiber v2                |
+| ORM              | GORM                    |
+| Database         | PostgreSQL 15           |
+| Scraping         | goquery                 |
+| Load Balancer    | NGINX                   |
+| Monitoring       | Prometheus + Grafana    |
+| Docs             | Swagger (swaggo)        |
 | Containerization | Docker + Docker Compose |

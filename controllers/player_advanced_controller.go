@@ -150,6 +150,9 @@ func GetAllAdvancedPlayerStats(db *gorm.DB) fiber.Handler {
 		// --- PAGINATION ---
 		page := c.QueryInt("page", 1)
 		pageSize := c.QueryInt("pageSize", 20)
+		if pageSize > 50 {
+			pageSize = 50
+		}
 		offset := (page - 1) * pageSize
 
 		// --- SORTING ---
