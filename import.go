@@ -62,7 +62,7 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 func importGameSchedules(db *gorm.DB) {
 	months := []string{"may", "june"}
 
-	for season := 2025; season <= 2025; season++ {
+	for season := 2025; season <= 2026; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			if err := services.FetchAndStoreGameSchedule(db, season, month); err != nil {
