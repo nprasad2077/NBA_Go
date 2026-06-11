@@ -95,6 +95,16 @@ func importBoxScores(db *gorm.DB) {
 	log.Println("--- Finished Box Score Data Import ---")
 }
 
+// importMarkPlayoffGames marks games as playoff using the dedicated Basketball Reference playoff schedule.
+func importMarkPlayoffGames(db *gorm.DB) {
+	for season := 2006; season <= 2006; season++ {
+		if err := services.FetchAndMarkPlayoffGames(db, season+1); err != nil {
+			log.Printf("playoff marking failed for %d: %v", season, err)
+		}
+		log.Printf("Playoff games marked for season: %d", season)
+	}
+}
+
 // importPlayerShotCharts fetches shot charts for a PREDEFINED list of players for a given range of seasons.
 func importPlayerShotCharts(db *gorm.DB) {
 	log.Println("--- Starting Player Shot Chart Import from Predefined List ---")

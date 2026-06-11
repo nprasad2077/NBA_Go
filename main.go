@@ -68,6 +68,9 @@ func main() {
 		importBoxScores(db)
 		log.Println("🎉 Related Box Score Imports completed successfully 📦")
 
+		importMarkPlayoffGames(db)
+		log.Println("🎉 Playoff games marked successfully 🏆")
+
 		// importPlayerShotCharts(db)
 		// log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
 
