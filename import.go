@@ -60,7 +60,7 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 
 // importGameSchedules fetches and stores game schedules
 func importGameSchedules(db *gorm.DB) {
-	months := []string{"october", "november", "december"}
+	months := []string{"december", "january", "february"}
 
 	for season := 2006; season <= 2006; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
@@ -79,8 +79,8 @@ func importGameSchedules(db *gorm.DB) {
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
-	from := time.Date(2006, time.October, 1, 0, 0, 0, 0, time.UTC)
-	to := time.Date(2006, time.December, 15, 5, 30, 0, 0, time.UTC)
+	from := time.Date(2006, time.December, 15, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2007, time.February, 13, 5, 30, 0, 0, time.UTC)
 
 	dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---",
 		from.Format("January 2, 2006"),
@@ -93,16 +93,6 @@ func importBoxScores(db *gorm.DB) {
 	}
 
 	log.Println("--- Finished Box Score Data Import ---")
-}
-
-// importMarkPlayoffGames marks games as playoff using the dedicated Basketball Reference playoff schedule.
-func importMarkPlayoffGames(db *gorm.DB) {
-	for season := 2006; season <= 2006; season++ {
-		if err := services.FetchAndMarkPlayoffGames(db, season+1); err != nil {
-			log.Printf("playoff marking failed for %d: %v", season, err)
-		}
-		log.Printf("Playoff games marked for season: %d", season)
-	}
 }
 
 // importPlayerShotCharts fetches shot charts for a PREDEFINED list of players for a given range of seasons.
@@ -152,4 +142,14 @@ func importPlayerShotCharts(db *gorm.DB) {
 	}
 
 	log.Println("--- Finished Player Shot Chart Import from Predefined List ---")
+}
+
+// importMarkPlayoffGames marks games as playoff using the dedicated Basketball Reference playoff schedule.
+func importMarkPlayoffGames(db *gorm.DB) {
+	for season := 2006; season <= 2006; season++ {
+		if err := services.FetchAndMarkPlayoffGames(db, season+1); err != nil {
+			log.Printf("playoff marking failed for %d: %v", season, err)
+		}
+		log.Printf("Playoff games marked for season: %d", season)
+	}
 }
