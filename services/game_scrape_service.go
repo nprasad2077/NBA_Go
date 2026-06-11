@@ -17,6 +17,57 @@ import (
 )
 
 const gameScheduleURLFmt = "https://www.basketball-reference.com/leagues/NBA_%d_games-%s.html"
+const playoffScheduleURLFmt = "https://www.basketball-reference.com/playoffs/NBA_%d_games.html"
+
+// FetchAndMarkPlayoffGames scrapes the dedicated playoff schedule page and
+// batch-updates all matching games in the DB to set IsPlayoff=true.
+// This is a post-processing step that does not modify the normal import flow.
+func FetchAndMarkPlayoffGames(db *gorm.DB, season int) error {
+	url := fmt.Sprintf(playoffScheduleURLFmt, season)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to fetch playoff schedule for %d: %w", season, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("playoff schedule returned status %s for season %d", resp.Status, season)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to parse playoff schedule HTML: %w", err)
+	}
+
+	var gameIDs []string
+	doc.Find(`td[data-stat="box_score_text"] a`).Each(func(i int, s *goquery.Selection) {
+		if href, exists := s.Attr("href"); exists {
+			parts := strings.Split(href, "/")
+			fileName := parts[len(parts)-1]
+			gameID := strings.TrimSuffix(fileName, ".html")
+			if gameID != "" {
+				gameIDs = append(gameIDs, gameID)
+			}
+		}
+	})
+
+	if len(gameIDs) == 0 {
+		log.Printf("No playoff game IDs found for season %d.", season)
+		return nil
+	}
+
+	if err := db.Model(&models.Game{}).Where("game_id IN ?", gameIDs).Update("is_playoff", true).Error; err != nil {
+		return fmt.Errorf("failed to mark playoff games: %w", err)
+	}
+
+	log.Printf("✅ Marked %d games as playoff for season %d.", len(gameIDs), season)
+	return nil
+}
 
 // FetchAndStoreGameSchedule scrapes the game schedule for a given season and month.
 // The month should be the full lowercase name, e.g., "october", "november".
