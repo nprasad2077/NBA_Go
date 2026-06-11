@@ -1,0 +1,125 @@
+name: Advance NBA Import Window
+
+on:
+  schedule:
+    # Runs every 40 minutes. Adjust to slow down:
+    # "0 * * * *" = hourly | "0 */2 * * *" = every 2h | "0 */3 * * *" = every 3h
+    - cron: "*/40 * * * *"
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  advance-import:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/remote'
+    steps:
+      - name: Checkout remote branch
+        uses: actions/checkout@v4
+        with:
+          ref: remote
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Advance import window
+        id: advance
+        run: |
+          set -e
+          STATE_FILE=".github/import-state.json"
+
+          COMPLETED=$(jq -r '.completed' "$STATE_FILE")
+          if [ "$COMPLETED" = "true" ]; then
+            echo "All imports completed. Nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+          # Read state
+          SEASON=$(jq -r '.current_season' "$STATE_FILE")
+          FROM=$(jq -r '.current_from' "$STATE_FILE")
+          TO=$(jq -r '.current_to' "$STATE_FILE")
+          TARGET_END=$(jq -r '.target_end' "$STATE_FILE")
+          WINDOW_DAYS=$(jq -r '.window_days' "$STATE_FILE")
+
+          echo "Generating import.go for Season $SEASON: $FROM → $TO"
+
+          # --- Build months list from date range ---
+          MONTHS=()
+          cursor="$FROM"
+          while [[ "$cursor" < "$TO" || "$cursor" == "$TO" ]]; do
+            m=$(date -d "$cursor" +%B | tr '[:upper:]' '[:lower:]')
+            # Add if not already present
+            if [[ ! " ${MONTHS[*]} " =~ " $m " ]]; then
+              MONTHS+=("$m")
+            fi
+            cursor=$(date -d "$cursor + 32 days" +%Y-%m-01)
+          done
+          # Ensure TO's month is included
+          to_m=$(date -d "$TO" +%B | tr '[:upper:]' '[:lower:]')
+          if [[ ! " ${MONTHS[*]} " =~ " $to_m " ]]; then
+            MONTHS+=("$to_m")
+          fi
+
+          # Format as Go string slice entries
+          GO_MONTHS=""
+          for m in "${MONTHS[@]}"; do
+            GO_MONTHS="${GO_MONTHS}\"${m}\", "
+          done
+          GO_MONTHS="${GO_MONTHS%, }"
+
+          # Parse date components
+          FROM_YEAR=$(date -d "$FROM" +%Y)
+          FROM_MONTH=$(date -d "$FROM" +%B)
+          FROM_DAY=$(date -d "$FROM" +%-d)
+          TO_YEAR=$(date -d "$TO" +%Y)
+          TO_MONTH=$(date -d "$TO" +%B)
+          TO_DAY=$(date -d "$TO" +%-d)
+
+          # --- Generate import.go ---
+          bash .github/scripts/generate-import.sh \
+            "$SEASON" "$GO_MONTHS" \
+            "$FROM_YEAR" "$FROM_MONTH" "$FROM_DAY" \
+            "$TO_YEAR" "$TO_MONTH" "$TO_DAY"
+
+          # --- Calculate next window ---
+          NEXT_FROM="$TO"
+          NEXT_TO=$(date -d "$NEXT_FROM + ${WINDOW_DAYS} days" +%Y-%m-%d)
+          NEXT_SEASON=$SEASON
+
+          # Season Y runs Oct Y to ~June Y+1. If past June of Y+1, advance season.
+          SEASON_END_DATE="$((SEASON + 1))-06-30"
+          if [[ "$NEXT_FROM" > "$SEASON_END_DATE" ]]; then
+            NEXT_SEASON=$((SEASON + 1))
+            NEXT_FROM="${NEXT_SEASON}-10-01"
+            NEXT_TO=$(date -d "$NEXT_FROM + ${WINDOW_DAYS} days" +%Y-%m-%d)
+          fi
+
+          # Cap at season boundary
+          NEXT_SEASON_END="$((NEXT_SEASON + 1))-06-30"
+          if [[ "$NEXT_TO" > "$NEXT_SEASON_END" ]]; then
+            NEXT_TO="$NEXT_SEASON_END"
+          fi
+
+          # Check completion
+          NEXT_COMPLETED="false"
+          if [[ "$NEXT_FROM" > "$TARGET_END" || "$NEXT_FROM" == "$TARGET_END" ]]; then
+            NEXT_COMPLETED="true"
+          fi
+
+          # Update state
+          jq \
+            --argjson season "$NEXT_SEASON" \
+            --arg from "$NEXT_FROM" \
+            --arg to "$NEXT_TO" \
+            --argjson completed "$([ "$NEXT_COMPLETED" = "true" ] && echo true || echo false)" \
+            '.current_season = $season | .current_from = $from | .current_to = $to | .completed = $completed' \
+            "$STATE_FILE" > tmp.json && mv tmp.json "$STATE_FILE"
+
+          echo "Next: Season $NEXT_SEASON, $NEXT_FROM → $NEXT_TO (done: $NEXT_COMPLETED)"
+
+      - name: Commit and push
+        if: steps.advance.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add import.go .github/import-state.json
+          git commit -m "chore: import window $(jq -r '.current_from' .github/import-state.json) [season $(jq -r '.current_season' .github/import-state.json)]"
+          git push origin remote

@@ -1,3 +1,18 @@
+#!/usr/bin/env bash
+# Generates import.go with the given season/date parameters.
+# Usage: generate-import.sh SEASON GO_MONTHS FROM_YEAR FROM_MONTH FROM_DAY TO_YEAR TO_MONTH TO_DAY
+set -e
+
+SEASON="$1"
+GO_MONTHS="$2"
+FROM_YEAR="$3"
+FROM_MONTH="$4"
+FROM_DAY="$5"
+TO_YEAR="$6"
+TO_MONTH="$7"
+TO_DAY="$8"
+
+cat > import.go << EOF
 package main
 
 import (
@@ -60,25 +75,15 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 
 // importGameSchedules fetches and stores game schedules
 func importGameSchedules(db *gorm.DB) {
-	// An NBA season typically runs from October to June
-	months := []string{
-		// "september", "october", "november", "december", "january",
-		// "february", "march", "april", "may", "june",
-		"may", "june",
-		// "february", "march", "april", "may", "june",
-		// "october", "november", "december",
-	}
+	months := []string{${GO_MONTHS}}
 
-	for season := 2026; season <= 2026; season++ {
+	for season := ${SEASON}; season <= ${SEASON}; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
-			// The service will print a warning and skip if a month has no data (e.g. May/June for a season not yet finished)
 			if err := services.FetchAndStoreGameSchedule(db, season, month); err != nil {
-				// Log the error but continue to the next month/season
 				log.Printf("Game schedule import failed for %s %d: %v", month, season, err)
 			}
 			log.Printf("Game schedule import for %s, %d complete.", month, season)
-			// Respectful delay between requests
 			time.Sleep(2500 * time.Millisecond)
 			utils.SleepWithJitter(1800 * time.Millisecond)
 		}
@@ -89,42 +94,29 @@ func importGameSchedules(db *gorm.DB) {
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
-	// now := time.Now()
+	from := time.Date(${FROM_YEAR}, time.${FROM_MONTH}, ${FROM_DAY}, 0, 0, 0, 0, time.UTC)
+	to := time.Date(${TO_YEAR}, time.${TO_MONTH}, ${TO_DAY}, 5, 30, 0, 0, time.UTC)
 
-    from := time.Date(2026, time.May, 25, 0, 0, 0, 0, time.UTC)
-	// from := time.Date(now.Year(), now.Month(), now.Day()-1, 5, 30, 0, 0, time.UTC)
-    to := time.Date(2026, time.June, 15, 5, 30, 0, 0, time.UTC)
+	dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---",
+		from.Format("January 2, 2006"),
+		to.Format("January 2, 2006"))
 
-    dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---", 
-        from.Format("January 2, 2006"), 
-        to.Format("January 2, 2006"))
-    
-    log.Println(dateRangeComment)
+	log.Println(dateRangeComment)
 
-    if err := services.FetchAndStoreBoxScoreDataForDateRange(db, from, to); err != nil {
-        log.Fatalf("Box score import failed: %v", err)
-    }
+	if err := services.FetchAndStoreBoxScoreDataForDateRange(db, from, to); err != nil {
+		log.Fatalf("Box score import failed: %v", err)
+	}
 
-    log.Println("--- Finished Box Score Data Import ---")
+	log.Println("--- Finished Box Score Data Import ---")
 }
-
-
 
 // importPlayerShotCharts fetches shot charts for a PREDEFINED list of players for a given range of seasons.
 func importPlayerShotCharts(db *gorm.DB) {
 	log.Println("--- Starting Player Shot Chart Import from Predefined List ---")
 
-	// 1. Define the season range. Your service fetches from newest to oldest.
 	startSeason := 2026
-	endSeason := 2017 // Basketball-Reference has data going back this far.
+	endSeason := 2017
 
-	// 2. Define the static list of player IDs to import.
-	// You can add or remove any Basketball-Reference player ID here.
-	// Examples:
-	// LeBron James:  "jamesle01"
-	// Stephen Curry: "curryst01"
-	// Nikola Jokić:  "jokicni01"
-	// Luka Dončić:   "doncilu01"
 	targetPlayerIDs := []string{
 		"jamesle01",
 		"curryst01",
@@ -134,23 +126,16 @@ func importPlayerShotCharts(db *gorm.DB) {
 		"irvinky01",
 		"duranke01",
 		"youngtr01",
-		// "lillada01",
 		"gilgesh01",
 		"brunsja01",
 		"edwaran01",
 		"mitchdo01",
-		// "bookede01",
 		"derozde01",
-		// "aldrila01",
 		"westbru01",
-		// "paulch01",
 		"butleji01",
 		"davisan02",
 		"leonaka01",
-		// "youngtr01",
 		"tatumja01",
-
-		// Add more player IDs here as needed
 	}
 
 	if len(targetPlayerIDs) == 0 {
@@ -160,19 +145,17 @@ func importPlayerShotCharts(db *gorm.DB) {
 
 	log.Printf("Found %d players in the predefined list. Starting shot chart import for seasons %d down to %d.", len(targetPlayerIDs), startSeason, endSeason)
 
-	// 3. Loop through each player ID and fetch their shot chart data.
 	for i, playerID := range targetPlayerIDs {
 		log.Printf("(%d/%d) Importing shot charts for player: %s", i+1, len(targetPlayerIDs), playerID)
 
 		err := services.FetchAndStoreShotChartScrapedForPlayer(db, playerID, startSeason, endSeason)
 		if err != nil {
-			// Log the error but continue with the next player.
 			log.Printf("❌ Shot chart import failed for player %s: %v", playerID, err)
 		}
 
-		// 4. Be a good internet citizen. Pause between scraping each player.
 		utils.SleepWithJitter(10000 * time.Millisecond)
 	}
 
 	log.Println("--- Finished Player Shot Chart Import from Predefined List ---")
 }
+EOF
