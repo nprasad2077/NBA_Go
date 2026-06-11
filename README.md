@@ -250,3 +250,5 @@ go run loadtest.go -n 100 -c 10 -url "http://localhost:8080/api/playeradvancedst
 | Monitoring       | Prometheus + Grafana    |
 | Docs             | Swagger (swaggo)        |
 | Containerization | Docker + Docker Compose |
+
+## Workflows
