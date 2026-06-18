@@ -71,8 +71,8 @@ func main() {
 		importMarkPlayoffGames(db)
 		log.Println("🎉 Playoff games marked successfully 🏆")
 
-		importPlayerShotCharts(db)
-		log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
+		// importPlayerShotCharts(db)
+		// log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
