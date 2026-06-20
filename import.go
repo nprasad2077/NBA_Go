@@ -80,7 +80,7 @@ func importGameSchedules(db *gorm.DB) {
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
 	from := time.Date(2010, time.November, 4, 0, 0, 0, 0, time.UTC)
-	to := time.Date(2010, time.November, 24, 5, 30, 0, 0, time.UTC)
+	to := time.Date(2010, time.November, 14, 5, 30, 0, 0, time.UTC)
 
 	dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---",
 		from.Format("January 2, 2006"),
