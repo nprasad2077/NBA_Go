@@ -1,7 +1,7 @@
 {
-  "current_season": 2010,
-  "current_from": "2011-06-30",
-  "current_to": "2011-06-30",
+  "current_season": 2012,
+  "current_from": "2011-10-01",
+  "current_to": "2011-10-20",
   "target_end": "2026-06-30",
   "window_days": 20,
   "completed": false
