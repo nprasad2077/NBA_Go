@@ -136,7 +136,7 @@ func scrapeAndParseWorker(id int, jobs <-chan models.Game, results chan<- Scrape
 		fullURL := boxScoreURLBase + game.BoxScoreURL
 
 		utils.SleepWithJitter(baseDelay)
-		time.Sleep(1500 * time.Millisecond)
+		time.Sleep(2500 * time.Millisecond)
 
 		req, err := http.NewRequest("GET", fullURL, nil)
 		if err != nil {
