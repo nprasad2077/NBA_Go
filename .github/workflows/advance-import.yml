@@ -4,11 +4,15 @@ on:
   schedule:
     # Runs every 40 minutes. Adjust to slow down:
     # "0 * * * *" = hourly | "0 */2 * * *" = every 2h | "0 */3 * * *" = every 3h
-    - cron: "*/40 * * * *"
+    - cron: "*/20 * * * *"
   workflow_dispatch: # Manual trigger
 
 permissions:
   contents: write
+
+concurrency:
+  group: advance-import
+  cancel-in-progress: true
 
 jobs:
   advance-import:
