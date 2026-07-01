@@ -1,8 +1,8 @@
 {
   "current_season": 2023,
   "current_from": "2022-10-26",
-  "current_to": "2022-11-15",
+  "current_to": "2022-11-01",
   "target_end": "2026-06-30",
-  "window_days": 20,
+  "window_days": 6,
   "completed": false
 }
