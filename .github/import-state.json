@@ -1,8 +1,8 @@
 {
   "current_season": 2026,
-  "current_from": "2026-06-28",
-  "current_to": "2026-07-18",
+  "current_from": "2026-07-18",
+  "current_to": "2026-08-07",
   "target_end": "2026-06-30",
   "window_days": 20,
-  "completed": false
+  "completed": true
 }
