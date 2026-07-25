@@ -60,7 +60,7 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 
 // importGameSchedules fetches and stores game schedules
 func importGameSchedules(db *gorm.DB) {
-	months := []string{"april"}
+	months := []string{"april", "may"}
 
 	for season := 2003; season <= 2003; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
@@ -79,8 +79,8 @@ func importGameSchedules(db *gorm.DB) {
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
-	from := time.Date(2004, time.April, 7, 0, 0, 0, 0, time.UTC)
-	to := time.Date(2004, time.April, 27, 5, 30, 0, 0, time.UTC)
+	from := time.Date(2004, time.April, 27, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2004, time.May, 17, 5, 30, 0, 0, time.UTC)
 
 	dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---",
 		from.Format("January 2, 2006"),
