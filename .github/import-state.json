@@ -1,7 +1,7 @@
 {
   "current_season": 2003,
-  "current_from": "2003-10-10",
-  "current_to": "2003-10-30",
+  "current_from": "2003-10-30",
+  "current_to": "2003-11-19",
   "target_end": "2026-06-30",
   "window_days": 20,
   "completed": false
