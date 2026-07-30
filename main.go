@@ -62,17 +62,17 @@ func main() {
 		// importPlayerTotalsPlayoffsScrape(db)
 		// log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
 
-		importGameSchedules(db)
-		log.Println("🎉 Game Imports completed successfully 🏀")
+		// importGameSchedules(db)
+		// log.Println("🎉 Game Imports completed successfully 🏀")
 
-		importBoxScores(db)
-		log.Println("🎉 Related Box Score Imports completed successfully 📦")
+		// importBoxScores(db)
+		// log.Println("🎉 Related Box Score Imports completed successfully 📦")
 
-		importMarkPlayoffGames(db)
-		log.Println("🎉 Playoff games marked successfully 🏆")
+		// importMarkPlayoffGames(db)
+		// log.Println("🎉 Playoff games marked successfully 🏆")
 
-		// importPlayerShotCharts(db)
-		// log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
+		importPlayerShotCharts(db)
+		log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
 
 		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
