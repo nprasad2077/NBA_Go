@@ -4,5 +4,5 @@
   "current_to": "2006-06-30",
   "target_end": "2026-06-30",
   "window_days": 20,
-  "completed": false
+  "completed": true
 }
