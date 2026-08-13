@@ -12,7 +12,7 @@ import (
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons
 func importPlayerAdvanced(db *gorm.DB) {
-	for season := 2026; season <= 2026; season++ {
+	for season := 2016; season <= 2019; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -24,7 +24,7 @@ func importPlayerAdvanced(db *gorm.DB) {
 
 // importPlayerAdvancedPlayoffs fetches and stores advanced stats for playoffs seasons
 func importPlayerAdvancedPlayoffs(db *gorm.DB) {
-	for season := 2026; season <= 2026; season++ {
+	for season := 2016; season <= 2019; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -36,7 +36,7 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-	for season := 2026; season <= 2026; season++ {
+	for season := 2016; season <= 2019; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
 			log.Printf("scraped totals import failed for %d: %v", season, err)
 		}
@@ -48,7 +48,7 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-	for season := 2026; season <= 2026; season++ {
+	for season := 2016; season <= 2019; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
 			log.Printf("scraped playoffs import failed for %d: %v", season, err)
 		}
@@ -122,26 +122,34 @@ func importPlayerShotCharts(db *gorm.DB) {
 		// "leonaka01",
 		// "tatumja01",
 		"hardeja01",
+		"curryst01",
+		"duranke01",
+		"jamesle01",
+		"lillada01",
+		"westbru01",
 		"georgpa01",
+		"derozde01",
+		"thomais02",
+		"davisan02",
+		"townska01",
 		"walkeke02",
 		"bealbr01",
-		"lillada01",
-		"hardeja01",
-		"bookede01",
-		"antetgi01",
-		"youngtr01",
-		"curryst01",
-		"jokicni01",
-		"doncilu01",
-		"derozde01",
-		"embiijo01",
-		"tatumja01",
-		"gilgesh01",
-		"brunsja01",
-		"edwaran01",
-		"brownja02",
-		"duranke01",
-		"maxeyty01",
+		// "antetgi01",
+		// "bookede01",
+		// "youngtr01",
+		// "doncilu01",
+		// "jokicni01",
+		// "randlju01",
+		// "embiijo01",
+		// "tatumja01",
+		// "gilgesh01",
+		// "edwaran01",
+		// "mitchdo01",
+		// "brunsja01",
+		// "herroty01",
+		// "brownja02",
+		// "maxeyty01",
+		// "murraja01",
 	}
 
 	if len(targetPlayerIDs) == 0 {
