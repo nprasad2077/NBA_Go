@@ -11,6 +11,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	"github.com/nprasad2077/NBA_Go/controllers"
 	"github.com/nprasad2077/NBA_Go/models"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/security"
@@ -76,4 +77,20 @@ func TestGetPlayerAdvancedStats(t *testing.T) {
 		body, _ := io.ReadAll(resp.Body)
 		assert.Contains(t, string(body), tc.wantSubstring, tc.name)
 	}
+}
+
+func TestHealthRoutes(t *testing.T) {
+	app := fiber.New()
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	assert.NoError(t, err)
+
+	controllers.RegisterHealthRoutes(app, db)
+
+	req, _ := http.NewRequest(http.MethodGet, "/healthz", nil)
+	resp, err := app.Test(req, -1)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
+
+	body, _ := io.ReadAll(resp.Body)
+	assert.Contains(t, string(body), `"status":"UP"`)
 }

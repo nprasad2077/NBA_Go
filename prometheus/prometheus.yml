@@ -11,3 +11,8 @@ scrape_configs:
     static_configs:
       - targets: ['api1:5000', 'api2:5000', 'api3:5000']
     metrics_path: '/metrics'
+
+  - job_name: 'haproxy'
+    static_configs:
+      - targets: ['178.105.149.129:7080']
+    metrics_path: '/metrics'

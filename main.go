@@ -22,7 +22,7 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,49 +32,51 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	fiberswagger "github.com/swaggo/fiber-swagger"
-	// "gorm.io/gorm"
 
 	"github.com/nprasad2077/NBA_Go/config"
 	"github.com/nprasad2077/NBA_Go/controllers"
-	_"github.com/nprasad2077/NBA_Go/docs"
+	_ "github.com/nprasad2077/NBA_Go/docs"
 	"github.com/nprasad2077/NBA_Go/routes"
 	"github.com/nprasad2077/NBA_Go/utils/middleware"
 )
 
 func main() {
+	// Setup structured JSON logger
+	jsonHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
+	slog.SetDefault(slog.New(jsonHandler))
+
 	// ——— One-off import-data mode ———
 	if len(os.Args) > 1 && os.Args[1] == "import-data" {
-		// Run all DB migrations + import steps exactly once
+		// Run all DB migrations + import steps exactly once on Primary (Write Ingress)
 		db := config.InitDB(true)
 
 		importPlayerAdvanced(db)
-		log.Println("🎉 Player Advanced Import completed successfully")
+		slog.Info("🎉 Player Advanced Import completed successfully")
 
 		importPlayerAdvancedPlayoffs(db)
-		log.Println("🎉 Player Advanced Playoffs Import completed successfully")
+		slog.Info("🎉 Player Advanced Playoffs Import completed successfully")
 
 		importPlayerTotalsScrape(db)
-		log.Println("🎉 Player Totals (scraped) Import completed successfully")
+		slog.Info("🎉 Player Totals (scraped) Import completed successfully")
 
 		importPlayerTotalsPlayoffsScrape(db)
-		log.Println("🎉 Player Playoffs (scraped) Import completed successfully")
+		slog.Info("🎉 Player Playoffs (scraped) Import completed successfully")
 
 		// importGameSchedules(db)
-		// log.Println("🎉 Game Imports completed successfully 🏀")
+		// slog.Info("🎉 Game Imports completed successfully 🏀")
 
 		// importBoxScores(db)
-		// log.Println("🎉 Related Box Score Imports completed successfully 📦")
+		// slog.Info("🎉 Related Box Score Imports completed successfully 📦")
 
 		// importMarkPlayoffGames(db)
-		// log.Println("🎉 Playoff games marked successfully 🏆")
+		// slog.Info("🎉 Playoff games marked successfully 🏆")
 
 		importPlayerShotCharts(db)
-		log.Println("🎉 Player Shot Chart Import completed successfully 🎯")
+		slog.Info("🎉 Player Shot Chart Import completed successfully 🎯")
 
-		log.Println("🏀 ALL Imports completed successfully ✅ 🙌")
+		slog.Info("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
 	}
 
@@ -97,13 +99,17 @@ func main() {
 	// — CORS Allow ALL origins (development) —
 	app.Use(cors.New())
 
-	// middlewares
-	app.Use(logger.New())
+	// Middlewares
+	app.Use(middleware.StructuredLogger())
 	app.Use(middleware.RateLimiter())
 	app.Use(middleware.MetricsMiddleware())
 
-	// DB connection (no migrations on API startup)
+	// DB connection (Read/Write splitting via DBResolver)
 	db := config.InitDB(false)
+
+	/* ---------- HEALTH & OBSERVABILITY ROUTES ---------- */
+	controllers.RegisterHealthRoutes(app, db)
+	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 
 	/* ---------- PUBLIC ROUTES (no API key) ---------- */
 	// Redirect root to swagger docs
@@ -111,7 +117,6 @@ func main() {
 		return c.Redirect("/swagger/index.html")
 	})
 
-	app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 	app.Get("/swagger/*", fiberswagger.WrapHandler)
 	controllers.RegisterKeyAdminRoutes(app, db)
 
@@ -125,14 +130,16 @@ func main() {
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
+		slog.Info("🚀 Starting NBA_Go Fiber API Server on :5000")
 		if err := app.Listen(":5000"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("listen: %v", err)
+			slog.Error("Failed to listen on :5000", "error", err)
+			os.Exit(1)
 		}
 	}()
 
 	<-ctx.Done()
 	stop()
-	log.Println("shutting down…")
+	slog.Info("🛑 Shutting down server gracefully...")
 	_ = app.Shutdown()
-	log.Println("bye")
+	slog.Info("👋 Server shutdown complete. Bye!")
 }

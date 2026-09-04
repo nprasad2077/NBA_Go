@@ -8,6 +8,7 @@ import (
 	"github.com/nprasad2077/NBA_Go/models"
 	"github.com/nprasad2077/NBA_Go/utils/security"
 	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
 // very small middleware: require header X‑Admin‑Secret == $ADMIN_SECRET
@@ -26,7 +27,8 @@ func RegisterKeyAdminRoutes(app *fiber.App, db *gorm.DB) {
 
 	admin.Get("/", func(c *fiber.Ctx) error {
 		var keys []models.APIKey
-		db.Find(&keys)
+		// Query write DB to guarantee immediate read-after-write consistency
+		db.Clauses(dbresolver.Write).Find(&keys)
 		return c.JSON(keys)
 	})
 
@@ -45,7 +47,7 @@ func RegisterKeyAdminRoutes(app *fiber.App, db *gorm.DB) {
 			Hash:  security.HashKey(raw),
 			Label: body.Label,
 		}
-		db.Create(&key)
+		db.Clauses(dbresolver.Write).Create(&key)
 
 		// return ONLY the raw key once
 		return c.JSON(fiber.Map{
@@ -56,7 +58,7 @@ func RegisterKeyAdminRoutes(app *fiber.App, db *gorm.DB) {
 
 	admin.Post("/:id/revoke", func(c *fiber.Ctx) error {
 		id := c.Params("id")
-		db.Model(&models.APIKey{}).Where("id = ?", id).Update("revoked", true)
+		db.Clauses(dbresolver.Write).Model(&models.APIKey{}).Where("id = ?", id).Update("revoked", true)
 		return c.JSON(fiber.Map{"revoked": id})
 	})
 }
