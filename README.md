@@ -232,10 +232,36 @@ go test -v .
 
 ### Load Testing
 
+The load-test utility sends concurrent GET requests and can distribute them
+across pages with `-pageMix`. Each entry uses the format
+`page-or-range:weight`; range weights are distributed evenly across the pages
+in that range. Weights are normalized automatically and do not need to total
+100.
+
 ```bash
-cd test
-go run loadtest.go -n 100 -c 10 -url "http://localhost:8080/api/playeradvancedstats?page=1&pageSize=20" -log results.log
+go run ./test/loadtest.go \
+  -url "http://localhost:8081/api/playertotals?page=1&pageSize=50" \
+  -n 500 \
+  -c 20 \
+  -pageMix "1-3:60,4-10:30,11-20:10" \
+  -seed 42 \
+  -log ./test/results.log
 ```
+
+In this example, approximately 60% of requests target pages 1 through 3,
+30% target pages 4 through 10, and 10% target pages 11 through 20. The
+`-seed` flag makes page selection reproducible; omit it to use a time-based
+seed. Without `-pageMix`, the URL is sent unchanged as in the original
+load-test behavior.
+
+The utility prints aggregate results and per-page counts, failures, and
+average successful response time. Invalid page ranges, non-positive weights,
+and overlapping ranges are rejected before requests are sent.
+
+Load tests should normally target a controlled environment. NGINX caches each
+full API URI for 30 seconds, and the API rate limiter allows 20 requests per
+minute per client IP on each API instance. These settings can make a test
+measure cache hits or rate limiting rather than database-read performance.
 
 ## Tech Stack
 
