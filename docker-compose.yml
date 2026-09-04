@@ -2,7 +2,7 @@
 services:
   db-init:
     build: .
-    command: ["/nba_go", "import-data"]
+    command: ["/nba_go"]
     networks:
       - coolify-shared
       # - api_network
