@@ -32,7 +32,7 @@ services:
   nginx:
     image: 'nginx:stable'
     volumes:
-      - '/data/nba-go-config/nginx:/etc/nginx:ro'
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
       - nginx_cache:/var/cache/nginx
     depends_on:
       - api1
@@ -49,7 +49,7 @@ services:
   prometheus:
     image: 'prom/prometheus:latest'
     volumes:
-      - '/data/nba-go-config/prometheus:/etc/prometheus'
+      - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro'
       - 'prometheus_data:/prometheus'
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -74,8 +74,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=testing
     volumes:
-      - '/data/nba-go-config/grafana/provisioning:/etc/grafana/provisioning'
-      - './grafana/dashboards:/var/lib/grafana/dashboards'
+      - './grafana/provisioning:/etc/grafana/provisioning:ro'
+      - './grafana/dashboards:/var/lib/grafana/dashboards:ro'
       - 'grafana_data:/var/lib/grafana'
     networks:
       - coolify-shared
