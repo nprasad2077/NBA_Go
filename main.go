@@ -130,9 +130,9 @@ func main() {
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
-		slog.Info("🚀 Starting NBA_Go Fiber API Server on :5000")
-		if err := app.Listen(":5000"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("Failed to listen on :5000", "error", err)
+		slog.Info("🚀 Starting NBA_Go Fiber API Server on [::]:5000 (Dual-Stack)")
+		if err := app.Listen("[::]:5000"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.Error("Failed to listen on [::]:5000", "error", err)
 			os.Exit(1)
 		}
 	}()
