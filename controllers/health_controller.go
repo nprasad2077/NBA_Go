@@ -24,16 +24,18 @@ type ReadinessResponse struct {
 	Targets   map[string]TargetHealth `json:"targets"`
 }
 
-// RegisterHealthRoutes mounts /healthz and /readyz probes
+// RegisterHealthRoutes mounts /health/live, /health/ready, and backward-compatible /healthz, /readyz probes
 func RegisterHealthRoutes(app *fiber.App, db *gorm.DB) {
-	app.Get("/healthz", func(c *fiber.Ctx) error {
+	liveHandler := func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status":    "UP",
 			"timestamp": time.Now().UTC(),
 		})
-	})
+	}
+	app.Get("/health/live", liveHandler)
+	app.Get("/healthz", liveHandler)
 
-	app.Get("/readyz", func(c *fiber.Ctx) error {
+	readyHandler := func(c *fiber.Ctx) error {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 
@@ -116,5 +118,7 @@ func RegisterHealthRoutes(app *fiber.App, db *gorm.DB) {
 			Timestamp: time.Now().UTC(),
 			Targets:   targets,
 		})
-	})
+	}
+	app.Get("/health/ready", readyHandler)
+	app.Get("/readyz", readyHandler)
 }

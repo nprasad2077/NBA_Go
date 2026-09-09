@@ -86,11 +86,24 @@ func TestHealthRoutes(t *testing.T) {
 
 	controllers.RegisterHealthRoutes(app, db)
 
-	req, _ := http.NewRequest(http.MethodGet, "/healthz", nil)
-	resp, err := app.Test(req, -1)
-	assert.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+	// Liveness tests (/health/live and /healthz)
+	for _, path := range []string{"/health/live", "/healthz"} {
+		req, _ := http.NewRequest(http.MethodGet, path, nil)
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err, path)
+		assert.Equal(t, 200, resp.StatusCode, path)
 
-	body, _ := io.ReadAll(resp.Body)
-	assert.Contains(t, string(body), `"status":"UP"`)
+		body, _ := io.ReadAll(resp.Body)
+		assert.Contains(t, string(body), `"status":"UP"`, path)
+	}
+
+	// Readiness tests (/health/ready and /readyz)
+	for _, path := range []string{"/health/ready", "/readyz"} {
+		req, _ := http.NewRequest(http.MethodGet, path, nil)
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err, path)
+		// Since in-memory SQLite doesn't have dbresolver write/read targets, status is 503 DEGRADED or 200 UP
+		body, _ := io.ReadAll(resp.Body)
+		assert.Contains(t, string(body), `"targets"`, path)
+	}
 }
