@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -130,9 +131,14 @@ func main() {
 
 	/* ---------- START & SHUTDOWN ---------- */
 	go func() {
-		slog.Info("🚀 Starting NBA_Go Fiber API Server on [::]:5000 (Dual-Stack)")
-		if err := app.Listen("[::]:5000"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("Failed to listen on [::]:5000", "error", err)
+		ln, err := net.Listen("tcp", ":5000")
+		if err != nil {
+			slog.Error("Failed to listen on :5000", "error", err)
+			os.Exit(1)
+		}
+		slog.Info("🚀 Starting NBA_Go Fiber API Server on :5000 (Dual-Stack)", "addr", ln.Addr().String())
+		if err := app.Listener(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.Error("Fiber server error", "error", err)
 			os.Exit(1)
 		}
 	}()
