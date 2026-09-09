@@ -18,7 +18,7 @@ COPY . .
 RUN go build -o /nba_go .
 
 # STEP 2 - final image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
