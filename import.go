@@ -12,7 +12,7 @@ import (
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons
 func importPlayerAdvanced(db *gorm.DB) {
-	for season := 2010; season <= 2012; season++ {
+	for season := 2008; season <= 2010; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -24,7 +24,7 @@ func importPlayerAdvanced(db *gorm.DB) {
 
 // importPlayerAdvancedPlayoffs fetches and stores advanced stats for playoffs seasons
 func importPlayerAdvancedPlayoffs(db *gorm.DB) {
-	for season := 2010; season <= 2012; season++ {
+	for season := 2008; season <= 2010; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -36,7 +36,7 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-	for season := 2010; season <= 2012; season++ {
+	for season := 2008; season <= 2010; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
 			log.Printf("scraped totals import failed for %d: %v", season, err)
 		}
@@ -48,7 +48,7 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-	for season := 2010; season <= 2012; season++ {
+	for season := 2008; season <= 2010; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
 			log.Printf("scraped playoffs import failed for %d: %v", season, err)
 		}
@@ -112,19 +112,19 @@ func importPlayerShotCharts(db *gorm.DB) {
 		// "duranke01",
 		// "youngtr01",
 		// "gilgesh01",
-		// "brunsja01",
-		// "edwaran01",
-		// "mitchdo01",
-		// "derozde01",
-		// "westbru01",
-		// "butleji01",
-		// "davisan02",
-		"leonaka01",
-		"tatumja01",
-		"hardeja01",
-		"curryst01",
-		"duranke01",
-		"jamesle01",
+		"brunsja01",
+		"edwaran01",
+		"mitchdo01",
+		"derozde01",
+		"westbru01",
+		"butleji01",
+		"davisan02",
+		// "leonaka01",
+		// "tatumja01",
+		// "hardeja01",
+		// "curryst01",
+		// "duranke01",
+		// "jamesle01",
 		// "lillada01",
 		// "westbru01",
 		// "georgpa01",
