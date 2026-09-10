@@ -2,14 +2,16 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 	"github.com/nprasad2077/NBA_Go/controllers"
+	"github.com/nprasad2077/NBA_Go/utils/middleware"
+	"gorm.io/gorm"
 )
 
 func RegisterPlayerAdvancedRoutes(app *fiber.App, db *gorm.DB) {
 	api := app.Group("/api/playeradvancedstats")
 
-	// api.Get("/fetch", controllers.FetchPlayerAdvancedStats(db))
-	api.Get("/scrape", controllers.ScrapePlayerAdvancedStats(db))
-	api.Get("/", controllers.GetAllAdvancedPlayerStats(db))
+	// Scraper trigger - never cached
+	api.Get("/scrape", middleware.EdgeCache(middleware.NoCache), controllers.ScrapePlayerAdvancedStats(db))
+	// Public query endpoint - edge cached with stale-while-revalidate
+	api.Get("/", middleware.EdgeCache(middleware.SemiDynamic, "nba-player-advanced"), controllers.GetAllAdvancedPlayerStats(db))
 }

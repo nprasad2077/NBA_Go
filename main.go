@@ -32,6 +32,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	fiberswagger "github.com/swaggo/fiber-swagger"
@@ -99,6 +100,11 @@ func main() {
 
 	// — CORS Allow ALL origins (development) —
 	app.Use(cors.New())
+
+	// — Global Brotli/Gzip Compression (shrinks transatlantic payload bytes by 70-85%) —
+	app.Use(compress.New(compress.Config{
+		Level: compress.LevelBestSpeed,
+	}))
 
 	// Middlewares
 	app.Use(middleware.StructuredLogger())
