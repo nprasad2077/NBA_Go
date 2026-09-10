@@ -65,8 +65,8 @@ func main() {
 		// importGameSchedules(db)
 		// log.Println("🎉 Game Imports completed successfully 🏀")
 
-		importBoxScores(db)
-		log.Println("🎉 Related Box Score Imports completed successfully 📦")
+		importMissingBoxScores(db)
+		log.Println("🎉 Missing Box Score Imports completed successfully 📦")
 
 		importMarkPlayoffGames(db)
 		log.Println("🎉 Playoff games marked successfully 🏆")

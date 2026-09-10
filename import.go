@@ -16,7 +16,7 @@ import (
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons
 func importPlayerAdvanced(db *gorm.DB) {
-	for season := 2001; season <= 2001; season++ {
+	for season := 2008; season <= 2009; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -28,7 +28,7 @@ func importPlayerAdvanced(db *gorm.DB) {
 
 // importPlayerAdvancedPlayoffs fetches and stores advanced stats for playoffs seasons
 func importPlayerAdvancedPlayoffs(db *gorm.DB) {
-	for season := 2001; season <= 2001; season++ {
+	for season := 2008; season <= 2009; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, true); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -40,7 +40,7 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-	for season := 2001; season <= 2001; season++ {
+	for season := 2008; season <= 2009; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
 			log.Printf("scraped totals import failed for %d: %v", season, err)
 		}
@@ -52,7 +52,7 @@ func importPlayerTotalsScrape(db *gorm.DB) {
 
 // importPlayerPlayoffsScrape fetches & stores scraped playoff total stats
 func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
-	for season := 2001; season <= 2001; season++ {
+	for season := 2008; season <= 2009; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, true); err != nil {
 			log.Printf("scraped playoffs import failed for %d: %v", season, err)
 		}
@@ -66,7 +66,7 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 func importGameSchedules(db *gorm.DB) {
 	months := []string{"october", "november", "december", "january", "february", "march", "april", "may", "june"}
 
-	for season := 2001; season <= 2001; season++ {
+	for season := 2008; season <= 2009; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			if err := services.FetchAndStoreGameSchedule(db, season, month); err != nil {
@@ -86,8 +86,8 @@ func importBoxScores(db *gorm.DB) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	from := time.Date(2000, time.October, 31, 0, 0, 0, 0, time.UTC)
-	to := time.Date(2001, time.June, 30, 23, 59, 59, 0, time.UTC)
+	from := time.Date(2008, time.February, 28, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2008, time.December, 31, 23, 59, 59, 0, time.UTC)
 
 	chunkDays := 20             // 20-day session chunks
 	coolOff := 20 * time.Second // 20s cool-off with jitter between chunks
@@ -102,6 +102,26 @@ func importBoxScores(db *gorm.DB) {
 	}
 
 	log.Println("--- Finished Box Score Data Import ---")
+}
+
+// importMissingBoxScores auto-detects games in the database lacking line scores and scrapes all missing box scores
+// in safe 20-game chunks with worker rate limiting, cool-off pauses, and immediate database upserts.
+func importMissingBoxScores(db *gorm.DB) {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	batchSize := 20             // 20 games per batch chunk
+	coolOff := 20 * time.Second // 20s cool-off with jitter between batches
+
+	if err := services.FetchAndStoreMissingBoxScores(ctx, db, batchSize, coolOff); err != nil {
+		if errors.Is(err, context.Canceled) {
+			log.Println("👋 Missing box score import interrupted by user. Safe to resume anytime!")
+			return
+		}
+		log.Fatalf("Missing box score import failed: %v", err)
+	}
+
+	log.Println("--- Finished Missing Box Score Import ---")
 }
 
 // importPlayerShotCharts fetches shot charts for a PREDEFINED list of players for a given range of seasons.
@@ -184,7 +204,7 @@ func importPlayerShotCharts(db *gorm.DB) {
 
 // importMarkPlayoffGames marks games as playoff using the dedicated Basketball Reference playoff schedule.
 func importMarkPlayoffGames(db *gorm.DB) {
-	for season := 2001; season <= 2001; season++ {
+	for season := 2008; season <= 2008; season++ {
 		if err := services.FetchAndMarkPlayoffGames(db, season); err != nil {
 			log.Printf("playoff marking failed for %d: %v", season, err)
 		}

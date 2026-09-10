@@ -160,18 +160,18 @@ Services will be available at:
 
 ### Importing Data
 
-The application has a dual-mode entry point. To run data imports (migrations + scraping):
+The application provides a dual-mode entry point. To run data migrations and imports:
 
-#### 1. Local CLI Execution (Recommended for targeted imports)
+#### 1. Local CLI Execution (Recommended for automated & targeted imports)
 ```bash
-# Export environment variables from .env
+# Export environment variables from .env (e.g. remote or local database)
 export $(grep -v '^#' .env | xargs)
 
 # Run the import pipeline
 go run . import-data
 ```
 
-#### 2. Local Docker Stack
+#### 2. Local Docker Development Stack
 ```bash
 docker-compose -f docker-compose.local.yml run --rm db-init
 ```
@@ -185,13 +185,52 @@ docker compose --profile init run --rm db-init
 
 ### Ingestion Pipeline & Scraping Architecture
 
-The data import engine (`import.go` & `services/`) features a robust, resilient ingestion workflow designed to safely handle thousands of games:
+The data import engine (`import.go` & `services/`) features a resilient, multi-stage ingestion workflow designed to safely scrape and persist NBA statistics without rate limits or data loss:
 
-- **20-Day Temporal Session Chunks**: Large date ranges (such as full seasons) are automatically partitioned into 20-day sliding windows (~80–120 games per chunk).
-- **Immediate Incremental Persistence**: Scraped data (`line_scores`, `player_game_basic_stats`, `player_game_adv_stats`, `team_game_basic_stats`, `team_game_adv_stats`) is immediately committed and upserted into PostgreSQL at the end of each chunk rather than held in memory until the end of the run.
-- **Inter-Chunk Cool-Off Period**: Enforces a 20-second pause ($\pm 25\%$ jitter) between chunks to avoid rate limiting and IP blocks from upstream sources.
-- **Smart Skip & Idempotent Resumption**: Automatically checks `WHERE game_id NOT IN (SELECT DISTINCT game_id FROM line_scores WHERE deleted_at IS NULL)` so completed games/chunks are instantly skipped.
-- **Graceful Interrupt Handling (`Ctrl+C`)**: Captures `SIGINT`/`SIGTERM` via `context.Context`. If interrupted, in-flight scraped games in the active chunk are flushed to the database before cleanly exiting without data loss.
+#### 1. Auto-Detect Missing Box Scores Engine (`importMissingBoxScores`)
+- **Dynamic Database Discovery**: Automatically queries PostgreSQL for any games in the `games` table that lack corresponding records in `line_scores` (`WHERE game_id NOT IN (SELECT DISTINCT game_id FROM line_scores WHERE deleted_at IS NULL)`).
+- **Zero Hardcoding**: Eliminates the need to manually configure date ranges or game IDs when fixing missing data across multiple historical seasons (e.g., 2008, 2013, 2017).
+- **20-Game Batches**: Groups detected missing games into safe 20-game chunks with 2 concurrent workers and staggered worker starts.
+- **Immediate Incremental Persistence**: Scraped data (`line_scores`, `player_game_basic_stats`, `player_game_adv_stats`, `team_game_basic_stats`, `team_game_adv_stats`) is immediately committed and upserted into PostgreSQL after every batch.
+- **Inter-Batch Cool-Off**: Enforces a 20-second pause ($\pm 25\%$ jitter) between batches to maintain compliant request rates against upstream sources.
+- **Defensive URL Construction**: Automatically constructs `/boxscores/{gameID}.html` if a game record has an empty `box_score_url`.
+
+#### 2. Date-Range Chunked Ingestion (`importBoxScores`)
+- **20-Day Temporal Session Chunks**: Large date spans (such as an entire 9-month season) are partitioned into 20-day sliding windows (~80–120 games per chunk).
+- **Off-Season Smart Skipping**: Summer months (July–October) with 0 games are automatically identified and skipped in milliseconds without triggering scraping pauses.
+
+#### 3. Fault Tolerance & Safety Guarantees
+- **Graceful Interrupt Handling (`Ctrl+C`)**: Captures `SIGINT` and `SIGTERM` via `context.Context`. If interrupted, all data from completed batches is safely preserved in PostgreSQL.
+- **Idempotent Resumption**: Re-running `go run . import-data` automatically discovers only the remaining pending games, skipping all previously completed games.
+
+---
+
+### Database Verification Queries
+
+Run the following SQL queries in PostgreSQL to verify data completeness and monitor ingestion progress:
+
+```sql
+-- 1. Check count of remaining missing games (returns 0 when fully complete)
+SELECT count(*) AS remaining_missing_games
+FROM games g
+LEFT JOIN line_scores ls ON g.game_id = ls.game_id AND ls.deleted_at IS NULL
+WHERE ls.game_id IS NULL AND g.deleted_at IS NULL;
+
+-- 2. Inspect recently imported line scores
+SELECT ls.game_id, g.date, ls.team, ls.q1, ls.q2, ls.q3, ls.q4, ls.ot1, ls.total
+FROM line_scores ls
+JOIN games g ON ls.game_id = g.game_id
+ORDER BY ls.updated_at DESC
+LIMIT 20;
+
+-- 3. Verify total games vs total line scores
+SELECT 
+    (SELECT count(*) FROM games WHERE deleted_at IS NULL) AS total_games,
+    (SELECT count(DISTINCT game_id) FROM line_scores WHERE deleted_at IS NULL) AS games_with_boxscores,
+    (SELECT count(*) FROM line_scores WHERE deleted_at IS NULL) AS total_line_scores;
+```
+
+---
 
 ### Stopping
 
@@ -273,3 +312,20 @@ go run loadtest.go -n 100 -c 10 -url "http://localhost:8080/api/playeradvancedst
 | Containerization | Docker + Docker Compose |
 
 ## Workflows
+
+### 1. Ingesting a New Season from Scratch
+1. Set the target season in [`import.go`](file:///Volumes/ROG_BLACK/code/update/NBA_Go/import.go) for `importPlayerTotalsScrape`, `importPlayerAdvanced`, `importGameSchedules`, and `importMarkPlayoffGames`.
+2. Enable schedule and season totals imports in [`main.go`](file:///Volumes/ROG_BLACK/code/update/NBA_Go/main.go).
+3. Run `go run . import-data` to ingest schedules and season totals.
+4. Run `importMissingBoxScores` to automatically ingest all game box scores and line scores in 20-game chunks.
+
+### 2. Auto-Detecting & Filling Data Gaps
+1. Ensure `importMissingBoxScores(db)` is active in [`main.go`](file:///Volumes/ROG_BLACK/code/update/NBA_Go/main.go).
+2. Run `go run . import-data`.
+3. The engine automatically finds any missing games in PostgreSQL across all seasons, splits them into 20-game batches, and ingests them with immediate DB commits.
+
+### 3. Local Development & API Testing
+1. Start the local stack with `make up` or `docker-compose -f docker-compose.local.yml up -d`.
+2. Open Swagger documentation at `http://localhost:8081/swagger/index.html`.
+3. View Grafana metrics dashboards at `http://localhost:3001` (login: `admin` / `testing`).
+

@@ -146,6 +146,95 @@ func FetchAndStoreBoxScoreDataChunked(
 	return nil
 }
 
+// FetchAndStoreMissingBoxScores auto-detects all games in the database lacking line_scores,
+// groups them into batches, and scrapes their box scores with rate limiting and immediate upserts.
+func FetchAndStoreMissingBoxScores(
+	ctx context.Context,
+	db *gorm.DB,
+	batchSize int,
+	coolOffBase time.Duration,
+) error {
+	if batchSize <= 0 {
+		batchSize = 20
+	}
+
+	var missingGames []models.Game
+	err := db.Where("game_id NOT IN (SELECT DISTINCT game_id FROM line_scores WHERE deleted_at IS NULL)").
+		Where("deleted_at IS NULL").
+		Order("date ASC").
+		Find(&missingGames).Error
+
+	if err != nil {
+		return fmt.Errorf("failed to query missing games: %w", err)
+	}
+
+	totalMissing := len(missingGames)
+	if totalMissing == 0 {
+		log.Println("🎉 All games in the database already have box score and line score data! Nothing to scrape.")
+		return nil
+	}
+
+	totalBatches := (totalMissing + batchSize - 1) / batchSize
+	log.Printf("🔍 Auto-Detect: Found %d missing games across all seasons. Processing in %d batches (%d games/batch).",
+		totalMissing, totalBatches, batchSize)
+
+	totalSaved := 0
+
+	for i := 0; i < totalBatches; i++ {
+		select {
+		case <-ctx.Done():
+			log.Println("🛑 Interrupt received. Halting missing box score scraping.")
+			return ctx.Err()
+		default:
+		}
+
+		startIdx := i * batchSize
+		endIdx := startIdx + batchSize
+		if endIdx > totalMissing {
+			endIdx = totalMissing
+		}
+
+		batchGames := missingGames[startIdx:endIdx]
+		batchNumber := i + 1
+
+		log.Printf("\n📦 ========================================================")
+		log.Printf("📦 [Batch %d/%d] Processing %d games (%s to %s)",
+			batchNumber, totalBatches, len(batchGames),
+			batchGames[0].Date.Format("2006-01-02"),
+			batchGames[len(batchGames)-1].Date.Format("2006-01-02"))
+		log.Printf("📦 ========================================================")
+
+		// Scrape batch with worker pool
+		results := processGamesWithWorkers(ctx, batchGames)
+
+		// Immediate database upsert
+		if len(results) > 0 {
+			log.Printf("💾 Saving and upserting data for %d games from Batch %d into PostgreSQL...", len(results), batchNumber)
+			if err := persistScrapedResults(db, results); err != nil {
+				log.Printf("❌ Failed to upsert results for batch %d: %v", batchNumber, err)
+				return err
+			}
+			totalSaved += len(results)
+			log.Printf("✅ [Batch %d/%d] Successfully saved %d games. (Total progress: %d/%d)",
+				batchNumber, totalBatches, len(results), totalSaved, totalMissing)
+		}
+
+		if ctx.Err() != nil {
+			log.Printf("🛑 Process interrupted! All data scraped up to Batch %d was safely committed to DB.", batchNumber)
+			return ctx.Err()
+		}
+
+		// Cool-off pause between batches
+		if i < totalBatches-1 {
+			log.Printf("😴 Cool-off period: Pausing before Batch %d/%d...", batchNumber+1, totalBatches)
+			utils.SleepWithJitter(coolOffBase)
+		}
+	}
+
+	log.Printf("\n🎉 All Missing Box Scores Finished! Successfully processed %d total games.", totalSaved)
+	return nil
+}
+
 // processGamesWithWorkers runs the worker pool for a slice of games.
 func processGamesWithWorkers(ctx context.Context, games []models.Game) []ScrapedResult {
 	jobs := make(chan models.Game, len(games))
@@ -243,8 +332,11 @@ func scrapeAndParseWorker(ctx context.Context, id int, jobs <-chan models.Game, 
 				return
 			}
 
-			log.Printf("🐝  Worker %d: Processing game %s", id, game.GameID)
-			fullURL := boxScoreURLBase + game.BoxScoreURL
+			boxScoreURL := game.BoxScoreURL
+			if boxScoreURL == "" {
+				boxScoreURL = fmt.Sprintf("/boxscores/%s.html", game.GameID)
+			}
+			fullURL := boxScoreURLBase + boxScoreURL
 
 			utils.SleepWithJitter(baseDelay)
 			time.Sleep(2500 * time.Millisecond)
