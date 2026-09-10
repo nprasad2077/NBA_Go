@@ -160,17 +160,38 @@ Services will be available at:
 
 ### Importing Data
 
-The application has a dual-mode entry point. To run the initial data import (migrations + scraping):
+The application has a dual-mode entry point. To run data imports (migrations + scraping):
 
+#### 1. Local CLI Execution (Recommended for targeted imports)
+```bash
+# Export environment variables from .env
+export $(grep -v '^#' .env | xargs)
+
+# Run the import pipeline
+go run . import-data
+```
+
+#### 2. Local Docker Stack
 ```bash
 docker-compose -f docker-compose.local.yml run --rm db-init
 ```
 
-This runs `main.go` with the `import-data` argument, which:
+#### 3. Production / Coolify Deployment
+```bash
+docker compose --profile init run --rm db-init
+```
 
-1. Runs all GORM AutoMigrate operations
-2. Scrapes Basketball Reference for player advanced stats, totals, game schedules, and box scores
-3. Upserts all data into PostgreSQL
+---
+
+### Ingestion Pipeline & Scraping Architecture
+
+The data import engine (`import.go` & `services/`) features a robust, resilient ingestion workflow designed to safely handle thousands of games:
+
+- **20-Day Temporal Session Chunks**: Large date ranges (such as full seasons) are automatically partitioned into 20-day sliding windows (~80–120 games per chunk).
+- **Immediate Incremental Persistence**: Scraped data (`line_scores`, `player_game_basic_stats`, `player_game_adv_stats`, `team_game_basic_stats`, `team_game_adv_stats`) is immediately committed and upserted into PostgreSQL at the end of each chunk rather than held in memory until the end of the run.
+- **Inter-Chunk Cool-Off Period**: Enforces a 20-second pause ($\pm 25\%$ jitter) between chunks to avoid rate limiting and IP blocks from upstream sources.
+- **Smart Skip & Idempotent Resumption**: Automatically checks `WHERE game_id NOT IN (SELECT DISTINCT game_id FROM line_scores WHERE deleted_at IS NULL)` so completed games/chunks are instantly skipped.
+- **Graceful Interrupt Handling (`Ctrl+C`)**: Captures `SIGINT`/`SIGTERM` via `context.Context`. If interrupted, in-flight scraped games in the active chunk are flushed to the database before cleanly exiting without data loss.
 
 ### Stopping
 

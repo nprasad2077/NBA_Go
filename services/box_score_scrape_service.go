@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -43,53 +44,154 @@ func uncommentDoc(doc *goquery.Document) *goquery.Document {
 	return doc
 }
 
-// FetchAndStoreBoxScoreDataForDateRange fetches games and batch processes their box scores concurrently.
+// FetchAndStoreBoxScoreDataForDateRange provides backward-compatibility by delegating
+// to the chunked scraper with default 20-day chunks and 20s cool-off.
 func FetchAndStoreBoxScoreDataForDateRange(db *gorm.DB, from, to time.Time) error {
-	var games []models.Game
-	if err := db.Where("date >= ? AND date < ?", from, to.Add(24*time.Hour)).Find(&games).Error; err != nil {
-		return fmt.Errorf("failed to query games from DB: %w", err)
+	return FetchAndStoreBoxScoreDataChunked(context.Background(), db, from, to, 20, 20*time.Second, true)
+}
+
+// FetchAndStoreBoxScoreDataChunked processes box scores in temporal chunks (e.g. 20 days)
+// with immediate per-chunk database upserts, cool-off periods, and graceful interrupt handling.
+func FetchAndStoreBoxScoreDataChunked(
+	ctx context.Context,
+	db *gorm.DB,
+	from, to time.Time,
+	chunkDays int,
+	coolOffBase time.Duration,
+	skipExisting bool,
+) error {
+	if chunkDays <= 0 {
+		chunkDays = 20
 	}
 
-	if len(games) == 0 {
-		log.Println("No games found to process in the specified date range.")
-		return nil
-	}
-	log.Printf("Found %d games to process. Initializing concurrent scraping...", len(games))
+	chunkDuration := time.Duration(chunkDays) * 24 * time.Hour
+	totalDays := int(to.Sub(from).Hours()/24) + 1
 
-	// --- Concurrency Setup ---
+	log.Printf("🚀 Starting Chunked Box Score Import: %s to %s (%d total days, %d days/chunk)",
+		from.Format("2006-01-02"), to.Format("2006-01-02"), totalDays, chunkDays)
+
+	currentStart := from
+	chunkIndex := 1
+	totalGamesScraped := 0
+
+	for currentStart.Before(to) {
+		select {
+		case <-ctx.Done():
+			log.Println("🛑 Interrupt received. Halting further chunk processing.")
+			return ctx.Err()
+		default:
+		}
+
+		currentEnd := currentStart.Add(chunkDuration)
+		if currentEnd.After(to) {
+			currentEnd = to
+		}
+
+		log.Printf("\n📦 ========================================================")
+		log.Printf("📦 [Chunk %d] Window: %s to %s", chunkIndex, currentStart.Format("2006-01-02"), currentEnd.Format("2006-01-02"))
+		log.Printf("📦 ========================================================")
+
+		// 1. Query games for this chunk
+		var games []models.Game
+		query := db.Where("date >= ? AND date <= ?", currentStart, currentEnd.Add(24*time.Hour))
+		if skipExisting {
+			query = query.Where("game_id NOT IN (SELECT DISTINCT game_id FROM line_scores WHERE deleted_at IS NULL)")
+		}
+
+		if err := query.Order("date ASC").Find(&games).Error; err != nil {
+			return fmt.Errorf("failed to query games for chunk %d: %w", chunkIndex, err)
+		}
+
+		if len(games) == 0 {
+			log.Printf("⏩ [Chunk %d] All games in this window are already scraped or none found. Skipping.", chunkIndex)
+			currentStart = currentEnd.Add(24 * time.Hour)
+			chunkIndex++
+			continue
+		}
+
+		log.Printf("Found %d pending games to scrape in Chunk %d. Starting worker pool...", len(games), chunkIndex)
+
+		// 2. Concurrently scrape the chunk's games
+		results := processGamesWithWorkers(ctx, games)
+
+		// 3. IMMEDIATELY UPSERT chunk results to DB
+		if len(results) > 0 {
+			log.Printf("💾 Saving and upserting data for %d games from Chunk %d into PostgreSQL...", len(results), chunkIndex)
+			if err := persistScrapedResults(db, results); err != nil {
+				log.Printf("❌ Failed to upsert results for chunk %d: %v", chunkIndex, err)
+				return err
+			}
+			totalGamesScraped += len(results)
+			log.Printf("✅ [Chunk %d] Successfully saved %d games to database. (Total so far: %d)",
+				chunkIndex, len(results), totalGamesScraped)
+		}
+
+		// Check if interrupted during chunk processing
+		if ctx.Err() != nil {
+			log.Printf("🛑 Process interrupted! All data scraped up to Chunk %d was safely committed to DB.", chunkIndex)
+			return ctx.Err()
+		}
+
+		// 4. Cool-off pause between chunks
+		if currentEnd.Before(to) {
+			log.Printf("😴 Cool-off period: Pausing before Chunk %d...", chunkIndex+1)
+			utils.SleepWithJitter(coolOffBase)
+		}
+
+		currentStart = currentEnd.Add(24 * time.Hour)
+		chunkIndex++
+	}
+
+	log.Printf("\n🎉 All Box Score Chunks Finished! Successfully processed %d total games.", totalGamesScraped)
+	return nil
+}
+
+// processGamesWithWorkers runs the worker pool for a slice of games.
+func processGamesWithWorkers(ctx context.Context, games []models.Game) []ScrapedResult {
 	jobs := make(chan models.Game, len(games))
-	results := make(chan ScrapedResult, len(games))
+	resultsChan := make(chan ScrapedResult, len(games))
 	var wg sync.WaitGroup
 
 	// Start worker goroutines
 	for w := 1; w <= numWorkers; w++ {
 		wg.Add(1)
-		go scrapeAndParseWorker(w, jobs, results, &wg)
+		go scrapeAndParseWorker(ctx, w, jobs, resultsChan, &wg)
 	}
 
 	// Send jobs to the workers
 	for _, game := range games {
-		jobs <- game
+		select {
+		case <-ctx.Done():
+			break
+		case jobs <- game:
+		}
 	}
 	close(jobs)
 
 	// Wait for all workers to finish
 	wg.Wait()
-	close(results)
+	close(resultsChan)
 
-	// --- Aggregation & Final Upsert ---
-	log.Println("All scraping complete. Aggregating results for final batch upsert...")
+	var validResults []ScrapedResult
+	for res := range resultsChan {
+		if res.Err != nil {
+			log.Printf("⚠️ Worker failed on game %s: %v", res.GameID, res.Err)
+			continue
+		}
+		validResults = append(validResults, res)
+	}
+	return validResults
+}
+
+// persistScrapedResults extracts and batch-upserts line scores, player stats, and team stats.
+func persistScrapedResults(db *gorm.DB, results []ScrapedResult) error {
 	var allPlayerBasicStats []models.PlayerGameBasicStat
 	var allPlayerAdvStats []models.PlayerGameAdvStat
 	var allTeamBasicStats []models.TeamGameBasicStat
 	var allTeamAdvStats []models.TeamGameAdvStat
 	var allLineScores []models.LineScore
 
-	for res := range results {
-		if res.Err != nil {
-			log.Printf("A worker failed on game %s: %v", res.GameID, res.Err)
-			continue
-		}
+	for _, res := range results {
 		allPlayerBasicStats = append(allPlayerBasicStats, res.PlayerBasicStats...)
 		allPlayerAdvStats = append(allPlayerAdvStats, res.PlayerAdvStats...)
 		allTeamBasicStats = append(allTeamBasicStats, res.TeamBasicStats...)
@@ -97,7 +199,7 @@ func FetchAndStoreBoxScoreDataForDateRange(db *gorm.DB, from, to time.Time) erro
 		allLineScores = append(allLineScores, res.LineScores...)
 	}
 
-	// Upsert Line Scores first
+	// Upsert Line Scores
 	if len(allLineScores) > 0 {
 		if err := db.Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "game_id"}, {Name: "team"}},
@@ -105,77 +207,93 @@ func FetchAndStoreBoxScoreDataForDateRange(db *gorm.DB, from, to time.Time) erro
 		}).Create(&allLineScores).Error; err != nil {
 			return fmt.Errorf("failed to upsert line scores: %w", err)
 		}
-		log.Printf("Successfully upserted %d line scores.", len(allLineScores))
 	}
 
-	// Call the batch upsert function with the fully aggregated data
+	// Batch upsert Player and Team Stats
 	if err := batchUpsertAll(db, allPlayerBasicStats, allPlayerAdvStats, allTeamBasicStats, allTeamAdvStats); err != nil {
-		return fmt.Errorf("final batch upsert failed: %w", err)
+		return fmt.Errorf("batch upsert failed: %w", err)
 	}
 
-	log.Printf("Successfully upserted all box score data for %d games.", len(games))
 	return nil
 }
 
 // scrapeAndParseWorker is a worker goroutine that receives games, scrapes them, and sends back the result.
-func scrapeAndParseWorker(id int, jobs <-chan models.Game, results chan<- ScrapedResult, wg *sync.WaitGroup) {
+func scrapeAndParseWorker(ctx context.Context, id int, jobs <-chan models.Game, results chan<- ScrapedResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	// --- Stagger the start of each worker ---
-	// Calculate an offset based on the worker's ID to spread out the initial requests.
-	// We divide the base delay by the number of workers to get an even interval.
+	// Stagger worker start
 	if numWorkers > 1 {
 		staggerAmount := time.Duration(int64(baseDelay) / int64(numWorkers))
 		initialDelay := time.Duration(id-1) * staggerAmount
 		log.Printf("Worker %d: Staggering start with an initial delay of %v", id, initialDelay)
-		time.Sleep(initialDelay)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(initialDelay):
+		}
 	}
 
-	for game := range jobs {
-		log.Printf("🐝  Worker %d: Processing game %s", id, game.GameID)
-		fullURL := boxScoreURLBase + game.BoxScoreURL
+	for {
+		select {
+		case <-ctx.Done():
+			log.Printf("Worker %d: Interrupted, finishing up...", id)
+			return
+		case game, ok := <-jobs:
+			if !ok {
+				return
+			}
 
-		utils.SleepWithJitter(baseDelay)
-		time.Sleep(2500 * time.Millisecond)
+			log.Printf("🐝  Worker %d: Processing game %s", id, game.GameID)
+			fullURL := boxScoreURLBase + game.BoxScoreURL
 
-		req, err := http.NewRequest("GET", fullURL, nil)
-		if err != nil {
-			results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("failed to create request: %w", err)}
-			continue
-		}
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("request failed: %w", err)}
-			continue
-		}
+			utils.SleepWithJitter(baseDelay)
+			time.Sleep(2500 * time.Millisecond)
 
-		if resp.StatusCode != http.StatusOK {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+
+			req, err := http.NewRequestWithContext(ctx, "GET", fullURL, nil)
+			if err != nil {
+				results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("failed to create request: %w", err)}
+				continue
+			}
+			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("request failed: %w", err)}
+				continue
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				resp.Body.Close()
+				results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("received non-200 status code: %s", resp.Status)}
+				continue
+			}
+
+			doc, err := goquery.NewDocumentFromReader(resp.Body)
 			resp.Body.Close()
-			results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("received non-200 status code: %s", resp.Status)}
-			continue
-		}
+			if err != nil {
+				results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("failed to parse document: %w", err)}
+				continue
+			}
 
-		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		resp.Body.Close()
-		if err != nil {
-			results <- ScrapedResult{GameID: game.GameID, Err: fmt.Errorf("failed to parse document: %w", err)}
-			continue
-		}
+			doc = uncommentDoc(doc)
 
-		doc = uncommentDoc(doc)
+			lineScores := parseLineScore(doc, game.GameID)
+			pbs, pas, tbs, tas := parseBoxScores(doc, game.GameID)
 
-		lineScores := parseLineScore(doc, game.GameID)
-		pbs, pas, tbs, tas := parseBoxScores(doc, game.GameID)
-
-		results <- ScrapedResult{
-			PlayerBasicStats: pbs,
-			PlayerAdvStats:   pas,
-			TeamBasicStats:   tbs,
-			TeamAdvStats:     tas,
-			LineScores:       lineScores,
-			GameID:           game.GameID,
-			Err:              nil,
+			results <- ScrapedResult{
+				PlayerBasicStats: pbs,
+				PlayerAdvStats:   pas,
+				TeamBasicStats:   tbs,
+				TeamAdvStats:     tas,
+				LineScores:       lineScores,
+				GameID:           game.GameID,
+				Err:              nil,
+			}
 		}
 	}
 }

@@ -1,8 +1,10 @@
-# "import-data" disabled
 services:
   db-init:
     build: .
     command: ["/nba_go", "import-data"]
+    profiles:
+      - init
+      - import
     networks:
       - coolify-shared
       # - api_network
