@@ -192,7 +192,12 @@ All data endpoints return structured JSON with pagination metadata:
 ## Rate Limiting & Caching
 
 - **Rate Limiting**: Configured per client IP at **20 requests per minute per instance** (~60 req/min across the 3-instance cluster). If exceeded, the API responds with `HTTP 429 Too Many Requests`.
-- **Response Caching**: NGINX provides an in-memory cache (`api_cache`) for **30 seconds** (`keys_zone=api_cache:10m`). Cached responses include the header `X-Cache-Status: HIT` (or `MISS`).
+  - **Custom Limits**: Configurable via `RATE_LIMIT_MAX` (default `20`) and `RATE_LIMIT_EXPIRATION_SECONDS` (default `60s`).
+  - **Internal Benchmark Bypass**: If `BENCHMARK_KEY` is configured in the environment, passing matching token in `X-Benchmark-Key` header skips rate limiting for automated benchmarks.
+- **Multi-Layer Caching**:
+  - **Edge CDN (Cloudflare)**: Caches GET requests with `s-maxage=86400` (24h) and `stale-while-revalidate=600`.
+  - **NGINX Reverse Proxy**: Provides an in-memory cache (`api_cache`) for **30 seconds** (`keys_zone=api_cache:10m`).
+  - Responses include `CF-Cache-Status` (`HIT`/`MISS`) and `X-Cache-Status` (`HIT`/`MISS`) headers.
 
 ---
 
@@ -212,6 +217,8 @@ DB_PASSWORD=your_password
 DB_NAME=appdb
 DB_PORT=5432
 ADMIN_SECRET=your_admin_secret
+BENCHMARK_KEY=your_internal_benchmark_token
+RATE_LIMIT_MAX=20
 ```
 
 ### Running Locally with Docker
@@ -302,16 +309,70 @@ swag init -g main.go -o docs
 go test -v ./...
 ```
 
-### Load Testing
-The built-in load test utility supports weighted page distributions:
+### Advanced Load Testing (`test/loadtest.go`)
+The built-in load testing engine simulates high-volume, realistic traffic patterns across edge caches, reverse proxies, and the origin PostgreSQL database.
+
+See the complete [Load Testing Guide](docs/loadtesting.md) for full details.
+
+#### Key Capabilities:
+- **Dynamic Query Randomization (`-varyParams`, `-complexity`)**: Permutes combinations of seasons, teams, sort columns, ascending/descending, page sizes, playoff filters, and heavy database relation joins (`include=lineScores,playerGameBasicStats,teamGameAdvStats`).
+- **Cold-Cache Stress Testing (`-cacheBust`)**: Injects unique request nonces to ensure a 100% cache-miss rate for benchmarking raw database execution.
+- **Cache Telemetry Split**: Inspects `CF-Cache-Status` (`HIT`/`MISS`) and `Age` headers to provide separate latency profiles for Edge Cache Hits vs. Origin / Database Misses.
+- **Latency Percentiles**: Reports **Min**, **p50 (Median)**, **p75**, **p90**, **p95**, **p99**, **Max**, and **Average** latency.
+- **Distributed Client Simulation (`-rotateIPs`)**: Injects rotating `X-Real-IP` and `X-Forwarded-For` headers to accurately simulate thousands of distinct clients.
+- **Benchmark Token Support (`-benchmarkKey`)**: Passes `X-Benchmark-Key` header to bypass rate limits during testing.
+- **Multi-Endpoint Traffic Mix (`-endpointMix`)**: Distributes traffic across `/api/playeradvancedstats`, `/api/playertotals`, `/api/games`, and `/api/playershotchart`.
+
+#### Load Test CLI Flags:
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `-url` | `http://localhost:5000/api/playeradvancedstats` | Target endpoint or base URL |
+| `-n` | `100` | Number of requests to send |
+| `-c` | `10` | Concurrency level (worker goroutines) |
+| `-varyParams` | `false` | Enable query parameter & filter randomization |
+| `-complexity` | `standard` | Query complexity: `standard` or `high` |
+| `-cacheBust` | `false` | Force 100% cold-cache misses on CDN/proxy |
+| `-benchmarkKey` | `$BENCHMARK_KEY` | Token for `X-Benchmark-Key` header |
+| `-rotateIPs` | `false` | Rotate synthetic client IPs |
+| `-endpointMix` | `""` | Multi-endpoint traffic mix (e.g. `playeradvancedstats:40,playertotals:30,games:30`) |
+| `-pageMix` | `""` | Weighted page mix (e.g. `1-3:60,4-10:30,11-20:10`) |
+| `-retryOnRateLimit` | `false` | Retry 429 responses with backoff |
+| `-log` | `loadtest.log` | Output log file destination |
+
+#### Example Usage:
 
 ```bash
+# 1. Realistic Traffic with Parameter Variance (Recommended)
 go run ./test/loadtest.go \
-  -url "https://nba.turbo-data.com/api/playertotals?page=1&pageSize=50" \
-  -n 500 \
+  -url 'https://nba.turbo-data.com/api/playeradvancedstats' \
+  -n 3000 \
   -c 20 \
-  -pageMix "1-3:60,4-10:30,11-20:10" \
-  -seed 42 \
+  -varyParams \
+  -complexity high \
+  -rotateIPs \
+  -benchmarkKey 'your-benchmark-token' \
+  -pageMix '1-3:60,4-10:30,11-20:10' \
+  -log ./test/results.log
+
+# 2. Pure Cold-Cache / Origin Database Benchmark (100% Cache Misses)
+go run ./test/loadtest.go \
+  -url 'https://nba.turbo-data.com/api/playeradvancedstats' \
+  -n 1000 \
+  -c 15 \
+  -varyParams \
+  -cacheBust \
+  -benchmarkKey 'your-benchmark-token' \
+  -log ./test/results.log
+
+# 3. Multi-Endpoint Traffic Mix
+go run ./test/loadtest.go \
+  -url 'https://nba.turbo-data.com' \
+  -endpointMix 'playeradvancedstats:40,playertotals:30,games:30' \
+  -varyParams \
+  -n 2000 \
+  -c 20 \
+  -benchmarkKey 'your-benchmark-token' \
   -log ./test/results.log
 ```
 
