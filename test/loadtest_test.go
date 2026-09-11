@@ -1,9 +1,12 @@
 package main
 
 import (
+	"math/rand"
+	"net/http"
 	"net/url"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestParsePageMixDistributesRangeWeights(t *testing.T) {
@@ -107,6 +110,172 @@ func TestURLForPageReplacesOnlyPageParameter(t *testing.T) {
 	}
 	if query.Get("season") != "2025" {
 		t.Errorf("season query parameter = %q, want 2025", query.Get("season"))
+	}
+}
+
+func TestParseEndpointMix(t *testing.T) {
+	buckets, err := parseEndpointMix("playeradvancedstats:40,playertotals:30,games:30")
+	if err != nil {
+		t.Fatalf("parseEndpointMix error: %v", err)
+	}
+	if len(buckets) != 3 {
+		t.Fatalf("expected 3 buckets, got %d", len(buckets))
+	}
+	if buckets[0].endpoint != "/api/playeradvancedstats" || buckets[0].weight != 40 {
+		t.Errorf("bucket 0 = %+v", buckets[0])
+	}
+	if buckets[1].endpoint != "/api/playertotals" || buckets[1].weight != 30 {
+		t.Errorf("bucket 1 = %+v", buckets[1])
+	}
+	if buckets[2].endpoint != "/api/games" || buckets[2].weight != 30 {
+		t.Errorf("bucket 2 = %+v", buckets[2])
+	}
+}
+
+func TestGenerateRequestURLVariesParams(t *testing.T) {
+	baseURL, _ := url.Parse("https://nba.turbo-data.com/api/playeradvancedstats")
+	generatedURLs := make(map[string]bool)
+
+	for i := 0; i < 50; i++ {
+		rng := rand.New(rand.NewSource(int64(i + 100)))
+		u := GenerateRequestURL(RequestOptions{
+			BaseURL:    *baseURL,
+			Page:       0,
+			VaryParams: true,
+			Complexity: "high",
+			CacheBust:  false,
+			RequestID:  i,
+			WorkerID:   1,
+			RNG:        rng,
+		})
+		generatedURLs[u] = true
+		parsed, err := url.Parse(u)
+		if err != nil {
+			t.Fatalf("invalid url generated: %s", u)
+		}
+		q := parsed.Query()
+		if q.Get("sortBy") == "" {
+			t.Errorf("expected sortBy to be populated, got URL: %s", u)
+		}
+		if q.Get("pageSize") == "" {
+			t.Errorf("expected pageSize to be populated, got URL: %s", u)
+		}
+	}
+
+	if len(generatedURLs) < 40 {
+		t.Errorf("expected high URL diversity (>40 distinct URLs for 50 requests), got %d", len(generatedURLs))
+	}
+}
+
+func TestGenerateRequestURLCacheBust(t *testing.T) {
+	baseURL, _ := url.Parse("https://nba.turbo-data.com/api/playeradvancedstats?page=1&pageSize=40")
+	rng := rand.New(rand.NewSource(42))
+
+	u1 := GenerateRequestURL(RequestOptions{
+		BaseURL:   *baseURL,
+		Page:      1,
+		CacheBust: true,
+		RequestID: 1,
+		WorkerID:  1,
+		RNG:       rng,
+	})
+
+	u2 := GenerateRequestURL(RequestOptions{
+		BaseURL:   *baseURL,
+		Page:      1,
+		CacheBust: true,
+		RequestID: 2,
+		WorkerID:  1,
+		RNG:       rng,
+	})
+
+	if u1 == u2 {
+		t.Errorf("expected distinct URLs with cacheBust=true, got identical: %s", u1)
+	}
+
+	p1, _ := url.Parse(u1)
+	if p1.Query().Get("_cb") == "" {
+		t.Errorf("expected _cb parameter in URL %s", u1)
+	}
+}
+
+func TestExtractCacheStatus(t *testing.T) {
+	tests := []struct {
+		name     string
+		headers  http.Header
+		expected CacheStatus
+	}{
+		{
+			name:     "Cloudflare HIT",
+			headers:  http.Header{"Cf-Cache-Status": []string{"HIT"}},
+			expected: CacheHit,
+		},
+		{
+			name:     "Cloudflare MISS",
+			headers:  http.Header{"Cf-Cache-Status": []string{"MISS"}},
+			expected: CacheMiss,
+		},
+		{
+			name:     "Cloudflare DYNAMIC",
+			headers:  http.Header{"Cf-Cache-Status": []string{"DYNAMIC"}},
+			expected: CacheMiss,
+		},
+		{
+			name:     "X-Cache HIT",
+			headers:  http.Header{"X-Cache": []string{"HIT from proxy"}},
+			expected: CacheHit,
+		},
+		{
+			name:     "Age header > 0",
+			headers:  http.Header{"Age": []string{"120"}},
+			expected: CacheHit,
+		},
+		{
+			name:     "Age header 0 with no cache headers",
+			headers:  http.Header{"Age": []string{"0"}},
+			expected: CacheUnknown,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := ExtractCacheStatus(tt.headers)
+			if actual != tt.expected {
+				t.Errorf("ExtractCacheStatus() = %v, want %v", actual, tt.expected)
+			}
+		})
+	}
+}
+
+func TestCalculatePercentiles(t *testing.T) {
+	durations := []time.Duration{
+		10 * time.Millisecond,
+		20 * time.Millisecond,
+		30 * time.Millisecond,
+		40 * time.Millisecond,
+		50 * time.Millisecond,
+		60 * time.Millisecond,
+		70 * time.Millisecond,
+		80 * time.Millisecond,
+		90 * time.Millisecond,
+		100 * time.Millisecond,
+	}
+
+	stats := CalculatePercentiles(durations)
+	if stats.Count != 10 {
+		t.Errorf("Count = %d, want 10", stats.Count)
+	}
+	if stats.Min != 10*time.Millisecond {
+		t.Errorf("Min = %v, want 10ms", stats.Min)
+	}
+	if stats.Max != 100*time.Millisecond {
+		t.Errorf("Max = %v, want 100ms", stats.Max)
+	}
+	if stats.Average != 55*time.Millisecond {
+		t.Errorf("Average = %v, want 55ms", stats.Average)
+	}
+	if stats.P50 != 55*time.Millisecond {
+		t.Errorf("P50 = %v, want 55ms", stats.P50)
 	}
 }
 
