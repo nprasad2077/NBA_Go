@@ -12,7 +12,7 @@ import (
 
 // importPlayerAdvanced fetches and stores advanced stats for seasons
 func importPlayerAdvanced(db *gorm.DB) {
-	for season := 2008; season <= 2010; season++ {
+	for season := 2027; season <= 2027; season++ {
 		if err := services.FetchAndStorePlayerAdvancedScrapedStats(db, season, false); err != nil {
 			log.Printf("advanced import failed for %d: %v", season, err)
 		}
@@ -36,7 +36,7 @@ func importPlayerAdvancedPlayoffs(db *gorm.DB) {
 
 // importPlayerTotalsScrape fetches & stores scraped regular-season total stats
 func importPlayerTotalsScrape(db *gorm.DB) {
-	for season := 2008; season <= 2010; season++ {
+	for season := 2027; season <= 2027; season++ {
 		if err := services.FetchAndStorePlayerTotalScrapedStats(db, season, false); err != nil {
 			log.Printf("scraped totals import failed for %d: %v", season, err)
 		}
@@ -60,9 +60,9 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 
 // importGameSchedules fetches and stores game schedules
 func importGameSchedules(db *gorm.DB) {
-	months := []string{"june"}
+	months := []string{"october"}
 
-	for season := 2005; season <= 2005; season++ {
+	for season := 2027; season <= 2027; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
 		for _, month := range months {
 			if err := services.FetchAndStoreGameSchedule(db, season, month); err != nil {
@@ -79,8 +79,8 @@ func importGameSchedules(db *gorm.DB) {
 // importBoxScores fetches and stores all box score data (line scores, player/team stats)
 // for games within a recent date range.
 func importBoxScores(db *gorm.DB) {
-	from := time.Date(2006, time.June, 30, 0, 0, 0, 0, time.UTC)
-	to := time.Date(2006, time.June, 30, 5, 30, 0, 0, time.UTC)
+	from := time.Date(2026, time.October, 20, 0, 0, 0, 0, time.UTC)
+	to := time.Now().UTC()
 
 	dateRangeComment := fmt.Sprintf("--- Starting Box Score Data Import for games between %s and %s ---",
 		from.Format("January 2, 2006"),
@@ -99,11 +99,11 @@ func importBoxScores(db *gorm.DB) {
 func importPlayerShotCharts(db *gorm.DB) {
 	log.Println("--- Starting Player Shot Chart Import from Predefined List ---")
 
-	startSeason := 2026
-	endSeason := 2017
+	startSeason := 2027
+	endSeason := 2027
 
 	targetPlayerIDs := []string{
-		// "jamesle01",
+		"jamesle01", // LeBron James (included in current scrape)
 		// "curryst01",
 		// "jokicni01",
 		// "doncilu01",
@@ -111,7 +111,7 @@ func importPlayerShotCharts(db *gorm.DB) {
 		// "irvinky01",
 		// "duranke01",
 		// "youngtr01",
-		// "gilgesh01",
+		"gilgesh01",
 		"brunsja01",
 		"edwaran01",
 		"mitchdo01",
@@ -120,35 +120,23 @@ func importPlayerShotCharts(db *gorm.DB) {
 		"butleji01",
 		"davisan02",
 		// "leonaka01",
-		// "tatumja01",
-		// "hardeja01",
-		// "curryst01",
-		// "duranke01",
-		// "jamesle01",
+		"tatumja01",
+		"cunnica01",
+		"wembavi01",
+		"holmgch01",
 		// "lillada01",
-		// "westbru01",
 		// "georgpa01",
-		// "derozde01",
 		// "thomais02",
-		// "davisan02",
-		// "townska01",
+		"townska01",
 		// "walkeke02",
 		// "bealbr01",
 		// "antetgi01",
 		// "bookede01",
-		// "youngtr01",
-		// "doncilu01",
-		// "jokicni01",
 		// "randlju01",
-		// "embiijo01",
-		// "tatumja01",
-		// "gilgesh01",
-		// "edwaran01",
-		// "mitchdo01",
-		// "brunsja01",
+		"embiijo01",
 		// "herroty01",
 		// "brownja02",
-		// "maxeyty01",
+		"maxeyty01",
 		// "murraja01",
 	}
 

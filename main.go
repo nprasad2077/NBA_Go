@@ -57,20 +57,20 @@ func main() {
 		importPlayerAdvanced(db)
 		slog.Info("🎉 Player Advanced Import completed successfully")
 
-		importPlayerAdvancedPlayoffs(db)
-		slog.Info("🎉 Player Advanced Playoffs Import completed successfully")
+		// importPlayerAdvancedPlayoffs(db)
+		// slog.Info("🎉 Player Advanced Playoffs Import completed successfully")
 
 		importPlayerTotalsScrape(db)
 		slog.Info("🎉 Player Totals (scraped) Import completed successfully")
 
-		importPlayerTotalsPlayoffsScrape(db)
-		slog.Info("🎉 Player Playoffs (scraped) Import completed successfully")
+		// importPlayerTotalsPlayoffsScrape(db)
+		// slog.Info("🎉 Player Playoffs (scraped) Import completed successfully")
 
-		// importGameSchedules(db)
-		// slog.Info("🎉 Game Imports completed successfully 🏀")
+		importGameSchedules(db)
+		slog.Info("🎉 Game Imports completed successfully 🏀")
 
-		// importBoxScores(db)
-		// slog.Info("🎉 Related Box Score Imports completed successfully 📦")
+		importBoxScores(db)
+		slog.Info("🎉 Related Box Score Imports completed successfully 📦")
 
 		// importMarkPlayoffGames(db)
 		// slog.Info("🎉 Playoff games marked successfully 🏆")

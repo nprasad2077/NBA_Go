@@ -46,6 +46,16 @@ services:
       - coolify-shared
       # - api_network
 
+  haproxy-exporter:
+    image: prom/haproxy-exporter:v0.15.0
+    command:
+      - '--haproxy.scrape-uri=http://178.105.149.129:7080/;csv'
+    ports:
+      - "9101:9101"
+    networks:
+      - coolify-shared
+    restart: unless-stopped
+
   prometheus:
     build:
       context: ./prometheus

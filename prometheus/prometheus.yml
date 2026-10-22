@@ -14,5 +14,5 @@ scrape_configs:
 
   - job_name: 'haproxy'
     static_configs:
-      - targets: ['178.105.149.129:7080']
+      - targets: ['haproxy-exporter:9101']
     metrics_path: '/metrics'

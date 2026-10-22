@@ -49,3 +49,6 @@ docs/digital_ocean/digitaal ocean llms.txt
 
 NBA_Go
 .docs
+
+.env.example
+test/results.log

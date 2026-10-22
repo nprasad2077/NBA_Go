@@ -6,18 +6,18 @@ A high-performance NBA statistics REST API built with Go (Fiber), PostgreSQL, an
 
 ## Live Production Endpoints
 
-| Service / Endpoint | URL | Description |
-| :--- | :--- | :--- |
-| **API Base URL** | `https://nba.turbo-data.com` | Production API root (redirects to Swagger UI) |
-| **Swagger UI Docs** | `https://nba.turbo-data.com/swagger/index.html` | Interactive API documentation & sandbox |
-| **Player Totals** | `https://nba.turbo-data.com/api/playertotals` | Season totals with pagination & sorting |
-| **Games & Box Scores** | `https://nba.turbo-data.com/api/games` | Game schedules, box scores, line scores |
-| **Advanced Stats** | `https://nba.turbo-data.com/api/playeradvancedstats` | Advanced metrics (PER, WS, VORP, BPM) |
-| **Shot Charts** | `https://nba.turbo-data.com/api/playershotchart` | Shot coordinate & outcome data |
-| **Liveness Check** | `https://nba.turbo-data.com/health/live` | Process liveness probe |
-| **Readiness Check** | `https://nba.turbo-data.com/health/ready` | Database readiness probe |
-| **Metrics** | `https://nba.turbo-data.com/metrics` | Prometheus metrics endpoint |
-| **Coolify Dashboard** | `https://turbo-data.com` | Infrastructure & deployment management |
+| Service / Endpoint     | URL                                                  | Description                                   |
+| :--------------------- | :--------------------------------------------------- | :-------------------------------------------- |
+| **API Base URL**       | `https://nba.turbo-data.com`                         | Production API root (redirects to Swagger UI) |
+| **Swagger UI Docs**    | `https://nba.turbo-data.com/swagger/index.html`      | Interactive API documentation & sandbox       |
+| **Player Totals**      | `https://nba.turbo-data.com/api/playertotals`        | Season totals with pagination & sorting       |
+| **Games & Box Scores** | `https://nba.turbo-data.com/api/games`               | Game schedules, box scores, line scores       |
+| **Advanced Stats**     | `https://nba.turbo-data.com/api/playeradvancedstats` | Advanced metrics (PER, WS, VORP, BPM)         |
+| **Shot Charts**        | `https://nba.turbo-data.com/api/playershotchart`     | Shot coordinate & outcome data                |
+| **Liveness Check**     | `https://nba.turbo-data.com/health/live`             | Process liveness probe                        |
+| **Readiness Check**    | `https://nba.turbo-data.com/health/ready`            | Database readiness probe                      |
+| **Metrics**            | `https://nba.turbo-data.com/metrics`                 | Prometheus metrics endpoint                   |
+| **Coolify Dashboard**  | `https://turbo-data.com`                             | Infrastructure & deployment management        |
 
 ---
 
@@ -53,6 +53,7 @@ A high-performance NBA statistics REST API built with Go (Fiber), PostgreSQL, an
 ```
 
 ### Key Architectural Highlights:
+
 1. **Dual-Stack Networking**: The Go Fiber backend listens on `[::]:5000` (`net.Listen("tcp", ":5000")` with `app.Listener`), accepting incoming connections seamlessly over both IPv6 and IPv4 within Docker and Coolify networks.
 2. **Read/Write DB Splitting**: GORM uses the `dbresolver` plugin to automatically route all write operations to the PostgreSQL Primary via HAProxy port 5437, while load balancing read queries across Read Replicas via HAProxy port 5438.
 3. **Multi-Layer Caching & Rate Limiting**: NGINX provides an in-memory cache (`api_cache`) for 30 seconds, while Fiber middleware enforces per-client rate limiting (20 req/min per instance, ~60 req/min effective across 3 replicas).
@@ -92,36 +93,37 @@ A high-performance NBA statistics REST API built with Go (Fiber), PostgreSQL, an
 
 ## API Endpoints
 
-| Method | Path | Description | Public |
-| :--- | :--- | :--- | :---: |
-| `GET` | `/` | Redirects to `/swagger/index.html` | Yes |
-| `GET` | `/swagger/*` | Interactive Swagger UI documentation | Yes |
-| `GET` | `/api/games` | Paginated games with box scores, line scores, team/player stats | Yes |
-| `GET` | `/api/playeradvancedstats` | Advanced metrics (PER, WS, VORP, BPM, etc.) | Yes |
-| `GET` | `/api/playertotals` | Season totals (points, rebounds, assists, etc.) | Yes |
-| `GET` | `/api/playershotchart` | Shot chart coordinates and made/missed outcomes | Yes |
-| `GET` | `/health/live` | Process liveness probe | Yes |
-| `GET` | `/health/ready` | Database connection readiness probe | Yes |
-| `GET` | `/metrics` | Prometheus metrics scrape endpoint | Yes |
-| `POST`| `/admin/keys` | Create API key (requires `X-Admin-Secret` header) | Admin |
-| `POST`| `/admin/keys/:id/revoke` | Revoke API key (requires `X-Admin-Secret` header) | Admin |
+| Method | Path                       | Description                                                     | Public |
+| :----- | :------------------------- | :-------------------------------------------------------------- | :----: |
+| `GET`  | `/`                        | Redirects to `/swagger/index.html`                              |  Yes   |
+| `GET`  | `/swagger/*`               | Interactive Swagger UI documentation                            |  Yes   |
+| `GET`  | `/api/games`               | Paginated games with box scores, line scores, team/player stats |  Yes   |
+| `GET`  | `/api/playeradvancedstats` | Advanced metrics (PER, WS, VORP, BPM, etc.)                     |  Yes   |
+| `GET`  | `/api/playertotals`        | Season totals (points, rebounds, assists, etc.)                 |  Yes   |
+| `GET`  | `/api/playershotchart`     | Shot chart coordinates and made/missed outcomes                 |  Yes   |
+| `GET`  | `/health/live`             | Process liveness probe                                          |  Yes   |
+| `GET`  | `/health/ready`            | Database connection readiness probe                             |  Yes   |
+| `GET`  | `/metrics`                 | Prometheus metrics scrape endpoint                              |  Yes   |
+| `POST` | `/admin/keys`              | Create API key (requires `X-Admin-Secret` header)               | Admin  |
+| `POST` | `/admin/keys/:id/revoke`   | Revoke API key (requires `X-Admin-Secret` header)               | Admin  |
 
 ---
 
 ### Query Parameters (Data Endpoints)
 
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `page` | `int` | `1` | Page number |
-| `pageSize` | `int` | `20` | Results per page (max 100) |
-| `sortBy` | `string` | varies | Field to sort by (e.g., `points`, `date`, `winShares`) |
-| `ascending` | `bool` | `false` | Sort ascending (`true`) or descending (`false`) |
-| `season` | `int` | - | Filter by season year (e.g., `2024`, `2025`) |
-| `team` | `string` | - | Filter by team abbreviation (e.g., `LAL`, `BOS`, `GSW`) |
-| `playerId` | `string` | - | Filter by player ID (e.g., `jamesle01`, `curryst01`) |
-| `isPlayoff` | `bool` | `false` | Filter for playoff games or stats |
+| Parameter   | Type     | Default | Description                                             |
+| :---------- | :------- | :------ | :------------------------------------------------------ |
+| `page`      | `int`    | `1`     | Page number                                             |
+| `pageSize`  | `int`    | `20`    | Results per page (max 100)                              |
+| `sortBy`    | `string` | varies  | Field to sort by (e.g., `points`, `date`, `winShares`)  |
+| `ascending` | `bool`   | `false` | Sort ascending (`true`) or descending (`false`)         |
+| `season`    | `int`    | -       | Filter by season year (e.g., `2024`, `2025`)            |
+| `team`      | `string` | -       | Filter by team abbreviation (e.g., `LAL`, `BOS`, `GSW`) |
+| `playerId`  | `string` | -       | Filter by player ID (e.g., `jamesle01`, `curryst01`)    |
+| `isPlayoff` | `bool`   | `false` | Filter for playoff games or stats                       |
 
 #### Additional Parameters for `/api/games`:
+
 - `date`: Filter by exact date (`YYYY-MM-DD`).
 - `gameId`: Filter by specific game ID (e.g., `202501010LAL`).
 - `include`: Comma-separated associations to preload (`lineScores`, `playerGameBasicStats`, `playerGameAdvStats`, `teamGameBasicStats`, `teamGameAdvStats`).
@@ -131,6 +133,7 @@ A high-performance NBA statistics REST API built with Go (Fiber), PostgreSQL, an
 ### Example Requests
 
 #### Production (Live API)
+
 ```bash
 # Get top scorers for the 2025 season
 curl "https://nba.turbo-data.com/api/playertotals?season=2025&sortBy=points&pageSize=10"
@@ -149,6 +152,7 @@ curl "https://nba.turbo-data.com/health/ready"
 ```
 
 #### Local Development
+
 ```bash
 # Query local NGINX load balancer (:8081)
 curl "http://localhost:8081/api/playertotals?season=2025&pageSize=5"
@@ -175,7 +179,7 @@ All data endpoints return structured JSON with pagination metadata:
       "assists": 379,
       "rebounds": 330,
       "threeP": 357,
-      "fieldPercent": 0.450
+      "fieldPercent": 0.45
     }
   ],
   "pagination": {
@@ -204,10 +208,12 @@ All data endpoints return structured JSON with pagination metadata:
 ## Getting Started
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - Go 1.23+ (for local development)
 
 ### Environment Variables
+
 Create a `.env` file in the project root:
 
 ```env
@@ -232,6 +238,7 @@ make up
 ```
 
 Local service ports:
+
 - **API (via NGINX)**: [http://localhost:8081](http://localhost:8081)
 - **Swagger Docs**: [http://localhost:8081/swagger/index.html](http://localhost:8081/swagger/index.html)
 - **Prometheus**: [http://localhost:9091](http://localhost:9091)
@@ -247,6 +254,7 @@ docker compose -f docker-compose.local.yml run --rm db-init
 ```
 
 This launches the container in one-off `import-data` mode:
+
 1. Executes GORM `AutoMigrate` against the Primary database.
 2. Scrapes player advanced stats, regular season totals, playoff totals, and shot charts.
 3. Upserts all records into PostgreSQL.
@@ -264,11 +272,13 @@ make down
 ## Production Deployment (Coolify)
 
 The application is deployed via Coolify on branch `shooting`:
+
 - Uses Traefik as the edge reverse proxy with automated Let's Encrypt SSL.
 - Bridges into the `coolify-shared` network to communicate with external databases and proxy services.
 - Configured with multi-container services (`api1`, `api2`, `api3`, `nginx`, `prometheus`, `grafana`, `db-init`).
 
 To trigger a redeployment from the command line on the server:
+
 ```bash
 docker compose -f /data/coolify/applications/<app_uuid>/docker-compose.yaml up -d --build
 ```
@@ -278,13 +288,17 @@ docker compose -f /data/coolify/applications/<app_uuid>/docker-compose.yaml up -
 ## Observability
 
 ### Prometheus Metrics
+
 Exposed at `/metrics`:
+
 - `nba_http_requests_total` — Counter partitioned by `method`, `endpoint`, and `status`.
 - `nba_http_request_duration_seconds` — Histogram tracking request latencies.
 - `nba_db_operations_total` — Counter tracking database read/write queries.
 
 ### Grafana Dashboards
+
 Pre-provisioned dashboards in `grafana/dashboards` visualize:
+
 - Request throughput and error rates per endpoint.
 - NGINX cache hit ratio.
 - Latency percentiles (p50, p95, p99).
@@ -305,16 +319,19 @@ swag init -g main.go -o docs
 ## Testing & Load Testing
 
 ### Unit & Integration Tests
+
 ```bash
 go test -v ./...
 ```
 
 ### Advanced Load Testing (`test/loadtest.go`)
+
 The built-in load testing engine simulates high-volume, realistic traffic patterns across edge caches, reverse proxies, and the origin PostgreSQL database.
 
 See the complete [Load Testing Guide](docs/loadtesting.md) for full details.
 
 #### Key Capabilities:
+
 - **Dynamic Query Randomization (`-varyParams`, `-complexity`)**: Permutes combinations of seasons, teams, sort columns, ascending/descending, page sizes, playoff filters, and heavy database relation joins (`include=lineScores,playerGameBasicStats,teamGameAdvStats`).
 - **Cold-Cache Stress Testing (`-cacheBust`)**: Injects unique request nonces to ensure a 100% cache-miss rate for benchmarking raw database execution.
 - **Cache Telemetry Split**: Inspects `CF-Cache-Status` (`HIT`/`MISS`) and `Age` headers to provide separate latency profiles for Edge Cache Hits vs. Origin / Database Misses.
@@ -325,20 +342,20 @@ See the complete [Load Testing Guide](docs/loadtesting.md) for full details.
 
 #### Load Test CLI Flags:
 
-| Flag | Default | Description |
-| :--- | :--- | :--- |
-| `-url` | `http://localhost:5000/api/playeradvancedstats` | Target endpoint or base URL |
-| `-n` | `100` | Number of requests to send |
-| `-c` | `10` | Concurrency level (worker goroutines) |
-| `-varyParams` | `false` | Enable query parameter & filter randomization |
-| `-complexity` | `standard` | Query complexity: `standard` or `high` |
-| `-cacheBust` | `false` | Force 100% cold-cache misses on CDN/proxy |
-| `-benchmarkKey` | `$BENCHMARK_KEY` | Token for `X-Benchmark-Key` header |
-| `-rotateIPs` | `false` | Rotate synthetic client IPs |
-| `-endpointMix` | `""` | Multi-endpoint traffic mix (e.g. `playeradvancedstats:40,playertotals:30,games:30`) |
-| `-pageMix` | `""` | Weighted page mix (e.g. `1-3:60,4-10:30,11-20:10`) |
-| `-retryOnRateLimit` | `false` | Retry 429 responses with backoff |
-| `-log` | `loadtest.log` | Output log file destination |
+| Flag                | Default                                         | Description                                                                         |
+| :------------------ | :---------------------------------------------- | :---------------------------------------------------------------------------------- |
+| `-url`              | `http://localhost:5000/api/playeradvancedstats` | Target endpoint or base URL                                                         |
+| `-n`                | `100`                                           | Number of requests to send                                                          |
+| `-c`                | `10`                                            | Concurrency level (worker goroutines)                                               |
+| `-varyParams`       | `false`                                         | Enable query parameter & filter randomization                                       |
+| `-complexity`       | `standard`                                      | Query complexity: `standard` or `high`                                              |
+| `-cacheBust`        | `false`                                         | Force 100% cold-cache misses on CDN/proxy                                           |
+| `-benchmarkKey`     | `$BENCHMARK_KEY`                                | Token for `X-Benchmark-Key` header                                                  |
+| `-rotateIPs`        | `false`                                         | Rotate synthetic client IPs                                                         |
+| `-endpointMix`      | `""`                                            | Multi-endpoint traffic mix (e.g. `playeradvancedstats:40,playertotals:30,games:30`) |
+| `-pageMix`          | `""`                                            | Weighted page mix (e.g. `1-3:60,4-10:30,11-20:10`)                                  |
+| `-retryOnRateLimit` | `false`                                         | Retry 429 responses with backoff                                                    |
+| `-log`              | `loadtest.log`                                  | Output log file destination                                                         |
 
 #### Example Usage:
 
@@ -380,16 +397,29 @@ go run ./test/loadtest.go \
 
 ## Tech Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| **Language** | Go 1.24 |
-| **HTTP Framework** | Fiber v2 (`valyala/fasthttp`) |
-| **Database** | PostgreSQL 17 (Primary + Read Replicas) |
-| **ORM & Routing** | GORM + `dbresolver` (R/W splitting) |
+| Layer                     | Technology                               |
+| :------------------------ | :--------------------------------------- |
+| **Language**              | Go 1.24                                  |
+| **HTTP Framework**        | Fiber v2 (`valyala/fasthttp`)            |
+| **Database**              | PostgreSQL 17 (Primary + Read Replicas)  |
+| **ORM & Routing**         | GORM + `dbresolver` (R/W splitting)      |
 | **Reverse Proxy / Cache** | NGINX Stable (API caching & round-robin) |
-| **Edge Routing & SSL** | Traefik v3 (Let's Encrypt automated TLS) |
-| **Monitoring** | Prometheus + Grafana |
-| **Scraping** | `goquery` (HTML parsing) |
-| **Documentation** | Swagger 2.0 (`swaggo/swag`) |
-| **Deployment** | Docker, Docker Compose, Coolify |
+| **Edge Routing & SSL**    | Traefik v3 (Let's Encrypt automated TLS) |
+| **Monitoring**            | Prometheus + Grafana                     |
+| **Scraping**              | `goquery` (HTML parsing)                 |
+| **Documentation**         | Swagger 2.0 (`swaggo/swag`)              |
+| **Deployment**            | Docker, Docker Compose, Coolify          |
 
+---
+
+## Verification
+
+• `go test -v ./...` passed in 0.309s.
+• `go build -o NBA_Go .` compiled cleanly.
+• Updated walkthrough: walkthrough.md.
+
+You can run the import via:
+
+```bash
+go run . import-data
+```
