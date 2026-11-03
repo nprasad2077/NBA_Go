@@ -75,8 +75,8 @@ func main() {
 		// importMarkPlayoffGames(db)
 		// slog.Info("🎉 Playoff games marked successfully 🏆")
 
-		importPlayerShotCharts(db)
-		slog.Info("🎉 Player Shot Chart Import completed successfully 🎯")
+		// importPlayerShotCharts(db)
+		// slog.Info("🎉 Player Shot Chart Import completed successfully 🎯")
 
 		slog.Info("🏀 ALL Imports completed successfully ✅ 🙌")
 		return

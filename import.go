@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
-	"fmt"
 
 	"github.com/nprasad2077/NBA_Go/services"
 	"github.com/nprasad2077/NBA_Go/utils"
@@ -60,7 +60,7 @@ func importPlayerTotalsPlayoffsScrape(db *gorm.DB) {
 
 // importGameSchedules fetches and stores game schedules
 func importGameSchedules(db *gorm.DB) {
-	months := []string{"october"}
+	months := []string{"october", "november"}
 
 	for season := 2027; season <= 2027; season++ {
 		log.Printf("--- Starting Game Schedule Import for Season: %d ---", season)
@@ -104,13 +104,13 @@ func importPlayerShotCharts(db *gorm.DB) {
 
 	targetPlayerIDs := []string{
 		"jamesle01", // LeBron James (included in current scrape)
-		// "curryst01",
-		// "jokicni01",
-		// "doncilu01",
-		// "hardeja01",
-		// "irvinky01",
-		// "duranke01",
-		// "youngtr01",
+		"curryst01",
+		"jokicni01",
+		"doncilu01",
+		"hardeja01",
+		"irvinky01",
+		"duranke01",
+		"youngtr01",
 		"gilgesh01",
 		"brunsja01",
 		"edwaran01",
@@ -119,25 +119,42 @@ func importPlayerShotCharts(db *gorm.DB) {
 		"westbru01",
 		"butleji01",
 		"davisan02",
-		// "leonaka01",
+		"leonaka01",
 		"tatumja01",
 		"cunnica01",
 		"wembavi01",
 		"holmgch01",
-		// "lillada01",
-		// "georgpa01",
-		// "thomais02",
+		"lillada01",
+		"georgpa01",
+		"thomais02",
 		"townska01",
-		// "walkeke02",
-		// "bealbr01",
-		// "antetgi01",
-		// "bookede01",
-		// "randlju01",
+		"walkeke02",
+		"bealbr01",
+		"antetgi01",
+		"bookede01",
+		"randlju01",
 		"embiijo01",
-		// "herroty01",
-		// "brownja02",
+		"herroty01",
+		"brownja02",
 		"maxeyty01",
-		// "murraja01",
+		"murraja01",
+		"sengual01",
+		"thompam01",
+		"vanvlfr01",
+		"smithja05",
+		"smartma01",
+		"sheppre01",
+		"adamsst01",
+		"adebaba01",
+		"thompkl01",
+		"flaggco01",
+		"anunoog01",
+		"reaveau01",
+		"willizi01",
+		"barnesc01",
+		"millebr02",
+		"jeromty01",
+		"boozeca02",
 	}
 
 	if len(targetPlayerIDs) == 0 {
@@ -163,7 +180,7 @@ func importPlayerShotCharts(db *gorm.DB) {
 
 // importMarkPlayoffGames marks games as playoff using the dedicated Basketball Reference playoff schedule.
 func importMarkPlayoffGames(db *gorm.DB) {
-	for season := 2005; season <= 2005; season++ {
+	for season := 2001; season <= 2006; season++ {
 		if err := services.FetchAndMarkPlayoffGames(db, season+1); err != nil {
 			log.Printf("playoff marking failed for %d: %v", season, err)
 		}
