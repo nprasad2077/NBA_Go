@@ -54,3 +54,13 @@ NBA_Go
 test/results.log
 
 .envtemp
+
+.agents
+.claude
+.opencode
+.remember
+test/go_test.log
+test/results.log.old
+test/remote_test.log
+./*.log
+**/*.log
