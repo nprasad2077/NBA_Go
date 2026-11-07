@@ -16,3 +16,14 @@ scrape_configs:
     static_configs:
       - targets: ['haproxy-exporter:9101']
     metrics_path: '/metrics'
+
+  # Cloudflare edge cache stats (cmd/cfexporter). Counters only move every
+  # POLL_INTERVAL (5m), so use rate()/increase() windows of at least 10m.
+  - job_name: 'cf-edge'
+    static_configs:
+      - targets: ['cf-exporter:9200']
+
+  # NGINX proxy_cache HIT/MISS per route (nginx/nginxlog-exporter.yml).
+  - job_name: 'nginx-cache'
+    static_configs:
+      - targets: ['nginx-log-exporter:4040']

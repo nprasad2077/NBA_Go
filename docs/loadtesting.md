@@ -41,7 +41,40 @@ The enhanced load tester solves this by introducing:
 
 ---
 
-## Usage Recipes
+## Automated Suite Execution (`test/run_suite.sh`)
+
+Instead of pasting individual commands, you can run all load testing scenarios automatically or execute specific scenarios on demand:
+
+```bash
+# Run the entire suite (all scenarios sequentially)
+./test/run_suite.sh
+
+# Or using Make:
+make loadtest
+
+# Run a quick smoke test with reduced request counts:
+./test/run_suite.sh --quick
+make loadtest-quick
+
+# Run an individual scenario:
+./test/run_suite.sh cold      # Pure Origin / DB stress
+./test/run_suite.sh warm      # Edge Cache delivery benchmark
+./test/run_suite.sh mix       # Multi-endpoint traffic mix
+./test/run_suite.sh variance  # Realistic high-complexity variance
+./test/run_suite.sh legacy    # Fixed-URL page mix
+
+# Run against a different environment or with a benchmark token:
+API_HOST='https://nba.turbo-data.com' BENCHMARK_KEY='your-key' ./test/run_suite.sh
+
+# Cross-compile for Linux to test from a cloud VM (AWS/DigitalOcean):
+make loadtest-build-linux
+```
+
+All run outputs are organized into clean, timestamped folders under `test/results/YYYYMMDD_HHMMSS/`.
+
+---
+
+## Manual CLI Recipes
 
 ### 1. Realistic Traffic with Parameter Variance (Recommended)
 Simulates realistic user traffic with diverse filter permutations across seasons, teams, and sorting:

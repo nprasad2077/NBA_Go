@@ -1,0 +1,6 @@
+# Receives nginx's cache_metrics access log over UDP syslog (:5531) and serves
+# Prometheus metrics on :4040. quay.io publishes a multi-arch (amd64/arm64) tag;
+# the ghcr.io image only has per-arch tags.
+FROM quay.io/martinhelmich/prometheus-nginxlog-exporter:v1.11.0
+COPY nginxlog-exporter.yml /etc/prometheus-nginxlog-exporter.yml
+CMD ["-config-file", "/etc/prometheus-nginxlog-exporter.yml"]

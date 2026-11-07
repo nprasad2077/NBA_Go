@@ -90,9 +90,19 @@ func StartDBPoolMetricsCollector(db *gorm.DB) {
 	if db == nil {
 		return
 	}
+
+	// Initialize series with 0 so Prometheus sees the metric immediately
+	DBPoolWaitCount.WithLabelValues("write").Add(0)
+	DBPoolWaitCount.WithLabelValues("read").Add(0)
+	DBPoolWaitDuration.WithLabelValues("write").Add(0)
+	DBPoolWaitDuration.WithLabelValues("read").Add(0)
+
 	go func() {
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
+
+		var prevWriteWaitCount, prevReadWaitCount int64
+		var prevWriteWaitDuration, prevReadWaitDuration time.Duration
 
 		for range ticker.C {
 			// Write Pool (Sources)
@@ -101,6 +111,15 @@ func StartDBPoolMetricsCollector(db *gorm.DB) {
 				DBPoolOpenConns.WithLabelValues("write").Set(float64(stats.OpenConnections))
 				DBPoolInUseConns.WithLabelValues("write").Set(float64(stats.InUse))
 				DBPoolIdleConns.WithLabelValues("write").Set(float64(stats.Idle))
+
+				if delta := stats.WaitCount - prevWriteWaitCount; delta > 0 {
+					DBPoolWaitCount.WithLabelValues("write").Add(float64(delta))
+					prevWriteWaitCount = stats.WaitCount
+				}
+				if deltaDur := stats.WaitDuration - prevWriteWaitDuration; deltaDur > 0 {
+					DBPoolWaitDuration.WithLabelValues("write").Add(deltaDur.Seconds())
+					prevWriteWaitDuration = stats.WaitDuration
+				}
 			}
 
 			// Read Pool (Replicas)
@@ -109,6 +128,15 @@ func StartDBPoolMetricsCollector(db *gorm.DB) {
 				DBPoolOpenConns.WithLabelValues("read").Set(float64(stats.OpenConnections))
 				DBPoolInUseConns.WithLabelValues("read").Set(float64(stats.InUse))
 				DBPoolIdleConns.WithLabelValues("read").Set(float64(stats.Idle))
+
+				if delta := stats.WaitCount - prevReadWaitCount; delta > 0 {
+					DBPoolWaitCount.WithLabelValues("read").Add(float64(delta))
+					prevReadWaitCount = stats.WaitCount
+				}
+				if deltaDur := stats.WaitDuration - prevReadWaitDuration; deltaDur > 0 {
+					DBPoolWaitDuration.WithLabelValues("read").Add(deltaDur.Seconds())
+					prevReadWaitDuration = stats.WaitDuration
+				}
 			}
 		}
 	}()

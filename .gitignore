@@ -52,6 +52,8 @@ NBA_Go
 
 .env.example
 test/results.log
+test/results/
+test/bin/
 
 .envtemp
 
