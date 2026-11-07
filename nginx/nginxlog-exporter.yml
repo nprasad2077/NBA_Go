@@ -1,0 +1,38 @@
+# prometheus-nginxlog-exporter: turns nginx's cache_metrics log lines (sent over
+# UDP syslog from location /api/) into Prometheus metrics:
+#   nginx_http_response_count_total{method,status,cache_status,route}
+#   nginx_http_response_time_seconds{...}  (histogram)
+# `format` must match `log_format cache_metrics` in nginx.conf.
+listen:
+  port: 4040
+  address: "0.0.0.0"
+  metrics_endpoint: "/metrics"
+
+consul:
+  enable: false
+
+namespaces:
+  - name: nginx
+    format: '"$request" $status $body_bytes_sent "$upstream_cache_status" $request_time'
+    source:
+      syslog:
+        listen_address: "udp://0.0.0.0:5531"
+        format: "rfc3164"
+        tags: ["nginx"]
+    histogram_buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]
+    relabel_configs:
+      # HIT / MISS / EXPIRED / STALE / UPDATING / BYPASS, or "-" when nginx didn't consult the cache.
+      - target_label: cache_status
+        from: upstream_cache_status
+      # Collapse request paths to their /api/<resource>/ prefix so player IDs and
+      # query strings don't create unbounded label cardinality.
+      - target_label: route
+        from: request
+        split: 2
+        matches:
+          # Whole lowercase segment only, so "/api/playerAdvancedStats" can't
+          # collapse to a misleading "/api/player/"; it falls through to "other".
+          - regexp: "^/api/([a-z]+)([/?].*)?$"
+            replacement: "/api/$1/"
+          - regexp: ".*"
+            replacement: "other"

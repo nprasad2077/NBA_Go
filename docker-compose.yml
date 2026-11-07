@@ -38,6 +38,8 @@ services:
       - api1
       - api2
       - api3
+      # nginx resolves the syslog target in nginx.conf once at startup.
+      - nginx-log-exporter
     ports:
       # --- MODIFICATION ---
       # Map container port 8080 to a static HOST port 8081.
@@ -52,6 +54,30 @@ services:
       - '--haproxy.scrape-uri=http://178.105.149.129:7080/;csv'
     ports:
       - "9101:9101"
+    networks:
+      - coolify-shared
+    restart: unless-stopped
+
+  # NGINX proxy_cache HIT/MISS metrics, parsed from access logs sent over syslog.
+  # Internal only: Prometheus scrapes nginx-log-exporter:4040 on the shared network.
+  nginx-log-exporter:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.log-exporter
+    networks:
+      - coolify-shared
+    restart: unless-stopped
+
+  # Cloudflare edge cache metrics, polled from the GraphQL Analytics API.
+  # CF_API_TOKEN needs only Zone > Analytics > Read on space-city.dev; set it in Coolify.
+  cf-exporter:
+    build:
+      context: .
+      dockerfile: cmd/cfexporter/Dockerfile
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      - CF_ZONE_ID=7d69da33a55de2d30a9e68fef097d8d9
+      - CF_HOST=nba.space-city.dev
     networks:
       - coolify-shared
     restart: unless-stopped

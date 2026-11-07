@@ -18,37 +18,62 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
+  "id": 968219299344384,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "id": 100,
-      "title": "⚡ Executive API & Cluster Health KPIs",
-      "type": "row"
+      "title": "\u26a1 Executive API & Cluster Health KPIs",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Rate of inbound requests across all business /api/* endpoints (excluding internal /metrics scrapes)",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "red", "value": 150 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 150
+              }
             ]
           },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 0,
+        "y": 1
+      },
       "id": 1,
       "options": {
         "colorMode": "value",
@@ -56,7 +81,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -65,7 +92,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum(rate(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__rate_interval])) or vector(0)",
           "instant": false,
@@ -78,25 +108,44 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Percentage of 5xx server errors on business API routes",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           },
           "unit": "percent"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 3,
+        "y": 1
+      },
       "id": 2,
       "options": {
         "colorMode": "value",
@@ -104,7 +153,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -113,7 +164,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "((sum(rate(nba_http_requests_total{endpoint=~\"/api/.*\", status=~\"5..\"}[$__rate_interval])) or vector(0)) / (sum(rate(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__rate_interval])) or vector(1))) * 100",
           "instant": false,
@@ -126,25 +180,44 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Percentage of 4xx client errors (e.g. 404, 429, 400) on business API routes",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 2 },
-              { "color": "red", "value": 10 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
             ]
           },
           "unit": "percent"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 6,
+        "y": 1
+      },
       "id": 3,
       "options": {
         "colorMode": "value",
@@ -152,7 +225,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -161,7 +236,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "((sum(rate(nba_http_requests_total{endpoint=~\"/api/.*\", status=~\"4..\"}[$__rate_interval])) or vector(0)) / (sum(rate(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__rate_interval])) or vector(1))) * 100",
           "instant": false,
@@ -174,25 +252,44 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "P95 response latency across all /api/* requests",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 150 },
-              { "color": "red", "value": 500 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 150
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
             ]
           },
           "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 9,
+        "y": 1
+      },
       "id": 4,
       "options": {
         "colorMode": "value",
@@ -200,7 +297,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -209,7 +308,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
           "instant": false,
@@ -222,25 +324,44 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Count of healthy, responding Go API replicas (api1, api2, api3)",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 2 },
-              { "color": "green", "value": 3 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "green",
+                "value": 3
+              }
             ]
           },
           "unit": "none"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 12,
+        "y": 1
+      },
       "id": 5,
       "options": {
         "colorMode": "value",
@@ -248,7 +369,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -257,7 +380,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "count(up{job=\"nba-api\"} == 1)",
           "instant": false,
@@ -270,21 +396,36 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "afxrpob6lpnggc" },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "afxrpob6lpnggc"
+      },
       "description": "Total games cataloged in PostgreSQL via Read HA ingress (:5438)",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "blue", "value": null }]
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
           },
           "unit": "locale"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
       "id": 6,
       "options": {
         "colorMode": "value",
@@ -292,7 +433,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -301,7 +444,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "afxrpob6lpnggc" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "afxrpob6lpnggc"
+          },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
@@ -313,18 +459,516 @@
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
-      "id": 200,
-      "title": "🌐 API Health & Endpoint Traffic Dynamics (/api/games, /api/playertotals, etc.)",
-      "type": "row"
+      "id": 30,
+      "title": "Total Box Scores (PostgreSQL)",
+      "description": "Total player basic box scores recorded in PostgreSQL",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 1
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "afxrpob6lpnggc"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "afxrpob6lpnggc"
+          },
+          "rawSql": "SELECT count(*) AS total_box_scores FROM player_game_basic_stats;",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#73BF69",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      }
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "id": 31,
+      "title": "Proxy Cache Hit Ratio %",
+      "description": "Overall NGINX proxy_cache HIT ratio across all /api/ requests",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "((sum(rate(nginx_http_response_count_total{cache_status=\"HIT\"}[$__rate_interval]))) / (sum(rate(nginx_http_response_count_total{cache_status=~\"HIT|MISS|EXPIRED|STALE|UPDATING\"}[$__rate_interval])))) * 100",
+          "legendFormat": "Hit %",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": null
+              },
+              {
+                "color": "#E02F44",
+                "value": 0.001
+              },
+              {
+                "color": "#FF780A",
+                "value": 50
+              },
+              {
+                "color": "#73BF69",
+                "value": 75
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100,
+          "noValue": "\u2014"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 150,
+      "title": "\ud83d\ude80 Edge & Ingress Caching (Cloudflare CDN + NGINX proxy_cache)",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "panels": []
+    },
+    {
+      "id": 32,
+      "title": "NGINX Cache Hit Ratio (%)",
+      "description": "Percentage of /api/ requests served directly from NGINX local memory/disk cache without hitting backend replicas",
+      "type": "gauge",
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "((sum(rate(nginx_http_response_count_total{cache_status=\"HIT\"}[$__rate_interval]))) / (sum(rate(nginx_http_response_count_total{cache_status=~\"HIT|MISS|EXPIRED|STALE|UPDATING\"}[$__rate_interval])))) * 100",
+          "legendFormat": "NGINX Hit Ratio",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#E02F44",
+                "value": null
+              },
+              {
+                "color": "#FF780A",
+                "value": 50
+              },
+              {
+                "color": "#73BF69",
+                "value": 75
+              }
+            ]
+          },
+          "noValue": "\u2014"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 33,
+      "title": "Cloudflare Edge Cache Hit Ratio (%)",
+      "description": "Percentage of edge requests absorbed by Cloudflare global CDN points of presence",
+      "type": "gauge",
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "((sum(rate(cf_edge_requests_total{status=\"hit\"}[10m]))) / (sum(rate(cf_edge_requests_total[10m])))) * 100",
+          "legendFormat": "CF Edge Hit %",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#E02F44",
+                "value": null
+              },
+              {
+                "color": "#FF780A",
+                "value": 50
+              },
+              {
+                "color": "#73BF69",
+                "value": 75
+              }
+            ]
+          },
+          "noValue": "\u2014"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 34,
+      "title": "NGINX Cache Status Rate by Route (Stacked)",
+      "description": "Inbound requests per second broken down by route prefix and cache outcome (HIT, MISS, BYPASS, EXPIRED)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (cache_status, route) (rate(nginx_http_response_count_total[$__rate_interval]))",
+          "legendFormat": "{{route}} [{{cache_status}}]",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "fillOpacity": 35,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "title": "NGINX Upstream Response Time: Cache Hit vs Miss",
+      "description": "P95 latency comparison between requests fulfilled from cache and requests passed to backend replicas",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le, cache_status) (rate(nginx_http_response_time_seconds_bucket[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 [{{cache_status}}]",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "auto"
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 36,
+      "title": "Cloudflare Edge Requests by Status",
+      "description": "Cloudflare CDN edge request volume polled from GraphQL Analytics API (hit, miss, dynamic)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (status) (rate(cf_edge_requests_total[10m]))",
+          "legendFormat": "{{status}}",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 15
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 37,
+      "title": "Cloudflare Edge Bandwidth (Bytes/sec by Status)",
+      "description": "Egress bandwidth served at Cloudflare edge vs origin fetch bytes",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (status) (rate(cf_edge_bytes_total[10m]))",
+          "legendFormat": "{{status}}",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 15
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 200,
+      "title": "\ud83c\udf10 API Health & Endpoint Traffic Dynamics (/api/games, /api/playertotals, etc.)",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Throughput broken down by API route (/api/games/, /api/playertotals/, /api/playeradvancedstats/, /api/playershotchart/)",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -338,26 +982,44 @@
             "pointSize": 5,
             "showPoints": "auto",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
           },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
       "id": 7,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (endpoint) (rate(nba_http_requests_total{endpoint=~\"$endpoint\", endpoint=~\"/api/.*\"}[$__rate_interval]))",
           "legendFormat": "{{endpoint}}",
@@ -369,11 +1031,16 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "HTTP status codes across all API traffic",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "req/sec",
             "axisPlacement": "auto",
@@ -381,43 +1048,104 @@
             "fillOpacity": 30,
             "lineInterpolation": "linear",
             "lineWidth": 1,
-            "stacking": { "group": "A", "mode": "normal" }
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
           },
           "unit": "reqps"
         },
         "overrides": [
           {
-            "matcher": { "id": "byRegexp", "options": ".*2..*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*2..*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": ".*3..*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*3..*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": ".*4..*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*4..*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": ".*5..*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*5..*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
       "id": 8,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull"],
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (status) (rate(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__rate_interval]))",
           "legendFormat": "HTTP {{status}}",
@@ -429,62 +1157,171 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Comprehensive comparative telemetry breakdown across all registered /api/* endpoints",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "align": "auto",
-            "cellOptions": { "type": "auto" },
+            "cellOptions": {
+              "type": "auto"
+            },
             "inspect": false
           },
           "mappings": []
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "P95 Latency (ms)" },
+            "matcher": {
+              "id": "byName",
+              "options": "P95 Latency (ms)"
+            },
             "properties": [
-              { "id": "unit", "value": "ms" },
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "noValue",
+                "value": "\u2014"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "nan",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "gray"
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "gray"
+                      }
+                    }
+                  }
+                ]
+              },
               {
                 "id": "thresholds",
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    { "color": "green", "value": null },
-                    { "color": "yellow", "value": 150 },
-                    { "color": "red", "value": 500 }
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 150
+                    },
+                    {
+                      "color": "red",
+                      "value": 500
+                    }
                   ]
                 }
               },
-              { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Throughput (req/s)" },
+            "matcher": {
+              "id": "byName",
+              "options": "Throughput (req/s)"
+            },
             "properties": [
-              { "id": "unit", "value": "reqps" }
+              {
+                "id": "unit",
+                "value": "reqps"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Total Requests" },
+            "matcher": {
+              "id": "byName",
+              "options": "Total Requests"
+            },
             "properties": [
-              { "id": "unit", "value": "locale" }
+              {
+                "id": "unit",
+                "value": "locale"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
             ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
       "id": 26,
       "options": {
         "cellHeight": "sm",
-        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true,
-        "sortBy": [{ "desc": true, "displayName": "Throughput (req/s)" }]
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Throughput (req/s)"
+          }
+        ]
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (endpoint) (rate(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__rate_interval]))",
           "format": "table",
@@ -494,9 +1331,12 @@
           "refId": "Throughput (req/s)"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, endpoint) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
+          "expr": "histogram_quantile(0.95, sum by (le, endpoint) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__range]))) * 1000",
           "format": "table",
           "instant": true,
           "legendFormat": "{{endpoint}}",
@@ -504,9 +1344,12 @@
           "refId": "P95 Latency (ms)"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
-          "expr": "sum by (endpoint) (increase(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__range]))",
+          "expr": "round(sum by (endpoint) (increase(nba_http_requests_total{endpoint=~\"/api/.*\"}[$__range])))",
           "format": "table",
           "instant": true,
           "legendFormat": "{{endpoint}}",
@@ -514,7 +1357,7 @@
           "refId": "Total Requests"
         }
       ],
-      "title": "📊 API Endpoints Performance Matrix (/api/games, /api/playertotals, /api/playeradvancedstats)",
+      "title": "\ud83d\udcca API Endpoints Performance Matrix (/api/games, /api/playertotals, /api/playeradvancedstats)",
       "transformations": [
         {
           "id": "seriesToColumns",
@@ -525,7 +1368,9 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": { "Time": true },
+            "excludeByName": {
+              "Time": true
+            },
             "renameByName": {
               "endpoint": "API Endpoint",
               "Value #Throughput (req/s)": "Throughput (req/s)",
@@ -538,10 +1383,15 @@
       "type": "table"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "Latency (ms)",
             "axisPlacement": "auto",
@@ -552,51 +1402,121 @@
             "pointSize": 5,
             "showPoints": "auto",
             "spanNulls": false,
-            "thresholdsStyle": { "mode": "line" }
+            "thresholdsStyle": {
+              "mode": "line"
+            }
           },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 200 },
-              { "color": "red", "value": 500 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
             ]
           },
           "unit": "ms"
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "P50 Latency" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "P50 Latency"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "P90 Latency" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "P90 Latency"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "P95 Latency" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "P95 Latency"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "P99 Latency" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "P99 Latency"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 39
+      },
       "id": 9,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "histogram_quantile(0.50, sum by (le) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
           "legendFormat": "P50 Latency",
@@ -604,7 +1524,10 @@
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by (le) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
           "legendFormat": "P90 Latency",
@@ -612,7 +1535,10 @@
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
           "legendFormat": "P95 Latency",
@@ -620,7 +1546,10 @@
           "refId": "C"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by (le) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
           "legendFormat": "P99 Latency",
@@ -632,10 +1561,15 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "ms",
             "drawStyle": "line",
@@ -646,20 +1580,34 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 12, "y": 22 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 12,
+        "y": 39
+      },
       "id": 10,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le, endpoint) (rate(nba_http_request_duration_seconds_bucket{endpoint=~\"$endpoint\", endpoint=~\"/api/.*\"}[$__rate_interval]))) * 1000",
           "legendFormat": "{{endpoint}}",
@@ -671,10 +1619,15 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "axisLabel": "req/sec",
             "drawStyle": "bars",
@@ -684,23 +1637,43 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 0.01 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.01
+              }
             ]
           },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 4, "x": 20, "y": 22 },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 39
+      },
       "id": 11,
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (endpoint) (rate(nba_http_requests_total{status=\"429\", endpoint=~\"/api/.*\"}[$__rate_interval])) or vector(0)",
           "legendFormat": "429: {{endpoint}}",
@@ -712,17 +1685,341 @@
       "type": "timeseries"
     },
     {
+      "id": 500,
+      "title": "\u2696\ufe0f Load Balancing & Network Ingress",
+      "type": "row",
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 },
-      "id": 300,
-      "title": "💻 System Health & Host/Container Resources",
-      "type": "row"
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "panels": []
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "req/sec",
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 48
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum by (instance) (rate(nba_http_requests_total{instance=~\"$instance\", endpoint=~\"/api/.*\"}[$__rate_interval]))",
+          "legendFormat": "{{instance}} Load",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "API Traffic per Replica (NGINX Load Balance)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "Inbound and outbound network bandwidth via HAProxy (populated when prometheus-exporter is enabled in haproxy.cfg)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Throughput (Bps)",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineWidth": 2
+          },
+          "unit": "Bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HAProxy Inbound Bandwidth"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HAProxy Outbound Bandwidth"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 48
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(haproxy_frontend_bytes_in_total[$__rate_interval])) or vector(0)",
+          "legendFormat": "HAProxy Inbound Bandwidth",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(haproxy_frontend_bytes_out_total[$__rate_interval])) or vector(0)",
+          "legendFormat": "HAProxy Outbound Bandwidth",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "HAProxy Ingress Network Bandwidth",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Active Sessions",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineWidth": 2
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 16,
+        "y": 48
+      },
+      "id": 24,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(haproxy_frontend_current_sessions) or vector(0)",
+          "legendFormat": "Frontend Sessions",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(haproxy_backend_current_sessions) or vector(0)",
+          "legendFormat": "Backend Sessions",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "HAProxy Active Sessions",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisLabel": "Errors / sec",
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "lineWidth": 2
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.01
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 48
+      },
+      "id": 25,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(haproxy_backend_connection_errors_total[$__rate_interval])) or vector(0)",
+          "legendFormat": "Conn Errors/s",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "HAProxy Connection Errors",
+      "type": "timeseries"
+    },
+    {
+      "id": 300,
+      "title": "\ud83d\udcbb Backend Runtime & Resource Consumption",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "CPU %",
             "drawStyle": "line",
@@ -733,29 +2030,53 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 60 },
-              { "color": "red", "value": 85 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
             ]
           },
           "unit": "percent"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 31 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 57
+      },
       "id": 12,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "rate(process_cpu_seconds_total{instance=~\"$instance\"}[$__rate_interval]) * 100",
           "legendFormat": "{{instance}} CPU %",
@@ -767,10 +2088,15 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "Memory",
             "drawStyle": "line",
@@ -781,20 +2107,35 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 31 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 57
+      },
       "id": 13,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "process_resident_memory_bytes{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} RSS",
@@ -802,7 +2143,10 @@
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "process_virtual_memory_bytes{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} Virtual Mem",
@@ -814,10 +2158,15 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "File Descriptors",
             "drawStyle": "line",
@@ -828,28 +2177,58 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byRegexp", "options": ".*Max.*" },
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*Max.*"
+            },
             "properties": [
-              { "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } },
-              { "id": "color", "value": { "fixedColor": "dark-red", "mode": "fixed" } }
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
             ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 4, "x": 16, "y": 31 },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 16,
+        "y": 57
+      },
       "id": 14,
       "options": {
         "legend": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi" }
+        "tooltip": {
+          "mode": "multi"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "process_open_fds{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} Open FDs",
@@ -857,7 +2236,10 @@
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "process_max_fds{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} Max FDs",
@@ -869,16 +2251,29 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "description": "Scrape health for API Replicas and external infrastructure",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [
             {
               "options": {
-                "0": { "color": "red", "index": 0, "text": "DOWN" },
-                "1": { "color": "green", "index": 1, "text": "UP" }
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "UP"
+                }
               },
               "type": "value"
             }
@@ -886,21 +2281,34 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
             ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 4, "x": 20, "y": 31 },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 57
+      },
       "id": 15,
       "options": {
         "colorMode": "value",
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -908,7 +2316,10 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "up{job=\"nba-api\"}",
           "instant": true,
@@ -917,7 +2328,10 @@
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "up{job=\"haproxy\"}",
           "instant": true,
@@ -930,17 +2344,15 @@
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 39 },
-      "id": 400,
-      "title": "⚙️ Application & Database Health (Go Runtime & PostgreSQL)",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "Goroutines",
             "drawStyle": "line",
@@ -951,20 +2363,35 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 40 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 65
+      },
       "id": 16,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "go_goroutines{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} Goroutines",
@@ -976,10 +2403,15 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "Heap / Alloc",
             "drawStyle": "line",
@@ -990,20 +2422,35 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 40 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 65
+      },
       "id": 17,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "go_memstats_alloc_bytes{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} Heap Alloc",
@@ -1011,7 +2458,10 @@
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "go_memstats_sys_bytes{instance=~\"$instance\"}",
           "legendFormat": "{{instance}} Sys Memory",
@@ -1023,10 +2473,28 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "id": 400,
+      "title": "\ud83d\uddc4\ufe0f PostgreSQL HA Cluster & GORM Connection Pool",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 73
+      },
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "Connections",
             "drawStyle": "line",
@@ -1037,33 +2505,81 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byRegexp", "options": ".*In-Use.*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*In-Use.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": ".*Idle.*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*Idle.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": ".*Open.*" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*Open.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 40 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 74
+      },
       "id": 18,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (pool) (nba_db_pool_open_connections)",
           "legendFormat": "{{pool}} Pool Open",
@@ -1071,7 +2587,10 @@
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (pool) (nba_db_pool_in_use_connections)",
           "legendFormat": "{{pool}} Pool In-Use",
@@ -1079,7 +2598,10 @@
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
           "expr": "sum by (pool) (nba_db_pool_idle_connections)",
           "legendFormat": "{{pool}} Pool Idle",
@@ -1091,10 +2613,15 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisLabel": "Events / Duration (s)",
             "drawStyle": "line",
@@ -1105,30 +2632,48 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 48 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 74
+      },
       "id": 19,
       "options": {
         "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
-          "expr": "sum by (pool) (rate(nba_db_pool_wait_duration_seconds_total[$__rate_interval]))",
+          "expr": "sum by (pool) (rate(nba_db_pool_wait_duration_seconds_total[$__rate_interval])) or vector(0)",
           "legendFormat": "{{pool}} Pool Wait Duration/s",
           "range": true,
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
           "editorMode": "code",
-          "expr": "sum by (pool) (rate(nba_db_pool_wait_count_total[$__rate_interval]))",
+          "expr": "sum by (pool) (rate(nba_db_pool_wait_count_total[$__rate_interval])) or vector(0)",
           "legendFormat": "{{pool}} Pool Wait Count/s",
           "range": true,
           "refId": "B"
@@ -1138,40 +2683,131 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "afxrpob6lpnggc" },
+      "id": 38,
+      "title": "PostgreSQL DB Operations & Queries/sec",
+      "description": "Database operations per second across models (SELECT, INSERT, UPDATE)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 74
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (operation) (rate(nba_db_operations_total[$__rate_interval]))",
+          "legendFormat": "{{operation}}",
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "auto"
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "afxrpob6lpnggc"
+      },
       "description": "Top 10 tables by disk footprint and catalog row counts (via WAL-replicated pg_class.reltuples on read replicas)",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "align": "auto",
-            "cellOptions": { "type": "auto" },
+            "cellOptions": {
+              "type": "auto"
+            },
             "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "row_count" },
-            "properties": [{ "id": "unit", "value": "locale" }]
+            "matcher": {
+              "id": "byName",
+              "options": "row_count"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "locale"
+              }
+            ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 10, "x": 8, "y": 48 },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 82
+      },
       "id": 20,
       "options": {
         "cellHeight": "sm",
-        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true,
-        "sortBy": [{ "desc": true, "displayName": "row_count" }]
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "row_count"
+          }
+        ]
       },
       "targets": [
         {
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "afxrpob6lpnggc" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "afxrpob6lpnggc"
+          },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
@@ -1183,31 +2819,52 @@
       "type": "table"
     },
     {
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "afxrpob6lpnggc" },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "afxrpob6lpnggc"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 90 },
-              { "color": "green", "value": 98 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 90
+              },
+              {
+                "color": "green",
+                "value": 98
+              }
             ]
           },
           "unit": "percent"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 48 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 82
+      },
       "id": 21,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1216,7 +2873,10 @@
       },
       "targets": [
         {
-          "datasource": { "type": "grafana-postgresql-datasource", "uid": "afxrpob6lpnggc" },
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "afxrpob6lpnggc"
+          },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
@@ -1226,218 +2886,34 @@
       ],
       "title": "Postgres Buffer Cache Hit Ratio %",
       "type": "gauge"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 56 },
-      "id": 500,
-      "title": "🌐 Networking & Traffic Distribution",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisLabel": "req/sec",
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 57 },
-      "id": 22,
-      "options": {
-        "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "editorMode": "code",
-          "expr": "sum by (instance) (rate(nba_http_requests_total{instance=~\"$instance\", endpoint=~\"/api/.*\"}[$__rate_interval]))",
-          "legendFormat": "{{instance}} Load",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "API Traffic per Replica (NGINX Load Balance)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "description": "Inbound and outbound network bandwidth via HAProxy (populated when prometheus-exporter is enabled in haproxy.cfg)",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisLabel": "Throughput (Bps)",
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "lineWidth": 2
-          },
-          "unit": "Bps"
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "HAProxy Inbound Bandwidth" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
-          },
-          {
-            "matcher": { "id": "byName", "options": "HAProxy Outbound Bandwidth" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }]
-          }
-        ]
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 57 },
-      "id": 23,
-      "options": {
-        "legend": {
-          "calcs": ["mean", "lastNotNull", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "editorMode": "code",
-          "expr": "sum(rate(haproxy_frontend_bytes_in_total[$__rate_interval])) or vector(0)",
-          "legendFormat": "HAProxy Inbound Bandwidth",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "editorMode": "code",
-          "expr": "sum(rate(haproxy_frontend_bytes_out_total[$__rate_interval])) or vector(0)",
-          "legendFormat": "HAProxy Outbound Bandwidth",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "HAProxy Ingress Network Bandwidth",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisLabel": "Active Sessions",
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "lineWidth": 2
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 4, "x": 16, "y": 57 },
-      "id": 24,
-      "options": {
-        "legend": {
-          "calcs": ["lastNotNull", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi" }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "editorMode": "code",
-          "expr": "sum(haproxy_frontend_current_sessions) or vector(0)",
-          "legendFormat": "Frontend Sessions",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "editorMode": "code",
-          "expr": "sum(haproxy_backend_current_sessions) or vector(0)",
-          "legendFormat": "Backend Sessions",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "HAProxy Active Sessions",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "custom": {
-            "axisLabel": "Errors / sec",
-            "drawStyle": "line",
-            "fillOpacity": 30,
-            "lineWidth": 2
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 0.01 }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 4, "x": 20, "y": 57 },
-      "id": 25,
-      "options": {
-        "legend": {
-          "calcs": ["mean", "max"],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi" }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "editorMode": "code",
-          "expr": "sum(rate(haproxy_backend_connection_errors_total[$__rate_interval])) or vector(0)",
-          "legendFormat": "Conn Errors/s",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "HAProxy Connection Errors",
-      "type": "timeseries"
     }
   ],
   "refresh": "10s",
   "schemaVersion": 41,
-  "tags": ["nba", "api", "postgres", "prometheus", "production", "networking"],
+  "tags": [
+    "nba",
+    "api",
+    "postgres",
+    "prometheus",
+    "production",
+    "networking",
+    "caching"
+  ],
   "templating": {
     "list": [
       {
-        "allValue": ".*",
-        "current": { "selected": true, "text": "All Replicas", "value": "$__all" },
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "definition": "label_values(nba_http_requests_total, instance)",
         "hide": 0,
         "includeAll": true,
-        "label": "Replica Instance",
         "multi": true,
         "name": "instance",
         "options": [],
@@ -1453,13 +2929,18 @@
         "type": "query"
       },
       {
-        "allValue": "/api/.*",
-        "current": { "selected": true, "text": "All API Endpoints", "value": "$__all" },
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "definition": "label_values(nba_http_requests_total{endpoint=~\"/api/.*\"}, endpoint)",
         "hide": 0,
         "includeAll": true,
-        "label": "API Endpoint",
         "multi": true,
         "name": "endpoint",
         "options": [],
@@ -1477,7 +2958,7 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -1495,7 +2976,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "NBA Go - Production Health & Observability",
-  "uid": "nba-production-health",
-  "version": 2
+  "title": "NBA Go - Production Health & Observability 2",
+  "uid": "nba-production-health-2",
+  "version": 3
 }
