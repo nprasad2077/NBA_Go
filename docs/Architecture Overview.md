@@ -93,7 +93,7 @@ Updated: 2026-10-21
    - `StructuredLogger` captures incoming request context.
    - `RateLimiter` inspects `X-Real-IP` (limit 20 req/min per container unless internal IP or `X-Benchmark-Key` provided).
    - `MetricsMiddleware` increments `nba_http_requests_total` and starts latency timer.
-   - `EdgeCache(Immutable, "nba-games")` adds headers: `Cache-Control: public, max-age=86400, s-maxage=2592000, immutable` and `Cache-Tag: nba-games`.
+   - `EdgeCache(SemiDynamic, "nba-games")` adds headers: `Cache-Control: public, max-age=60, s-maxage=86400, stale-while-revalidate=600` and `Cache-Tag: nba-games`.
 3. **Controller (`controllers.GetGames` in `controllers/game_controller.go:176`)**:
    - Resolves team abbreviation `LAL` to `Los Angeles Lakers` via `utils.GetFullName`.
    - Constructs GORM query: filters `WHERE (visitor_team = ? OR home_team = ?) AND date = ?`.

@@ -11,6 +11,6 @@ func RegisterGameRoutes(app *fiber.App, db *gorm.DB) {
 	// Create a new group for game-related endpoints
 	api := app.Group("/api/games")
 
-	// Register the GET endpoint to fetch games with immutable edge caching
-	api.Get("/", middleware.EdgeCache(middleware.Immutable, "nba-games"), controllers.GetGames(db))
+	// Register the GET endpoint to fetch games with semi-dynamic edge caching (1-day edge TTL)
+	api.Get("/", middleware.EdgeCache(middleware.SemiDynamic, "nba-games"), controllers.GetGames(db))
 }

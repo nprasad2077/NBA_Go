@@ -72,11 +72,11 @@ func main() {
 		importBoxScores(db)
 		slog.Info("🎉 Related Box Score Imports completed successfully 📦")
 
-		importMarkPlayoffGames(db)
-		slog.Info("🎉 Playoff games marked successfully 🏆")
+		// importMarkPlayoffGames(db)
+		// slog.Info("🎉 Playoff games marked successfully 🏆")
 
-		importPlayerShotCharts(db)
-		slog.Info("🎉 Player Shot Chart Import completed successfully 🎯")
+		// importPlayerShotCharts(db)
+		// slog.Info("🎉 Player Shot Chart Import completed successfully 🎯")
 
 		slog.Info("🏀 ALL Imports completed successfully ✅ 🙌")
 		return
